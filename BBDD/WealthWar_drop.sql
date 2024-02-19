@@ -1,17 +1,17 @@
---Eliminación tabla Jugador
-DROP TABLE Jugador();
+-- Drop Player table
+DROP TABLE Player;
 
---Eliminación tabla Partida
-DROP TABLE Partida();
+-- Drop Game table
+DROP TABLE Game;
 
---Eliminación tabla Logro
-DROP TABLE Logro();
+-- Drop Achievement table
+DROP TABLE Achievement;
 
---Eliminación tabla Consigue
-DROP TABLE Consigue();
+-- Drop Obtains table
+DROP TABLE Obtains;
 
---Eliminación tabla Compuesta
-DROP TABLE Compuesta();
+-- Drop Compound table
+DROP TABLE Compound;
 
---Eliminación tabla Amigo
-DROP TABLE Amigo();
+-- Drop Friend table
+DROP TABLE Friend;

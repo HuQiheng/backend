@@ -1,53 +1,53 @@
---Creación tabla Jugador
-CREATE TABLE Jugador
+-- Player table creation
+CREATE TABLE Player
 (
-   correo CHAR(50) PRIMARY KEY,
-   nombreUsuario CHAR(20) NOT NULL,
-   contrasenya CHAR(20) NOT NULL
+   email CHAR(50) PRIMARY KEY,
+   username CHAR(20) NOT NULL,
+   password CHAR(20) NOT NULL
 );
 
---Creación tabla Partida
-CREATE TABLE Partida
+-- Game table creation
+CREATE TABLE Game
 (
-   claveAcceso CHAR(20) PRIMARY KEY,
+   accessKey CHAR(20) PRIMARY KEY,
    ranking CHAR(90) NOT NULL,
-   fecha DATE NOT NULL
+   date DATE NOT NULL
 );
 
---Creación tabla Logro
-CREATE TABLE Logro
+-- Achievement table creation
+CREATE TABLE Achievement
 (
-   titulo CHAR(30) PRIMARY KEY,
-   descripcion CHAR(60) NOT NULL
+   title CHAR(30) PRIMARY KEY,
+   description CHAR(60) NOT NULL
 );
 
---Creación tabla Consigue
-CREATE TABLE Consigue
+-- Obtains table creation
+CREATE TABLE Obtains
 (
-   obtenido BOOLEAN NOT NULL,
-   Logros_titulo CHAR(30),
-   Jugador_correo CHAR(50),
-   PRIMARY KEY (Logros_titulo,Jugador_correo),
-   FOREIGN KEY (Logros_titulo) REFERENCES Logros(titulo),
-   FOREIGN KEY (Jugador_correo) REFERENCES Jugador(correo)
+   obtained BOOLEAN NOT NULL,
+   Achievements_title CHAR(30),
+   Players_email CHAR(50),
+   PRIMARY KEY (Achievements_title, Players_email),
+   FOREIGN KEY (Achievements_title) REFERENCES Achievement(title),
+   FOREIGN KEY (Players_email) REFERENCES Player(email)
 );
 
---Creación tabla Compuesta
-CREATE TABLE Compuesta
+-- Compound table creation
+CREATE TABLE Compound
 (
-   Jugador_correo CHAR(50),
-   Partida_claveAcceso CHAR(20),
-   PRIMARY KEY (Jugador_correo,Partida_claveAcceso),
-   FOREIGN KEY (Jugador_correo) REFERENCES Jugador(correo),
-   FOREIGN KEY (Partida_claveAcceso) REFERENCES Partida(claveAcceso)
+   Players_email CHAR(50),
+   Games_accessKey CHAR(20),
+   PRIMARY KEY (Players_email, Games_accessKey),
+   FOREIGN KEY (Players_email) REFERENCES Player(email),
+   FOREIGN KEY (Games_accessKey) REFERENCES Game(accessKey)
 );
 
---Creación tabla Amigo
-CREATE TABLE Amigo
+-- Friend table creation
+CREATE TABLE Friend
 (
-   Jugador_correo CHAR(50),
-   Jugador_correo CHAR(50),
-   PRIMARY KEY (Jugador_correo,Jugador_correo),
-   FOREIGN KEY (Jugador_correo) REFERENCES Jugador(correo),
-   FOREIGN KEY (Jugador_correo) REFERENCES Jugador(correo)
+   Player_email1 CHAR(50),
+   Player_email2 CHAR(50),
+   PRIMARY KEY (Player_email1, Player_email2),
+   FOREIGN KEY (Player_email1) REFERENCES Player(email),
+   FOREIGN KEY (Player_email2) REFERENCES Player(email)
 );
