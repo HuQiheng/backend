@@ -53,6 +53,17 @@ class PlayerDAO {
             throw error;
         }
     }
+    async verificarCredenciales(playerVO) {
+        const query = 'SELECT * FROM Player WHERE email = $1 AND password = $2';
+        const values = [email, password];
+        try {
+            const res = await pool.query(query, values);
+            return res.rowCount == 1; // Devuelve true si hay una fila que cumple las condiciones
+        } catch (err) {
+            console.error('Error al verificar las credenciales del usuario:', err);
+            throw err;
+        }
+    }
 }
 
 module.exports = PlayerDAO;
