@@ -1,29 +1,30 @@
-const { db, closeDb } = require("./ConnectionManager");
+const { dbConnect, dbClose } = require("./ConnectionManager");
 const AchievementVO = require('./AchievementVO');
 
 class AchievementDAO {
-    async insert(achievementVO) {
+    async insert(AchievementVO) {
         try {
             const query = `INSERT INTO achievement (name, description) VALUES(?, ?)`;
-            const values = [achievementVO.name, achievementVO.description];
-            const result = await db.query(query, values);
+            const values = [AchievementVO.name, AchievementVO.description];
+            const client = await dbConnect();
+            const result = await client.query(query, values);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            dbClose(client);
         }
     }
 
     async selectAll() {
         try {
             const query = `SELECT * FROM achievement`;
-            const result = await db.query(query);
+            const result = await dbConnect.query(query);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            dbClose();
         }
     }
 
@@ -33,21 +34,21 @@ class AchievementDAO {
     async remove(id) {
         try {
             const query = `DELETE FROM achievement WHERE id = ?`;
-            const result = await db.query(query, [id]);
+            const result = await dbConnect.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            dbClose();
         }
     }
 
-    async update(achievementVO) {
+    async update(AchievementVO) {
         try {
             const query = `UPDATE achievement SET name = ?, description = ? WHERE id = ?`;
-            const values = [achievementVO.name, achievementVO.description
-                , achievementVO.id];
-            const result = await db.query(query, values);
+            const values = [AchievementVO.name, AchievementVO.description
+                , AchievementVO.id];
+            const result = await dbConnect.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error('No se ha podido actualizar el achievement');
             } else {
@@ -56,7 +57,7 @@ class AchievementDAO {
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            dbClose();
         }
     }
 };
