@@ -1,4 +1,4 @@
-name: Node.js backedn to production
+name: Node.js backend to production
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['16.x','18.x','20.x']
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -44,4 +44,3 @@ jobs:
           mv /var/backend/temp backend/* /var/www/backend
           cd /var/www/backend
           npm install --production
-          npm start
