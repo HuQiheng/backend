@@ -41,6 +41,6 @@ jobs:
         script: |
           rm -rf /var/www/backend
           mkdir /var/www/backend
-          mv /var/backend/temp backend/* /var/www/backend
+          mv /var/backend/temp/backend/* /var/www/backend
           cd /var/www/backend
           npm install --production
