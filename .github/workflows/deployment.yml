@@ -31,7 +31,7 @@ jobs:
         target: /var/backend/temp
         
     - name: Install dependencies and start the server
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
