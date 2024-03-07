@@ -19,12 +19,13 @@ class AchievementDAO {
     async selectAll() {
         try {
             const query = `SELECT * FROM achievement`;
+            client = await dbConnect();
             const result = await dbConnect.query(query);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            dbClose();
+            dbClose(client);
         }
     }
 
@@ -34,12 +35,13 @@ class AchievementDAO {
     async remove(id) {
         try {
             const query = `DELETE FROM achievement WHERE id = ?`;
+            client = await dbConnect();
             const result = await dbConnect.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            dbClose();
+            dbClose(client);
         }
     }
 
@@ -48,6 +50,7 @@ class AchievementDAO {
             const query = `UPDATE achievement SET name = ?, description = ? WHERE id = ?`;
             const values = [AchievementVO.name, AchievementVO.description
                 , AchievementVO.id];
+            client = await dbConnect();    
             const result = await dbConnect.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error('No se ha podido actualizar el achievement');
@@ -57,7 +60,7 @@ class AchievementDAO {
         } catch (error) {
             throw error;
         } finally {
-            dbClose();
+            dbClose(client);
         }
     }
 };
