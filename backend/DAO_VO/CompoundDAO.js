@@ -2,24 +2,34 @@ const { db, closeDb } = require("./ConnectionManager");
 const CompoundVO = require('./CompoundVO');
 
 class CompoundDAO{
-    async insert(compoundVO){
+    async insert(CompoundVO){
         try{
             const query = `INSERT INTO compound (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [compoundVO.name, compoundVO.description, compoundVO.price, compoundVO.rating, compoundVO.releaseDate];
+            const values = [CompoundVO.name, CompoundVO.description, CompoundVO.price, CompoundVO.rating, CompoundVO.releaseDate];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb(client);
         }
     }
-    async update(compoundVO){
+    async update(CompoundVO){
         try{
             const query = `UPDATE compound SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [compoundVO.name, compoundVO.description, compoundVO.price, compoundVO.rating, compoundVO.releaseDate, compoundVO.id];
+            const values = [CompoundVO.name, CompoundVO.description, CompoundVO.price, CompoundVO.rating, CompoundVO.releaseDate, CompoundVO.id];
             const result = await db.query(query, values);
+            if (!result || !Array.isArray(result) || result.length === 0) {
+                throw new Error('No se ha podido actualizar el Compound');
+            } else {
+                return this._buildCompoundVO(result[0]);
+            }
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async delete(id){
@@ -29,6 +39,8 @@ class CompoundDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async select(id){
@@ -38,6 +50,8 @@ class CompoundDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async selectAll(){
@@ -47,6 +61,8 @@ class CompoundDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
 };

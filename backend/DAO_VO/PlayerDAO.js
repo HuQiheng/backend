@@ -2,25 +2,34 @@ const { db, closeDb } = require("./ConnectionManager");
 const PlayerVO = require('./PlayerVO');
 
 class PlayerDAO {
-    async insert(playerVO) {
+    async insert(PlayerVO) {
         try {
             const query = `INSERT INTO player (name, age, position) VALUES (?, ?, ?)`;
-            const values = [playerVO.name, playerVO.age, playerVO.position];
+            const values = [PlayerVO.name, PlayerVO.age, PlayerVO.position];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
         } catch (error) {
             throw error;
+        } finally {
+            closeDb(client);
         }
     }
 
-    async update(playerVO) {
+    async update(PlayerVO) {
         try {
             const query = `UPDATE player SET name = ?, age = ?, position = ? WHERE id = ?`;
-            const values = [playerVO.name, playerVO.age, playerVO.position, playerVO.id];
+            const values = [PlayerVO.name, PlayerVO.age, PlayerVO.position, PlayerVO.id];
             const result = await db.query(query, values);
-            return result;
+            if (!result || !Array.isArray(result) || result.length === 0) {
+                throw new Error('No se ha podido actualizar el Player');
+            } else {
+                return this._buildPlayerVO(result[0]);
+            }
         } catch (error) {
             throw error;
+        } finally {
+            closeDb();
         }
     }
 
@@ -31,6 +40,8 @@ class PlayerDAO {
             return result;
         } catch (error) {
             throw error;
+        } finally {
+            closeDb();
         }
     }
 
@@ -41,6 +52,8 @@ class PlayerDAO {
             return result;
         } catch (error) {
             throw error;
+        } finally {
+            closeDb();
         }
     }
 
@@ -51,6 +64,8 @@ class PlayerDAO {
             return result;
         } catch (error) {
             throw error;
+        } finally {
+            closeDb();
         }
     }
 }

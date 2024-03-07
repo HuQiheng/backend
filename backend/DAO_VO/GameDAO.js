@@ -2,24 +2,33 @@ const { db, closeDb } = require("./ConnectionManager");
 const GameVO = require('./GameVO');
 
 class GameDAO{
-    async insert(gameVO){
+    async insert(GameVO){
         try{
             const query = `INSERT INTO game (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [gameVO.name, gameVO.description, gameVO.price, gameVO.rating, gameVO.releaseDate];
+            const values = [GameVO.name, GameVO.description, GameVO.price, GameVO.rating, GameVO.releaseDate];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb(client);
         }
     }
-    async update(gameVO){
+    async update(GameVO){
         try{
             const query = `UPDATE game SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [gameVO.name, gameVO.description, gameVO.price, gameVO.rating, gameVO.releaseDate, gameVO.id];
+            const values = [GameVO.name, GameVO.description, GameVO.price, GameVO.rating, GameVO.releaseDate, GameVO.id];
             const result = await db.query(query, values);
-            return result;
+            if (!result || !Array.isArray(result) || result.length === 0) {
+                throw new Error(`No game found with id ${GameVO.id}`);
+            } else {
+                return result[0];
+            }
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async delete(id){
@@ -29,6 +38,8 @@ class GameDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async select(id){
@@ -38,6 +49,8 @@ class GameDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
     async selectAll(){
@@ -47,6 +60,8 @@ class GameDAO{
             return result;
         }catch(error){
             throw error;
+        } finally {
+            closeDb();
         }
     }
 }

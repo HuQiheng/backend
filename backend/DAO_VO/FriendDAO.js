@@ -2,16 +2,17 @@ const { db, closeDb } = require("./ConnectionManager");
 const FriendVO = require('./FriendVO');
 
 class FriendDAO {
-    async insert(friendVO) {
+    async insert(FriendVO) {
         try {
             const query = `INSERT INTO friend (name, email) VALUES(?, ?)`; // 1.2.3.4       
-            const values = [friendVO.name, friendVO.email];
+            const values = [FriendVO.name, FriendVO.email];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 

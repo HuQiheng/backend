@@ -2,16 +2,17 @@ const { db, closeDb } = require("./ConnectionManager");
 const ObtainsVO = require('./ObtainsVO');
 
 class ObtainsDAO {
-    async insert(obtainsVO) {
+    async insert(ObtainsVO) {
         try {
             const query = `INSERT INTO obtains (gameId, playerId) VALUES(?, ?)`;
-            const values = [obtainsVO.gameId, obtainsVO.playerId];
+            const values = [ObtainsVO.gameId, ObtainsVO.playerId];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
@@ -42,13 +43,13 @@ class ObtainsDAO {
         }
     }
 
-    async update(obtainsVO) {
+    async update(ObtainsVO) {
         try {
             const query = `UPDATE obtains SET gameId = ?, playerId = ? WHERE id = ?`;
-            const values = [obtainsVO.gameId, obtainsVO.playerId, obtainsVO.id];
+            const values = [ObtainsVO.gameId, ObtainsVO.playerId, ObtainsVO.id];
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
-                throw new Error(`No se ha podido actualizar el obtains con id ${obtainsVO.id}`);
+                throw new Error(`No se ha podido actualizar el obtains con id ${ObtainsVO.id}`);
             } else {
                 return result;
             }
