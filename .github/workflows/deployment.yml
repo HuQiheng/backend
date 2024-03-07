@@ -42,5 +42,5 @@ jobs:
           mv /var/backend/temp/backend/* /var/www/backend
           echo "ENV_VAR=${{ secrets.ENV_VAR }}" > /var/www/backend/.env
           cd /var/www/backend
-          npm install --production
+          npm install --omit=dev
           node app.js
