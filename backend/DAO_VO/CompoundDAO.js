@@ -19,6 +19,7 @@ class CompoundDAO{
         try{
             const query = `UPDATE compound SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
             const values = [CompoundVO.name, CompoundVO.description, CompoundVO.price, CompoundVO.rating, CompoundVO.releaseDate, CompoundVO.id];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error('No se ha podido actualizar el Compound');
@@ -29,40 +30,43 @@ class CompoundDAO{
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async delete(id){
         try{
             const query = `DELETE FROM compound WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async select(id){
         try{
             const query = `SELECT * FROM compound WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async selectAll(){
         try{
             const query = `SELECT * FROM compound`;
+            const client = await dbConnect();
             const result = await db.query(query);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 };

@@ -19,12 +19,13 @@ class FriendDAO {
     async selectAll() {
         try {
             const query = `SELECT * FROM friend`;
+            const client = await dbConnect();
             const result = await db.query(query);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     
@@ -34,12 +35,13 @@ class FriendDAO {
     async remove(id) {
         try {
             const query = `DELETE FROM friend WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 };

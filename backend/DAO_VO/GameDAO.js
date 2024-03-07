@@ -19,6 +19,7 @@ class GameDAO{
         try{
             const query = `UPDATE game SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
             const values = [GameVO.name, GameVO.description, GameVO.price, GameVO.rating, GameVO.releaseDate, GameVO.id];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error(`No game found with id ${GameVO.id}`);
@@ -28,40 +29,43 @@ class GameDAO{
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async delete(id){
         try{
             const query = `DELETE FROM game WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async select(id){
         try{
             const query = `SELECT * FROM game WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
     async selectAll(){
         try{
             const query = `SELECT * FROM game`;
+            const client = await dbConnect();
             const result = await db.query(query);
             return result;
         }catch(error){
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 }
