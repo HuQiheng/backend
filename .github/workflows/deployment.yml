@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js backedn to production
 
 on:
   push:
@@ -11,18 +11,27 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['16.x', '18.x', '20.x']
+        node-version: ['16.x','18.x','20.x']
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
     - run: cd backend && npm ci
     - run: cd backend && npm run build --if-present
-    - name: Deploy to remote server
+    - name: Upload to remote server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        source: backend/*
+        target: /var/backend/temp
+        
+    - name: Install dependencies and start the server
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -30,6 +39,9 @@ jobs:
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd your_directory
-          git pull
+          rm -rf /var/www/backend
+          mkdir /var/www/backend
+          mv /var/backend/temp backend/* /var/www/backend
+          cd /var/www/backend
           npm install --production
+          npm start
