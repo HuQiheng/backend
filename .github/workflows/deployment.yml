@@ -27,7 +27,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        port: ${{ secrets.PORT }}
         source: backend/*
         target: /var/backend/temp
         
@@ -37,7 +36,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        port: ${{ secrets.PORT }}
         script: |
           rm -rf /var/www/backend
           mkdir /var/www/backend
