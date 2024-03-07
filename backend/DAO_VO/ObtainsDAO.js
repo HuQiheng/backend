@@ -19,12 +19,13 @@ class ObtainsDAO {
     async selectAll() {
         try {
             const query = `SELECT * FROM obtains`;
+            const client = await dbConnect();
             const result = await db.query(query);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
@@ -34,12 +35,13 @@ class ObtainsDAO {
     async removeById(id) {
         try {
             const query = `DELETE FROM obtains WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
@@ -47,6 +49,7 @@ class ObtainsDAO {
         try {
             const query = `UPDATE obtains SET gameId = ?, playerId = ? WHERE id = ?`;
             const values = [ObtainsVO.gameId, ObtainsVO.playerId, ObtainsVO.id];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error(`No se ha podido actualizar el obtains con id ${ObtainsVO.id}`);
@@ -56,7 +59,7 @@ class ObtainsDAO {
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }       
 };

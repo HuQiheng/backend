@@ -20,6 +20,7 @@ class PlayerDAO {
         try {
             const query = `UPDATE player SET name = ?, age = ?, position = ? WHERE id = ?`;
             const values = [PlayerVO.name, PlayerVO.age, PlayerVO.position, PlayerVO.id];
+            const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {
                 throw new Error('No se ha podido actualizar el Player');
@@ -29,43 +30,46 @@ class PlayerDAO {
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
     async delete(id) {
         try {
             const query = `DELETE FROM player WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
     async select(id) {
         try {
             const query = `SELECT * FROM player WHERE id = ?`;
+            const client = await dbConnect();
             const result = await db.query(query, [id]);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 
     async selectAll() {
         try {
             const query = `SELECT * FROM player`;
+            const client = await dbConnect();
             const result = await db.query(query);
             return result;
         } catch (error) {
             throw error;
         } finally {
-            closeDb();
+            closeDb(client);
         }
     }
 }
