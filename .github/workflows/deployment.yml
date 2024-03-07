@@ -43,4 +43,4 @@ jobs:
           echo "ENV_VAR=${{ secrets.ENV_VAR }}" > /var/www/backend/.env
           cd /var/www/backend
           npm install --omit=dev
-          npm run build
+          nohup node app.js > /dev/null 2>&1 &
