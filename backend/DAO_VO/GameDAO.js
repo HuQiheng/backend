@@ -4,8 +4,8 @@ const GameVO = require('./GameVO');
 class GameDAO{
     async insert(GameVO){
         try{
-            const query = `INSERT INTO game (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [GameVO.name, GameVO.description, GameVO.price, GameVO.rating, GameVO.releaseDate];
+            const query = `INSERT INTO game (accessKey, ranking, date) VALUES (?, ?, ?)`;
+            const values = [GameVO.accessKey, GameVO.ranking, GameVO.date];
             const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
@@ -17,8 +17,8 @@ class GameDAO{
     }
     async update(GameVO){
         try{
-            const query = `UPDATE game SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [GameVO.name, GameVO.description, GameVO.price, GameVO.rating, GameVO.releaseDate, GameVO.id];
+            const query = `UPDATE game SET accessKey = ?, ranking = ?, date = ? WHERE id = ?`;
+            const values = [GameVO.accessKey, GameVO.ranking, GameVO.date, GameVO.id];
             const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {

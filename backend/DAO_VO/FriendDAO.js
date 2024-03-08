@@ -4,8 +4,8 @@ const FriendVO = require('./FriendVO');
 class FriendDAO {
     async insert(FriendVO) {
         try {
-            const query = `INSERT INTO friend (name, email) VALUES(?, ?)`; // 1.2.3.4       
-            const values = [FriendVO.name, FriendVO.email];
+            const query = `INSERT INTO friend (Player_email1, Player_email2) VALUES(?, ?)`; // 1.2.3.4       
+            const values = [FriendVO.Player_email1, FriendVO.Player_email2];
             const client = await dbConnect();
             const result = await db.query(query, values);
             return result;

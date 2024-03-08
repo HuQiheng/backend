@@ -4,8 +4,8 @@ const CompoundVO = require('./CompoundVO');
 class CompoundDAO{
     async insert(CompoundVO){
         try{
-            const query = `INSERT INTO compound (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [CompoundVO.name, CompoundVO.description, CompoundVO.price, CompoundVO.rating, CompoundVO.releaseDate];
+            const query = `INSERT INTO compound (Players_email, Games_accessKey) VALUES (?, ?)`;
+            const values = [CompoundVO.Players_email, CompoundVO.Games_accessKey];
             const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
@@ -17,8 +17,8 @@ class CompoundDAO{
     }
     async update(CompoundVO){
         try{
-            const query = `UPDATE compound SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [CompoundVO.name, CompoundVO.description, CompoundVO.price, CompoundVO.rating, CompoundVO.releaseDate, CompoundVO.id];
+            const query = `UPDATE compound SET Players_email = ?, Games_accessKey = ? WHERE id = ?`;
+            const values = [CompoundVO.Players_email, CompoundVO.Games_accessKey, CompoundVO.id];
             const client = await dbConnect();
             const result = await db.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {

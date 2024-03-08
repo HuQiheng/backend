@@ -4,8 +4,8 @@ const PlayerVO = require('./PlayerVO');
 class PlayerDAO {
     async insert(PlayerVO) {
         try {
-            const query = `INSERT INTO player (name, age, position) VALUES (?, ?, ?)`;
-            const values = [PlayerVO.name, PlayerVO.age, PlayerVO.position];
+            const query = `INSERT INTO player (email, username, passwd) VALUES (?, ?, ?)`;
+            const values = [PlayerVO.email, PlayerVO.username, PlayerVO.passwd];
             const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
@@ -18,15 +18,11 @@ class PlayerDAO {
 
     async update(PlayerVO) {
         try {
-            const query = `UPDATE player SET name = ?, age = ?, position = ? WHERE id = ?`;
-            const values = [PlayerVO.name, PlayerVO.age, PlayerVO.position, PlayerVO.id];
+            const query = `UPDATE player SET email = ?, username = ?, passwd = ? WHERE id = ?`;
+            const values = [PlayerVO.email, PlayerVO.username, PlayerVO.passwd, PlayerVO.id];
             const client = await dbConnect();
             const result = await db.query(query, values);
-            if (!result || !Array.isArray(result) || result.length === 0) {
-                throw new Error('No se ha podido actualizar el Player');
-            } else {
-                return this._buildPlayerVO(result[0]);
-            }
+            return result;
         } catch (error) {
             throw error;
         } finally {

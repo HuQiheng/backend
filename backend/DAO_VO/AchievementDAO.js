@@ -4,8 +4,8 @@ const AchievementVO = require('./AchievementVO');
 class AchievementDAO {
     async insert(AchievementVO) {
         try {
-            const query = `INSERT INTO achievement (name, description) VALUES(?, ?)`;
-            const values = [AchievementVO.name, AchievementVO.description];
+            const query = `INSERT INTO achievement (title, description) VALUES(?, ?)`;
+            const values = [AchievementVO.title, AchievementVO.description];
             const client = await dbConnect();
             const result = await client.query(query, values);
             return result;
@@ -47,9 +47,8 @@ class AchievementDAO {
 
     async update(AchievementVO) {
         try {
-            const query = `UPDATE achievement SET name = ?, description = ? WHERE id = ?`;
-            const values = [AchievementVO.name, AchievementVO.description
-                , AchievementVO.id];
+            const query = `UPDATE achievement SET title = ?, description = ? WHERE id = ?`;
+            const values = [AchievementVO.title, AchievementVO.description, AchievementVO.id];
             client = await dbConnect();    
             const result = await dbConnect.query(query, values);
             if (!result || !Array.isArray(result) || result.length === 0) {

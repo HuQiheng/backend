@@ -4,13 +4,13 @@ const ObtainsVO = require('./ObtainsVO');
 class ObtainsDAO {
     async insert(ObtainsVO) {
         try {
-            const query = `INSERT INTO obtains (gameId, playerId) VALUES(?, ?)`;
-            const values = [ObtainsVO.gameId, ObtainsVO.playerId];
+            const query = `INSERT INTO obtains (obtained, Achievements_title, Players_email) VALUES (?, ?, ?)`;
+            const values = [ObtainsVO.obtained, ObtainsVO.Achievements_title, ObtainsVO.Players_email];
             const client = await dbConnect();
             const result = await db.query(query, values);
             return result;
-        } catch (error) {
-            throw error;
+        } catch (err) {
+            throw err;
         } finally {
             closeDb(client);
         }
@@ -47,15 +47,11 @@ class ObtainsDAO {
 
     async update(ObtainsVO) {
         try {
-            const query = `UPDATE obtains SET gameId = ?, playerId = ? WHERE id = ?`;
-            const values = [ObtainsVO.gameId, ObtainsVO.playerId, ObtainsVO.id];
+            const query = `UPDATE obtains SET obtained = ?, Achievements_title = ?, Players_email = ? WHERE id = ?`;
+            const values = [ObtainsVO.obtained, ObtainsVO.Achievements_title, ObtainsVO.Players_email, ObtainsVO.id];
             const client = await dbConnect();
             const result = await db.query(query, values);
-            if (!result || !Array.isArray(result) || result.length === 0) {
-                throw new Error(`No se ha podido actualizar el obtains con id ${ObtainsVO.id}`);
-            } else {
-                return result;
-            }
+            return result;
         } catch (error) {
             throw error;
         } finally {
@@ -63,4 +59,5 @@ class ObtainsDAO {
         }
     }       
 };
+
 module.exports = ObtainsDAO;
