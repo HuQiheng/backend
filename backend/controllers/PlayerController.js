@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 
-class PlayerDAO {
+class PlayerController {
     async insert(playerVO) {
         try {
             const query = `INSERT INTO Player (email, username, password) VALUES ($1, $2, $3)`;
@@ -66,4 +66,4 @@ class PlayerDAO {
     }
 }
 
-module.exports = PlayerDAO;
+module.exports = PlayerController;

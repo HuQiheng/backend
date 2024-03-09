@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 
-class CompoundDAO {
+class CompoundController {
     async insert(playersEmail, gamesAccessKey) {
         try {
             const query = `INSERT INTO Compound (Players_email, Games_accessKey) VALUES ($1, $2)`;
@@ -45,4 +45,4 @@ class CompoundDAO {
     }
 };
 
-module.exports = CompoundDAO;
+module.exports = CompoundController;
