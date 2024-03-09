@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 
-class GameDAO{
+class GameController {
     async insert(accessKey, ranking, date){
         try{
             const query = `INSERT INTO Game (accessKey, ranking, date) VALUES ($1, $2, $3)`;
@@ -50,4 +50,4 @@ class GameDAO{
     }
 }
 
-module.exports = GameDAO;
+module.exports = GameController;

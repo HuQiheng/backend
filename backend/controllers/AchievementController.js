@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 
-class AchievementDAO {
+class AchievementController {
     async insert(title, description) {
         try {
             const query = `INSERT INTO Achievement (title, description) VALUES($1, $2)`;
@@ -48,4 +48,4 @@ class AchievementDAO {
     }
 };
 
-module.exports = AchievementDAO;
+module.exports = AchievementController;

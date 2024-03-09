@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 
-class FriendDAO {
+class AchievementController {
     async insert(name, email) {
         try {
             const query = `INSERT INTO friend (name, email) VALUES(?, ?)`; // 1.2.3.4       
@@ -33,4 +33,4 @@ class FriendDAO {
     }
 };
 
-module.exports = FriendDAO;
+module.exports = AchievementController;
