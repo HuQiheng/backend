@@ -1,40 +1,39 @@
-const { db, closeDb } = require("./ConnectionManager");
-const GameVO = require('./GameVO');
+const { db } = require("../db/index");
 
 class GameDAO{
-    async insert(gameVO){
+    async insert(accessKey, ranking, date){
         try{
-            const query = `INSERT INTO game (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [gameVO.name, gameVO.description, gameVO.price, gameVO.rating, gameVO.releaseDate];
+            const query = `INSERT INTO Game (accessKey, ranking, date) VALUES ($1, $2, $3)`;
+            const values = [accessKey, ranking, date];
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
         }
     }
-    async update(gameVO){
+    async update(accessKey, ranking, date){
         try{
-            const query = `UPDATE game SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [gameVO.name, gameVO.description, gameVO.price, gameVO.rating, gameVO.releaseDate, gameVO.id];
+            const query = `UPDATE Game SET ranking = $1, date = $2 WHERE accessKey = $3`;
+            const values = [ranking, date, accessKey];
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
         }
     }
-    async delete(id){
+    async delete(accessKey){
         try{
-            const query = `DELETE FROM game WHERE id = ?`;
-            const result = await db.query(query, [id]);
+            const query = `DELETE FROM Game WHERE accessKey = $1`;
+            const result = await db.query(query, [accessKey]);
             return result;
         }catch(error){
             throw error;
         }
     }
-    async select(id){
+    async select(accessKey){
         try{
-            const query = `SELECT * FROM game WHERE id = ?`;
-            const result = await db.query(query, [id]);
+            const query = `SELECT * FROM Game WHERE accessKey = $1`;
+            const result = await db.query(query, [accessKey]);
             return result;
         }catch(error){
             throw error;
@@ -42,7 +41,7 @@ class GameDAO{
     }
     async selectAll(){
         try{
-            const query = `SELECT * FROM game`;
+            const query = `SELECT * FROM Game`;
             const result = await db.query(query);
             return result;
         }catch(error){

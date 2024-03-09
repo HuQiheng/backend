@@ -1,48 +1,42 @@
-const { db, closeDb } = require("./ConnectionManager");
-const CompoundVO = require('./CompoundVO');
+const { db } = require("../db/index");
 
-class CompoundDAO{
-    async insert(compoundVO){
+class CompoundDAO {
+    async insert(playersEmail, gamesAccessKey) {
+        try {
+            const query = `INSERT INTO Compound (Players_email, Games_accessKey) VALUES ($1, $2)`;
+            const values = [playersEmail, gamesAccessKey];
+            const result = await db.query(query, values);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async delete(playersEmail, gamesAccessKey){
         try{
-            const query = `INSERT INTO compound (name, description, price, rating, releaseDate) VALUES (?, ?, ?, ?, ?)`;
-            const values = [compoundVO.name, compoundVO.description, compoundVO.price, compoundVO.rating, compoundVO.releaseDate];
+            const query = `DELETE FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
+            const values = [playersEmail, gamesAccessKey];
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
         }
     }
-    async update(compoundVO){
+
+    async select(playersEmail, gamesAccessKey){
         try{
-            const query = `UPDATE compound SET name = ?, description = ?, price = ?, rating = ?, releaseDate = ? WHERE id = ?`;
-            const values = [compoundVO.name, compoundVO.description, compoundVO.price, compoundVO.rating, compoundVO.releaseDate, compoundVO.id];
+            const query = `SELECT * FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
+            const values = [playersEmail, gamesAccessKey];
             const result = await db.query(query, values);
             return result;
         }catch(error){
             throw error;
         }
     }
-    async delete(id){
-        try{
-            const query = `DELETE FROM compound WHERE id = ?`;
-            const result = await db.query(query, [id]);
-            return result;
-        }catch(error){
-            throw error;
-        }
-    }
-    async select(id){
-        try{
-            const query = `SELECT * FROM compound WHERE id = ?`;
-            const result = await db.query(query, [id]);
-            return result;
-        }catch(error){
-            throw error;
-        }
-    }
+
     async selectAll(){
         try{
-            const query = `SELECT * FROM compound`;
+            const query = `SELECT * FROM Compound`;
             const result = await db.query(query);
             return result;
         }catch(error){

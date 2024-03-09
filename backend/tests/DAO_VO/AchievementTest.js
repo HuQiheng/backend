@@ -1,8 +1,7 @@
 const AchievementDAO = require('./AchievementDAO');
-const AchievementVO = require('./AchievementVO');
-const { db, closeDb } = require("./ConnectionManager");
+const { db } = require("./ index");
 
-jest.mock('./ConnectionManager');
+jest.mock('./ index');
 
 describe('AchievementDAO', () => {
     let achievementDAO;

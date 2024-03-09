@@ -1,31 +1,14 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
+require('dotenv').config();
 
-const getUserInfo = async (id) => {
-    /*
-    const client = new Client({
-
-    });
-
-    try {
-        await client.connect();
-
-        const res = await client.query('SELECT * FROM Player WHERE email = $1', [id]);
-
-        await client.end();
-
-        return res.rows[0];
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-    */
-    return {
-        id: id,
-        name: 'Napoleon Bonaparte',
-        email: 'napoleon.bonaparte@gmail.com',
-    };
-};
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+});
 
 module.exports = {
-    getUserInfo
-};
+    query: (text, params) => pool.query(text, params),
+}
