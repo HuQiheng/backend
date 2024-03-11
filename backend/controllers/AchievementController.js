@@ -37,7 +37,7 @@ class AchievementController {
             const query = `UPDATE Achievement SET description = $1 WHERE title = $2`;
             const values = [description, title];
             const result = await db.query(query, values);
-            if (!result || !Array.isArray(result) || result.rowCount === 0) {
+            if (!result  || result.rowCount === 0) {
                 throw new Error('The achievement could not be updated');
             } else {
                 return result.rows[0];

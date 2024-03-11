@@ -8,5 +8,8 @@
   },
   "scripts": {
     "test": "jest tests/**/*.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

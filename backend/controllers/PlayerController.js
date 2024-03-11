@@ -1,10 +1,10 @@
 const { db } = require("../db/index");
 
 class PlayerController {
-    async insert(playerVO) {
+    async insert(email, username, password) {
         try {
             const query = `INSERT INTO Player (email, username, password) VALUES ($1, $2, $3)`;
-            const values = [playerVO.email, playerVO.username, playerVO.password];
+            const values = [email, username, password];
             const result = await db.query(query, values);
             return result;
         } catch (error) {
@@ -12,10 +12,10 @@ class PlayerController {
         }
     }
 
-    async update(playerVO) {
+    async update(email, username, password) {
         try {
-            const query = `UPDATE Player SET username = $1, password = $2 WHERE email = $3`;
-            const values = [playerVO.username, playerVO.password, playerVO.email];
+            const query = `UPDATE Player SET username = $2, password = $3 WHERE email = $1`;
+            const values = [email, username, password];
             const result = await db.query(query, values);
             return result;
         } catch (error) {
