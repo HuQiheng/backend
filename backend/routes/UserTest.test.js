@@ -1,6 +1,8 @@
+const express = require('express');
+const app = express();
 // Importa el router que deseas probar
-const userRoutes = require('../../routes/router');
-
+const userRoutes = require('../routes/userRoutes');
+const request = require('supertest');
 // Configura una ruta de prueba para verificar la autenticación
 app.use('/test', userRoutes);
 const jwt = require('jsonwebtoken');
@@ -18,14 +20,13 @@ console.log('Token de prueba:', t);
 
 describe('Pruebas de la API de autenticación de Google', () => {
   it('debería autenticar correctamente un token válido', async () => {
-    const token = t; 
     const response = await request(app)
       .post('/test/auth')
-      .send({ token });
+      .send({ token: t });
 
     expect(response.status).toBe(200);
     expect(response.body.name).toBe(uName); 
-  });
+  }, 10000);
 
   it('debería devolver un error para un token inválido', async () => {
     const invalidToken = 'token_invalido'; // Reemplaza con un token inválido
