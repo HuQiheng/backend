@@ -1,3 +1,4 @@
+
 const express = require('express');
 const app = express();
 // Importa el router que deseas probar
@@ -5,19 +6,8 @@ const userRoutes = require('../../routes/userRoutes');
 const request = require('supertest');
 // Configura una ruta de prueba para verificar la autenticación
 app.use('/test', userRoutes);
-const jwt = require('jsonwebtoken');
 
-// Datos simulados del usuario
-const uId = '123'; // ID del usuario
-const uEmail = 'test@example.com'; // Correo electrónico
-const uName = 'John Doe'; // Nombre del usuario
-
-// Generar el token
-const secretKey = 'mi_clave_secreta'; // Clave secreta para pruebas
-const t = jwt.sign({ sub: uId, email: uEmail, name: uName }, secretKey);
-
-console.log('Token de prueba:', t);
-
+const t = process.env.TOKEN_PRUEBA; // Use the existing token
 describe('Pruebas de la API de autenticación de Google', () => {
   it('debería autenticar correctamente un token válido', async () => {
     const response = await request(app)
@@ -48,4 +38,3 @@ describe('Pruebas de la API de autenticación de Google', () => {
     // Agrega más expectativas según tus necesidades
   }, 10000);
 });
-

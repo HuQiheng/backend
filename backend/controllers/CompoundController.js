@@ -1,48 +1,48 @@
-const { db } = require("../db/index");
+const db = require("../db");
 
-class CompoundController {
-    async insert(playersEmail, gamesAccessKey) {
-        try {
-            const query = `INSERT INTO Compound (Players_email, Games_accessKey) VALUES ($1, $2)`;
-            const values = [playersEmail, gamesAccessKey];
-            const result = await db.query(query, values);
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async delete(playersEmail, gamesAccessKey){
-        try{
-            const query = `DELETE FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
-            const values = [playersEmail, gamesAccessKey];
-            const result = await db.query(query, values);
-            return result;
-        }catch(error){
-            throw error;
-        }
-    }
-
-    async select(playersEmail, gamesAccessKey){
-        try{
-            const query = `SELECT * FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
-            const values = [playersEmail, gamesAccessKey];
-            const result = await db.query(query, values);
-            return result;
-        }catch(error){
-            throw error;
-        }
-    }
-
-    async selectAll(){
-        try{
-            const query = `SELECT * FROM Compound`;
-            const result = await db.query(query);
-            return result;
-        }catch(error){
-            throw error;
-        }
+const insertCompound = async (playersEmail, gamesAccessKey) => {
+    try {
+        const query = `INSERT INTO Compound (Players_email, Games_accessKey) VALUES ($1, $2)`;
+        const result = await db.query(query, [playersEmail, gamesAccessKey]);
+        return result;
+    } catch (error) {
+        throw error;
     }
 };
 
-module.exports = CompoundController;
+const deleteCompound = async (playersEmail, gamesAccessKey) => {
+    try {
+        const query = `DELETE FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
+        const result = await db.query(query, [playersEmail, gamesAccessKey]);
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const selectCompound = async (playersEmail, gamesAccessKey) => {
+    try {
+        const query = `SELECT * FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2`;
+        const result = await db.query(query, [playersEmail, gamesAccessKey]);
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const selectAllCompounds = async () => {
+    try {
+        const query = `SELECT * FROM Compound`;
+        const result = await db.query(query);
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+module.exports = {
+    insertCompound,
+    deleteCompound,
+    selectCompound,
+    selectAllCompounds
+};

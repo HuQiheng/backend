@@ -1,11 +1,11 @@
 // Gestionar token de google auth
 const express = require('express');
 const { OAuth2Client } = require('google-auth-library');
-
+require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-const PlayerController = require('../controllers/playerController');
+const PlayerController = require('../controllers/PlayerController');
 const { validateJWT } = require('../auth/auth'); // Import validateJWT
 
 const router = express.Router(); // Create a new router
@@ -13,6 +13,7 @@ const router = express.Router(); // Create a new router
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/auth', async (req, res) => {
+  const playerInstance = new PlayerController();
   const { token } = req.body;
   try {
     const ticket = await client.verifyIdToken({
@@ -29,7 +30,7 @@ router.post('/auth', async (req, res) => {
       email: payload.email,
       image: payload.picture,
     };
-    const existingUser = await PlayerController.select(userInfo.email);
+    const existingUser = await playerInstance.select(userInfo.email);
     if(existingUser == null) {
         await PlayerController.insert(userInfo.email, userInfo.name, userInfo.id);
     }
@@ -46,7 +47,8 @@ router.post('/auth', async (req, res) => {
 
 router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
     try {
-      const userInfo = await PlayerController.select(req.params.myID);
+      const playerInstance = new PlayerController();
+      const userInfo = await playerInstance.select(req.params.myID);
       res.send(userInfo);
     } catch (error) {
       console.error('Error getting user info', error);

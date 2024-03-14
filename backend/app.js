@@ -2,13 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const PORT = 3010;
+const PlayerController = require('./controllers/PlayerController') 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-const users = require('./routes/userRoutes');
+const users = require('./routes/userRoutes');;
 
 // Routes
 app.use('/', users);
@@ -25,6 +26,13 @@ app.use((err, req, res, next) => {
     res.status(500).send('¡Algo salió mal!');
 });
 
-app.listen(PORT, () => {
+const prueba = async() =>{
+    const controller = new PlayerController();
+const result = await controller.selectAll();
+console.log(result);
+}
+prueba()
+
+/*app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
+});*/

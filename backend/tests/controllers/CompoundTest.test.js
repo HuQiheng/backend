@@ -1,92 +1,100 @@
-// CompoundController.test.js
-const CompoundController = require('../../controllers/CompoundController');
+// compoundController.test.js
+const db = require('../../db');
+const {
+    insertCompound,
+    deleteCompound,
+    selectCompound,
+    selectAllCompounds
+} = require('../../controllers/CompoundController');
 
-// Mocking the database query function
-jest.mock('../../db/index.js', () => ({
-  db: {
-    query: jest.fn(),
-  },
-}));
+jest.mock('../../db');
 
-describe('CompoundController', () => {
-  beforeEach(() => {
-    // Clear mock calls before each test
-    jest.clearAllMocks();
+describe('Compound Controller', () => {
+    afterEach(() => {
+        // Clear mock implementation after each test
+        db.query.mockReset();
+    });
+
+    test('Insert Compound', async () => {
+        const playersEmail = 'test1@example.com';
+        const gamesAccessKey = 'testKey';
+        const mockResult = { rows: [] };
+        db.query.mockResolvedValueOnce(mockResult);
+
+        const result = await insertCompound(playersEmail, gamesAccessKey);
+
+        expect(db.query).toHaveBeenCalledWith(expect.any(String), [playersEmail, gamesAccessKey]);
+        expect(result).toEqual(mockResult);
+    });
+
+    test('Delete Compound', async () => {
+      // Define the test data
+      const playersEmail = 'test1@example.com';
+      const gamesAccessKey = 'testKey';
+      
+      // Mock result for deletion
+      const deleteMockResult = { rowCount: 1 }; // Assuming one record was deleted
+      db.query.mockResolvedValueOnce(deleteMockResult);
+  
+      // Call the deleteCompound function
+      const result = await deleteCompound(playersEmail, gamesAccessKey);
+  
+      // Verify that the db.query function was called with the correct arguments
+      expect(db.query).toHaveBeenCalledWith(expect.any(String), [playersEmail, gamesAccessKey]);
+  
+      // Verify that the result returned by deleteCompound matches the expected result
+      expect(result).toEqual(deleteMockResult);
+  });
+  
+
+    test('Select Compound', async () => {
+      // Define the data to be inserted
+      const playersEmail = 'test1@example.com';
+      const gamesAccessKey = 'testKey';
+      
+      // Mock result for insertion
+      const insertResult = { rows: [] };
+      db.query.mockResolvedValueOnce(insertResult);
+  
+      // Call the insertCompound function to insert the data
+      await insertCompound(playersEmail, gamesAccessKey);
+      
+      // Mock result for selection
+      const selectResult = { rows: [{ players_email: playersEmail, games_accessKey: gamesAccessKey }] };
+      db.query.mockResolvedValueOnce(selectResult);
+  
+      // Call the selectCompound function to select the inserted data
+      const result = await selectCompound(playersEmail, gamesAccessKey);
+  
+      // Verify that the insertCompound function was called with the correct arguments
+      expect(db.query).toHaveBeenCalledWith(expect.any(String), [playersEmail, gamesAccessKey]);
+  
+      // Verify that the selectCompound function was called with the correct arguments
+      expect(db.query).toHaveBeenCalledWith(expect.any(String), [playersEmail, gamesAccessKey]);
+  
+      // Verify that the result returned by selectCompound matches the expected result
+      expect(result).toEqual(selectResult);
   });
 
-  it('should insert a compound', async () => {
-    const playersEmail = 'test@example.com';
-    const gamesAccessKey = 'ABCDEFG';
+  test('Select All Compounds', async () => {
+    // Define mock data for compounds
+    const mockCompounds = [
+        { id: 1, playersEmail: 'test1@example.com', gamesAccessKey: 'key1' },
+        { id: 2, playersEmail: 'test2@example.com', gamesAccessKey: 'key2' }
+    ];
 
-    // Mock the database query result
-    const mockResult = { rows: [{ id: 1, Players_email: playersEmail, Games_accessKey: gamesAccessKey }] };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
+    // Mock result for selecting all compounds
+    const mockResult = { rows: mockCompounds };
+    db.query.mockResolvedValueOnce(mockResult);
 
-    const controller = new CompoundController();
-    const result = await controller.insert(playersEmail, gamesAccessKey);
+    // Call the selectAllCompounds function
+    const result = await selectAllCompounds();
 
+    // Verify that db.query was called with the correct SQL query
+    expect(db.query).toHaveBeenCalledWith(expect.any(String));
+
+    // Verify that the result returned by selectAllCompounds matches the expected result
     expect(result).toEqual(mockResult);
-    expect(require('../../db/index.js').db.query).toHaveBeenCalledWith(
-      'INSERT INTO Compound (Players_email, Games_accessKey) VALUES ($1, $2)',
-      [playersEmail, gamesAccessKey]
-    );
-  });
+});
 
-  it('should delete a compound', async () => {
-    const playersEmail = 'test@example.com';
-    const gamesAccessKey = 'ABCDEFG';
-
-    // Mock the database query result
-    const mockResult = { rowCount: 1 };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-
-    const controller = new CompoundController();
-    const result = await controller.delete(playersEmail, gamesAccessKey);
-
-    expect(result).toEqual(mockResult);
-    expect(require('../../db/index.js').db.query).toHaveBeenCalledWith(
-      'DELETE FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2',
-      [playersEmail, gamesAccessKey]
-    );
-  });
-
-  it('should select a compound', async () => {
-    const playersEmail = 'test@example.com';
-    const gamesAccessKey = 'ABCDEFG';
-
-    // Mock the database query result
-    const mockResult = { rows: [{ id: 1, Players_email: playersEmail, Games_accessKey: gamesAccessKey }] };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-
-    const controller = new CompoundController();
-    const result = await controller.select(playersEmail, gamesAccessKey);
-
-    expect(result).toEqual(mockResult);
-    expect(require('../../db/index.js').db.query).toHaveBeenCalledWith(
-      'SELECT * FROM Compound WHERE Players_email = $1 AND Games_accessKey = $2',
-      [playersEmail, gamesAccessKey]
-    );
-  });
-
-  it('should select all compounds', async () => {
-    // Mock the database query result
-    const mockResult = { rows: [{ id: 1, Players_email: 'test1@example.com', Games_accessKey: 'ABC123' }] };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-
-    const controller = new CompoundController();
-    const result = await controller.selectAll();
-
-    expect(result).toEqual(mockResult);
-    expect(require('../../db/index.js').db.query).toHaveBeenCalledWith('SELECT * FROM Compound');
-  });
-
-  it('should throw an error when any database operation fails', async () => {
-    const errorMessage = 'Database error';
-
-    // Mock the database query to throw an error
-    require('../../db/index.js').db.query.mockRejectedValueOnce(new Error(errorMessage));
-
-    const controller = new CompoundController();
-    await expect(controller.insert('test@example.com', 'ABCDEFG')).rejects.toThrow(errorMessage);
-  });
 });

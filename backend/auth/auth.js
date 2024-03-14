@@ -1,33 +1,29 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = 'your-secret-key';
+// Middleware to verify JWT token
+const validateJWT = (req, res, next) => {
+  const token = req.headers.authorization;
 
-const validateJWT = (req, next) => {
-    const authHeader = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
 
-    if (!authHeader) {
-        throw new Error('Unauthorized');
+  if (!token.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Invalid token format' });
+  }
+
+  const tokenValue = token.split(' ')[1];
+
+  jwt.verify(tokenValue, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid token' });
     }
 
-    const parts = authHeader.split(' ');
-
-    if (parts.length !== 2) {
-        throw new Error('Bad Request');
-    }
-
-    const token = parts[1];
-
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
-        if (err) {
-            console.error(err);
-            throw new Error('Unauthorized');
-        }
-
-        req.user = decoded;
-        next();
-    });
-};
-
+    // You can also attach the decoded user information to the request for use in later middleware or route handlers
+    req.user = decoded;
+    next();
+  });
+}
 module.exports = {
     validateJWT
 };

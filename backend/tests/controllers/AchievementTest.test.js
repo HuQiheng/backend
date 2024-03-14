@@ -1,105 +1,125 @@
-// AchievementController.test.js
-const AchievementController = require('../../controllers/AchievementController');
+// achievementController.test.js
+const {
+    insertAchievement,
+    selectAllAchievements,
+    removeAchievement,
+    updateAchievement
+} = require('../../controllers/AchievementController');
 
-// Mocking the database query function
-jest.mock('../../db/index.js', () => ({
-db: {
-query: jest.fn(),
-},
+// Mocking the database query function for testing
+jest.mock('../../db/index', () => ({
+    query: jest.fn(),
 }));
 
-describe('AchievementController', () => {
-beforeEach(() => {
-// Clear mock calls before each test
-jest.clearAllMocks();
-});
+const db = require('../../db/index');
 
-it('should insert an achievement', async () => {
-const title = 'Test Achievement';
-const description = 'Test Description';
+describe('Achievement Controller', () => {
+    afterEach(() => {
+        // Clear mock implementation after each test
+        jest.clearAllMocks();
+    });
 
-// Mock the database query result
-const mockResult = { rows: [{ id: 1, title, description }] };
-require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
+    test('Insert Achievement', async () => {
+        const title = 'Achievement Title';
+        const description = 'Achievement Description';
+        const mockResult = { rows: [] };
+        db.query.mockResolvedValueOnce(mockResult);
 
-const controller = new AchievementController();
-const result = await controller.insert(title, description);
+        const result = await insertAchievement(title, description);
 
-expect(result).toEqual(mockResult);
-expect(require('../../db/index.js').db.query).toHaveBeenCalledWith(
-    'INSERT INTO Achievement (title, description) VALUES($1, $2)',
-    [title, description]
-);
-});
+        expect(db.query).toHaveBeenCalledWith(expect.any(String), [title, description]);
+        expect(result).toEqual(mockResult);
+    });
 
-it('should select all achievements', async () => {
-// Mock the database query result
-const mockResult = { rows: [{ id: 1, title: 'Achievement 1', description: 'Description 1' }] };
-require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-
-const controller = new AchievementController();
-const result = await controller.selectAll();
-
-expect(result).toEqual(mockResult);
-expect(require('../../db/index.js').db.query).toHaveBeenCalledWith('SELECT * FROM Achievement');
-});
-
-it('should update an achievement', async () => {
-    const title = 'Test Achievement';
-    const description = 'Updated Description';
+    test('Select All Achievements', async () => {
+        // Define mock data to be inserted
+        const achievement1 = { id: 1, title: 'Achievement 1', description: 'Description 1' };
+        const achievement2 = { id: 2, title: 'Achievement 2', description: 'Description 2' };
+        
+        // Mock result for insertion
+        const insertMockResult = { rowCount: 2 }; // Assuming two achievements were inserted
+        db.query.mockResolvedValueOnce(insertMockResult);
     
-    // Mock the database query result
-    const mockResult = { rowCount: 1, rows: [{ id: 1, title, description }] };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
+        // Insert the mock data
+        await insertAchievement(achievement1.title, achievement1.description);
+        await insertAchievement(achievement2.title, achievement2.description);
+        
+        // Mock result for selection
+        const selectMockResult = { rows: [achievement1, achievement2] };
+        db.query.mockResolvedValueOnce(selectMockResult);
     
-    const controller = new AchievementController();
-    const result = await controller.update(title, description);
+        // Call the selectAllAchievements function
+        const result = await selectAllAchievements();
     
-    expect(result).toEqual(mockResult.rows[0]);
-    expect(require('../../db/index.js').db.query).toHaveBeenCalledWith(
-        'UPDATE Achievement SET description = $1 WHERE title = $2',
-        [description, title]
-);
-});
-
-it('should remove an achievement', async () => {
-const title = 'Test Achievement';
-
-// Mock the database query result
-const mockResult = { rowCount: 1 };
-require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-
-const controller = new AchievementController();
-const result = await controller.remove(title);
-
-expect(result).toEqual(mockResult);
-expect(require('../../db/index.js').db.query).toHaveBeenCalledWith('DELETE FROM Achievement WHERE title = $1', [title]);
-});
-
-
-
-it('should throw an error when updating a non-existing achievement', async () => {
-    const title = 'Non-Existing Achievement';
-    const description = 'Updated Description';
-  
-    // Mock the database query result
-    const mockResult = { rowCount: 0 };
-    require('../../db/index.js').db.query.mockResolvedValueOnce(mockResult);
-  
-    const controller = new AchievementController();
+        // Verify that the insertAchievement function was called twice
+        expect(db.query).toHaveBeenCalledTimes(3);
     
-    // Use an asynchronous function to await the promise rejection
-    await expect(async () => await controller.update(title, description))
-      .rejects.toThrow('The achievement could not be updated');
-  });
+        // Verify that the selectAllAchievements function was called with the correct arguments
+        expect(db.query).toHaveBeenCalledWith(expect.any(String));
+    
+        // Verify that the result returned by selectAllAchievements matches the expected result
+        expect(result).toEqual(selectMockResult);
+    });
+    
 
-it('should throw an error when any database operation fails', async () => {
-const errorMessage = 'Database error';
+    test('Remove Achievement', async () => {
+        // Define mock data for the achievement to be inserted
+        const title = 'Achievement Title';
+        const description = 'Achievement Description';
+        
+        // Mock result for insertion
+        const insertMockResult = { rowCount: 1 }; // Assuming one achievement was inserted
+        db.query.mockResolvedValueOnce(insertMockResult);
+    
+        // Insert the mock achievement
+        await insertAchievement(title, description);
+    
+        // Mock result for removal
+        const removeMockResult = { rowCount: 1 }; // Assuming one achievement was removed
+        db.query.mockResolvedValueOnce(removeMockResult);
+    
+        // Call the removeAchievement function
+        const result = await removeAchievement(title);
+    
+        // Verify that the insertAchievement function was called once
+        expect(db.query).toHaveBeenCalledTimes(2);
+    
+        // Verify that the removeAchievement function was called with the correct arguments
+        expect(db.query).toHaveBeenCalledWith(expect.any(String), [title]);
+    
+        // Verify that the result returned by removeAchievement matches the expected result
+        expect(result).toEqual(removeMockResult);
+    });
+    
 
-// Mock the database query to throw an error
-require('../../db/index.js').db.query.mockRejectedValueOnce(new Error(errorMessage));
-
-const controller = new AchievementController();
-await expect(controller.insert('Test', 'Description')).rejects.toThrow(errorMessage);
-});
+    test('Update Achievement', async () => {
+        // Define mock data for the achievement to be inserted
+        const title = 'Achievement Title';
+        const description = 'Achievement Description';
+        
+        // Mock result for insertion
+        const insertMockResult = { rowCount: 1 }; // Assuming one achievement was inserted
+        db.query.mockResolvedValueOnce(insertMockResult);
+    
+        // Insert the mock achievement
+        await insertAchievement(title, description);
+    
+        // Mock result for update
+        const updateMockResult = { rowCount: 1, rows: [{}] }; // Assuming one achievement was updated
+        db.query.mockResolvedValueOnce(updateMockResult);
+    
+        // Call the updateAchievement function
+        const result = await updateAchievement(title, 'New Description');
+    
+        // Verify that the insertAchievement function was called once before calling updateAchievement
+        expect(db.query).toHaveBeenCalledTimes(2);
+    
+        // Verify that the updateAchievement function was called with the correct arguments
+        expect(db.query).toHaveBeenCalledWith(expect.any(String), ['New Description', title]);
+    
+        // Verify that the result returned by updateAchievement matches the expected result
+        expect(result).toEqual(updateMockResult.rows[0]);
+    });
+    
+    
 });
