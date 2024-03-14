@@ -1,6 +1,7 @@
 const express = require('express');
 const {OAuth2Client} = require('google-auth-library');
 const router = express.Router(); // Create a new router
+require('dotenv').config();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/auth', async (req, res) => {

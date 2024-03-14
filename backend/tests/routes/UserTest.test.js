@@ -1,6 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const router = require('../../routes/userRoutes'); // replace with your router file
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
@@ -20,7 +21,7 @@ afterAll((done) => {
 describe('POST /auth', () => {
     it('should authenticate a user', async () => {
         const token = process.env.TOKEN_PRUEBA; // replace with a test token
-
+        console.log('token', token);
         const res = await request(app)
             .post('/auth')
             .send({ token })
