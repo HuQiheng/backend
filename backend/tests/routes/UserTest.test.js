@@ -19,7 +19,7 @@ afterAll((done) => {
 
 describe('POST /auth', () => {
     it('should authenticate a user', async () => {
-        const token = 'test-token'; // replace with a test token
+        const token = process.env.TOKEN_PRUEBA; // replace with a test token
 
         const res = await request(app)
             .post('/auth')
