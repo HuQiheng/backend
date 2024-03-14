@@ -1,52 +1,37 @@
-// Gestionar token de google auth
 const express = require('express');
-const { OAuth2Client } = require('google-auth-library');
-require('dotenv').config();
-const app = express();
-app.use(express.json());
-
-
-const PlayerController = require('../controllers/PlayerController');
-const { validateJWT } = require('../auth/auth'); // Import validateJWT
-
+const {OAuth2Client} = require('google-auth-library');
 const router = express.Router(); // Create a new router
-
-const client = new OAuth2Client();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/auth', async (req, res) => {
-  const playerInstance = new PlayerController();
-  const { token } = req.body;
+  const token = req.body.token;
   try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    if (!payload) {
-      return res.status(401).send('Invalid token');
-    }
-    const userInfo = {
-      id: payload['sub'],
-      name: payload['name'],
-      email: payload['email'],
-      image: payload['picture'],
-    };
-    const existingUser = await playerInstance.select(userInfo.email);
-    if(existingUser == null) {
-        await PlayerController.insert(userInfo.email, userInfo.name, userInfo.id);
-    }
-    req.session.userId = userInfo.id;
-    req.session.save(() => {
-      console.log(`User ${userInfo.name} authenticated`);
-      res.send(userInfo);
-    });
+      const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID,  // replace with your Client ID
+      });
+      const payload = ticket.getPayload();
+      const userid = payload['sub'];
+      const email = payload['email'];
+
+      // Check if user exists
+      const user = await selectPlayer(email);
+      if (user.rows.length === 0) {
+          // If user doesn't exist, create a new one
+          const username = payload['name'];
+          const password = payload['at_hash']; // or any other field you want to use as password
+          await insertPlayer(email, username, password);
+      }
+
+      // Save session id and return response
+      req.session.userId = userid;
+      res.send({status: 'success', userId: userid});
   } catch (error) {
-    console.error('Error verifying token', error);
-    res.status(401).send('Invalid token');
+      res.status(401).send({status: 'error', error});
   }
 });
 
-router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
+/*router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
     try {
       const playerInstance = new PlayerController();
       const userInfo = await playerInstance.select(req.params.myID);
@@ -55,7 +40,7 @@ router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT
       console.error('Error getting user info', error);
       res.status(500).send('Internal Server Error');
     }
-  });
+  });*/
   
 module.exports = router; // Export the router
 

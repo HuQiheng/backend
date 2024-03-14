@@ -1,40 +1,43 @@
-
-const express = require('express');
-const app = express();
-// Importa el router que deseas probar
-const userRoutes = require('../../routes/userRoutes');
 const request = require('supertest');
-// Configura una ruta de prueba para verificar la autenticación
-app.use('/test', userRoutes);
+const express = require('express');
+const router = require('../../routes/userRoutes'); // replace with your router file
 
-const t = process.env.TOKEN_PRUEBA; // Use the existing token
-describe('Pruebas de la API de autenticación de Google', () => {
-  it('debería autenticar correctamente un token válido', async () => {
-    const response = await request(app)
-      .post('/backend/app.js')
-      .send({ token: t });
+const app = express();
+app.use(express.json());
+app.use('/', router);
 
-    expect(response.status).toBe(200);
-    expect(response.body.name).toBe(uName); 
-  }, 10000);
+let server;
 
-  it('debería devolver un error para un token inválido', async () => {
-    const invalidToken = 'token_invalido'; // Reemplaza con un token inválido
-    const response = await request(app)
-      .post('/backend/app.js')
-      .send({ token: invalidToken });
+beforeAll(() => {
+  server = app.listen(); // start server
+});
 
-    expect(response.status).toBe(401);
-  }, 10000);
+afterAll((done) => {
+  server.close(done); // close server after all tests
+});
 
-  /*it('debería obtener la información del usuario autenticado', async () => {
-    const userId = uId; // Reemplaza con el ID correcto
-    const response = await request(app)
-      .get(`/test/users/${userId}`)
-      .set('Authorization', t); // Reemplaza con un token válido
 
-    expect(response.status).toBe(200);
-    expect(response.body.email).toBe(uEmail); // Reemplaza con el correo correcto
-    // Agrega más expectativas según tus necesidades
-  }, 10000);*/
+describe('POST /auth', () => {
+    it('should authenticate a user', async () => {
+        const token = 'test-token'; // replace with a test token
+
+        const res = await request(app)
+            .post('/auth')
+            .send({ token })
+            .expect(200);
+
+        expect(res.body).toHaveProperty('status', 'success');
+        expect(res.body).toHaveProperty('userId');
+    });
+
+    it('should return an error for invalid token', async () => {
+        const token = 'invalid-token';
+
+        const res = await request(app)
+            .post('/auth')
+            .send({ token })
+            .expect(401);
+
+        expect(res.body).toHaveProperty('status', 'error');
+    });
 });
