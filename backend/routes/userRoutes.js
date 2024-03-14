@@ -5,6 +5,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
+
 const PlayerController = require('../controllers/PlayerController');
 const { validateJWT } = require('../auth/auth'); // Import validateJWT
 
@@ -57,3 +58,4 @@ router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT
   });
   
 module.exports = router; // Export the router
+
