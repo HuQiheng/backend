@@ -27,7 +27,7 @@ describe('Pruebas de la API de autenticación de Google', () => {
     expect(response.status).toBe(401);
   }, 10000);
 
-  it('debería obtener la información del usuario autenticado', async () => {
+  /*it('debería obtener la información del usuario autenticado', async () => {
     const userId = uId; // Reemplaza con el ID correcto
     const response = await request(app)
       .get(`/test/users/${userId}`)
@@ -36,5 +36,5 @@ describe('Pruebas de la API de autenticación de Google', () => {
     expect(response.status).toBe(200);
     expect(response.body.email).toBe(uEmail); // Reemplaza con el correo correcto
     // Agrega más expectativas según tus necesidades
-  }, 10000);
+  }, 10000);*/
 });

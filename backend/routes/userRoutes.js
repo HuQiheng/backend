@@ -10,7 +10,7 @@ const { validateJWT } = require('../auth/auth'); // Import validateJWT
 
 const router = express.Router(); // Create a new router
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client();
 
 router.post('/auth', async (req, res) => {
   const playerInstance = new PlayerController();
@@ -25,10 +25,10 @@ router.post('/auth', async (req, res) => {
       return res.status(401).send('Invalid token');
     }
     const userInfo = {
-      id: payload.sub,
-      name: payload.name,
-      email: payload.email,
-      image: payload.picture,
+      id: payload['sub'],
+      name: payload['name'],
+      email: payload['email'],
+      image: payload['picture'],
     };
     const existingUser = await playerInstance.select(userInfo.email);
     if(existingUser == null) {
