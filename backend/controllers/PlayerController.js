@@ -42,6 +42,16 @@ const selectPlayer = async (email) => {
   }
 };
 
+const selectPlayeByname = async (name) => {
+  try {
+    const query = `SELECT * FROM Player WHERE username = $1`;
+    const result = await db.query(query, [name]);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const selectAllPlayers = async () => {
   try {
     const query = `SELECT * FROM Player`;
@@ -71,4 +81,5 @@ module.exports = {
   selectPlayer,
   selectAllPlayers,
   verificarCredenciales,
+  selectPlayeByname,
 };

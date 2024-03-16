@@ -6,10 +6,17 @@
     "express-session": "^1.18.0",
     "google-auth-library": "^9.6.3",
     "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "pg": "^8.11.3",
     "supertest": "^6.3.4"
   },
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Backen of the group 12 at Proyecto Software",
+  "main": "app.js",
   "scripts": {
+    "dev": "nodemon app.js",
     "test": "jest --detectOpenHandles tests/**/**.test.js"
   },
   "devDependencies": {
