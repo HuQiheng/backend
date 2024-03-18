@@ -1,19 +1,16 @@
-// Importar el módulo de Socket.IO
+// createGame.js
 const io = require("socket.io")();
 
-// Crear un objeto para almacenar las relaciones entre los sockets y las salas
-const sids = new Map(); // Map<SocketId, Set<Room>>
-const rooms = new Map(); // Map<Room, Set<SocketId>>
+// Genero los conjuntos
+const sids = new Map();
+const rooms = new Map(); 
 
 // Función para unirse a una sala
 function joinRoom(socketId, room) {
-  // Agregar la sala al conjunto identificado por el ID del socket
   if (!sids.has(socketId)) {
     sids.set(socketId, new Set());
   }
   sids.get(socketId).add(room);
-
-  // Agregar el ID del socket al conjunto identificado por el nombre de la sala
   if (!rooms.has(room)) {
     rooms.set(room, new Set());
   }
@@ -22,12 +19,9 @@ function joinRoom(socketId, room) {
 
 // Función para salir de una sala
 function leaveRoom(socketId, room) {
-  // Eliminar la sala del conjunto identificado por el ID del socket
   if (sids.has(socketId)) {
     sids.get(socketId).delete(room);
   }
-
-  // Eliminar el ID del socket del conjunto identificado por el nombre de la sala
   if (rooms.has(room)) {
     rooms.get(room).delete(socketId);
   }
@@ -56,3 +50,28 @@ leaveRoom(socketId1, roomName);
 console.log(sids);
 console.log("-----------------");
 console.log(rooms);
+
+io.on("connection", (socket) => {
+    // Me uno a una única sala
+    socket.on("joinRoom", (roomName) => {
+      joinRoom(socket.id, roomName);
+      console.log(`Socket ${socket.id} joined room ${roomName}`);
+    });
+
+    // Salir de una sala en específico
+    socket.on("leaveRoom", (roomName) => {
+        leaveRoom(socket.id, roomName);
+        console.log(`Socket ${socket.id} left room ${roomName}`);
+    });
+
+    // Salir de todas las salas por desconexión
+    socket.on("disconnect", () => {
+        // Cojo todas las salas en la que está el cliente
+        const rooms = sids.get(socket.id);
+        if (rooms) {
+            for (let room of rooms) {
+                leaveRoom(socket.id, room);
+            }
+        }
+    });
+  });
