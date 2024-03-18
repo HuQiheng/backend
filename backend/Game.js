@@ -1,4 +1,4 @@
-// createGame.js
+// Game.js
 const io = require("socket.io")();
 
 // Genero los conjuntos
@@ -27,30 +27,6 @@ function leaveRoom(socketId, room) {
   }
 }
 
-// Inicializo a valores de pruebas
-const socketId1 = "socket123";
-const socketId2 = "socket456";
-const roomName = "mi-sala";
-const roomName1 = "mi-sala1";
-
-// Me uno a las salas
-joinRoom(socketId1, roomName);
-joinRoom(socketId2, roomName);
-joinRoom(socketId1, roomName1);
-
-// Muestro los conjuntos
-console.log(sids);
-console.log("-----------------");
-console.log(rooms);
-
-// Salgo de la sala
-leaveRoom(socketId1, roomName);
-
-// Muestro los conjuntos
-console.log(sids);
-console.log("-----------------");
-console.log(rooms);
-
 io.on("connection", (socket) => {
     // Me uno a una única sala
     socket.on("joinRoom", (roomName) => {
@@ -75,3 +51,5 @@ io.on("connection", (socket) => {
         }
     });
   });
+
+  module.exports = { joinRoom, leaveRoom, rooms };
