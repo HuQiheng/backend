@@ -1,26 +1,40 @@
-// chat.test.js
-// importar createGame
-const { joinRoom, leaveRoom, rooms } = require('./Game');
+// Game.test.js
+// importar Game
+const { createRoom, joinRoom, leaveRoom, rooms } = require('./Game');
 const { serverSocket, cleanUp } =  require('socket.io-client');
 
-// Prueba la función joinRoom
-test('joinRoom should add socket to the room', () => {
-  const socketId = 'socket123';
-  const roomName = 'mi-sala';
-
-  joinRoom(socketId, roomName);
-
-  // Verifica que el socket se haya unido a la sala
-  expect([...rooms.get(roomName)]).toContain(socketId);
+// Prueba crear sala
+test('Crear sala', () => {
+  const socketId = serverSocket;
+  createRoom(socketId, 'sala1');
+  expect(rooms.has('sala1')).toBe(true);
 });
 
-// Prueba la función leaveRoom
-test('leaveRoom should remove socket from the room', () => {
-  const socketId = 'socket123';
-  const roomName = 'mi-sala';
+// Prueba unirse a sala
+test('Unirse a una sala existente', () => {
+  const socketId = serverSocket;
+  createRoom(socketId, 'sala1');
+  joinRoom(socketId, 'sala1', 'sala1');
+  expect(rooms.get('sala1').has(socketId)).toBe(true);
+});
 
-  leaveRoom(socketId, roomName);
+// Prueba error al unirse a sala que no existe
+test('Error al unirse a una sala que no existe', () => {
+  const socketId = serverSocket;
+  joinRoom(socketId, 'sala3', 'sala3');
+  expect(rooms.has('sala3')).toBe(false);
+});
 
-  // Verifica que el socket se haya salido de la sala
-  expect([...rooms.get(roomName)]).not.toContain(socketId);
+// Prueba salir de una sala
+test('Salir de una sala', () => {
+  const socketId = serverSocket;
+  createRoom(socketId, 'sala1');
+  joinRoom(socketId, 'sala1', 'sala1');
+  leaveRoom(socketId);
+  expect(rooms.get('sala1').has(socketId)).toBe(false);
+});
+
+// Limpiar variables globales
+afterAll(() => {
+  cleanUp;
 });
