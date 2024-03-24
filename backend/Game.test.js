@@ -13,8 +13,7 @@ test('Crear sala', () => {
 // Prueba unirse a sala
 test('Unirse a una sala existente', () => {
   const socketId = serverSocket;
-  createRoom(socketId, 'sala1');
-  joinRoom(socketId, 'sala1', 'sala1');
+  joinRoom(socketId, 'sala1', 3);
   expect(rooms.get('sala1').has(socketId)).toBe(true);
 });
 
@@ -28,8 +27,6 @@ test('Error al unirse a una sala que no existe', () => {
 // Prueba salir de una sala
 test('Salir de una sala', () => {
   const socketId = serverSocket;
-  createRoom(socketId, 'sala1');
-  joinRoom(socketId, 'sala1', 'sala1');
   leaveRoom(socketId);
   expect(rooms.get('sala1').has(socketId)).toBe(false);
 });

@@ -12,22 +12,26 @@ function createRoom(socketId, room) {
   }
   rooms.get(room).add(socketId);
   //genera el código de invitación para unirse a la sala
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  sids.set(socketId, room, code);
+  const code = 3;
+  //const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  sids.set(socketId, {room, code});
   console.log(`Jugador ${socketId} creó la sala ${room} con código de acceso ${code}`);
   
   socketEmit(socketId, "Código de acceso", code);
-  socketBroadcastToOthers(socketId, "Sala creada", room);
+  socketBroadcastToOthers(socketId, "Sala creada", room, code);
 }
 
 // Función para unirse a una sala existente por codigo de invitacion
 function joinRoom(socketId, room, code) {
-  if (rooms.has(room) && code === sids.get(socketId)) {
+  // Verifica si la sala existe y si el código es correcto
+  let realRoom = [...rooms.keys()].find(r => r === room);
+  c = sids.get(socketId);
+  if (realRoom && c && c.code == code) {
     rooms.get(room).add(socketId);
-    sids.set(socketId, room, code);
+    sids.set(socketId, {room, code});
     console.log(`Jugador ${socketId} se conectó a la sala ${room}`);
     socketEmit(socketId, "Acceso a sala", room);
-    socketBroadcastToOthers(socketId, "Jugador conectado", room);
+    socketBroadcastToOthers(socketId, "Jugador conectado", room, code);
   } else {
     console.log(`Jugador ${socketId} no pudo unirse a la sala ${room}`);
     socketEmit(socketId, "Error de unión a la sala", room);
@@ -37,12 +41,12 @@ function joinRoom(socketId, room, code) {
 // Función para salir de una sala
 function leaveRoom(socketId) {
   const room = sids.get(socketId);
-  if (room) {
-    rooms.get(room).delete(socketId);
+  if (room.room) {
+    rooms.get(room.room).delete(socketId);
     sids.delete(socketId);
-    console.log(`Jugador ${socketId} abandonó la sala ${room}`);
-    socketEmit(socketId, "Salida de sala", room);
-    socketBroadcastToOthers(socketId, "Jugador abandonó sala", room);
+    console.log(`Jugador ${socketId} abandonó la sala ${room.room}`);
+    socketEmit(socketId, "Salida de sala", room.room);
+    socketBroadcastToOthers(socketId, "Jugador abandonó sala", room.room, room.code);
   }
 }
 
