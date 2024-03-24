@@ -21,8 +21,11 @@ describe('POST /auth', () => {
   it('should authenticate a user', async () => {
     const token = process.env.TOKEN_PRUEBA; // replace with a test token
     console.log('token', token);
-    const res = await request(app).post('/auth').send({ token }).expect(200);
-
+    const res = await request(app)
+      .post('/auth')
+      .send({ token: `Bearer ${token}` })
+      .expect(200);
+      
     expect(res.body).toHaveProperty('status', 'success');
     expect(res.body).toHaveProperty('userId');
   });
@@ -32,7 +35,7 @@ describe('POST /auth', () => {
 
         const res = await request(app)
             .post('/auth')
-            .send({ token })
+            .set('Authorization', `Bearer ${token}`)
             .expect(401);
 
         expect(res.body).toHaveProperty('status', 'error');
