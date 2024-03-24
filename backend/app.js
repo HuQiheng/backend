@@ -43,13 +43,15 @@ app.get('/', (req, res) => {
 const userRoutes = require("./routes/userRoutes");
 app.use("/user", userRoutes);
 
+const gameRoutes = require("./routes/gamesRoutes");
+app.use("/games", gameRoutes);
 
 // Sample payload for the JWT
 const payload = {
   userId: '1',
   username: 'Ahmed',
   email: 'akarafy@gmail.com',
-  at_hash: 'contrasñea'
+  at_hash: 'contraseña'
   // Add any other claims you want to include in the token
 };
 
