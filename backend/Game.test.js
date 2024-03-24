@@ -10,6 +10,14 @@ test('Crear sala', () => {
   expect(rooms.has('sala1')).toBe(true);
 });
 
+// Prueba crear sala existente
+test('Crear sala existente', () => {
+  const socketId = serverSocket;
+  createRoom(socketId, 'sala1');
+  const result = createRoom(socketId, 'sala1');
+  expect(result).toBe('Error: La sala ya existe');
+});
+
 // Prueba unirse a sala
 test('Unirse a una sala existente', () => {
   const socketId = serverSocket;
