@@ -7,20 +7,20 @@ const rooms = new Map();
 
 // Función para crear una sala y que el socket genere el codigo de invitación para que se lo pueda enviar a sus amigos
 function createRoom(socketId, room) {
-  if (!rooms.has(room)) {
-    rooms.set(room, new Set());
+  if (rooms.has(room)) {
+    return 'Error: La sala ya existe';
   }
+  rooms.set(room, new Set());
   rooms.get(room).add(socketId);
-  //genera el código de invitación para unirse a la sala
   const code = 3;
-  //const code = Math.random().toString(36).substring(2, 8).toUpperCase();
   sids.set(socketId, {room, code});
   console.log(`Jugador ${socketId} creó la sala ${room} con código de acceso ${code}`);
   
   socketEmit(socketId, "Código de acceso", code);
   socketBroadcastToOthers(socketId, "Sala creada", room, code);
-}
 
+  return 'Sala creada con éxito';
+}
 // Función para unirse a una sala existente por codigo de invitacion
 function joinRoom(socketId, room, code) {
   // Verifica si la sala existe y si el código es correcto
