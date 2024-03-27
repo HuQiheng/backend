@@ -11,7 +11,7 @@ router.post('/auth', async (req, res) => {
   try {
     const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID,  // replace with your Client ID
+        audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
     const userid = payload['sub'];
@@ -39,15 +39,37 @@ router.post('/auth', async (req, res) => {
   }
 });
 
-/*router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
+router.get('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
     try {
       const playerInstance = new PlayerController();
-      const userInfo = await playerInstance.select(req.params.myID);
+      const userInfo = await playerInstance.selectPlayer(req.params.myID);
       res.send(userInfo);
     } catch (error) {
       console.error('Error getting user info', error);
       res.status(500).send('Internal Server Error');
     }
-  });*/
+});
+
+router.put('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
+    try {
+      const playerInstance = new PlayerController();
+      await playerInstance.updatePlayer(req.params.myID, req.body.username, req.body.password);
+      res.send('User updated');
+    } catch (error) {
+      console.error('Error updating user info', error);
+      res.status(500).send('Internal Server Error');
+    }
+});
+
+router.delete('/users/:myID', validateJWT, async (req, res) => { // Use validateJWT as middleware
+    try {
+      const playerInstance = new PlayerController();
+      await playerInstance.deletePlayer(req.params.myID);
+      res.send('User deleted');
+    } catch (error) {
+      console.error('Error deleting user', error);
+      res.status(500).send('Internal Server Error');
+    }
+});
 
 module.exports = router; // Export the router 

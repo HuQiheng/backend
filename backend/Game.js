@@ -13,12 +13,13 @@ function createRoom(socketId, room) {
   rooms.set(room, new Set());
   rooms.get(room).add(socketId);
   const code = 3;
+  // Crear la partida en la BD y el código que devuelva que sea el de acceso
   sids.set(socketId, {room, code});
   console.log(`Jugador ${socketId} creó la sala ${room} con código de acceso ${code}`);
   
   socketEmit(socketId, "Código de acceso", code);
   socketBroadcastToOthers(socketId, "Sala creada", room, code);
-
+  
   return 'Sala creada con éxito';
 }
 // Función para unirse a una sala existente por codigo de invitacion
