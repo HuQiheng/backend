@@ -1,3 +1,9 @@
+jest.mock('passport', () => ({
+  use: jest.fn(),
+  serializeUser: jest.fn(),
+  deserializeUser: jest.fn(),
+}));
+
 const passport = require('passport');
 const Player = require("../../controllers/PlayerController");
 const jwt = require('jsonwebtoken');
@@ -45,7 +51,14 @@ describe('GoogleStrategy', () => {
 
     Player.selectPlayeByname.mockRejectedValue(error);
 
-    await verifyCallback('accessToken', 'refreshToken', {}, doneCallback);
+    const profile = {
+      _json: {
+        email: 'test@test.com',
+        name: 'test',
+      },
+    };
+
+    await verifyCallback('accessToken', 'refreshToken', profile, doneCallback);
 
     expect(doneCallback).toHaveBeenCalledWith(error);
   });
