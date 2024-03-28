@@ -15,11 +15,12 @@
   },
   "name": "server",
   "version": "1.0.0",
-  "description": "Backen of the group 12 at Proyecto Software",
+  "description": "Backend of the group 12 at Proyecto Software",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "test": "jest --detectOpenHandles tests/**/**.test.js"
+    "test": "jest --detectOpenHandles tests/**/**.test.js",
+    "pretty": "npx prettier . --write"
   },
   "devDependencies": {
     "jest": "^29.7.0",

@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-require("dotenv").config();
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const router = require('../../routes/gamesRoutes');
 
@@ -11,24 +11,24 @@ app.use('/', router);
 let server;
 
 beforeAll(() => {
-    server = app.listen(); // start server
+  server = app.listen(); // start server
 });
 
 afterAll((done) => {
-    server.close(done); // close server after all tests
+  server.close(done); // close server after all tests
 });
 
 describe('POST /games', () => {
-    it('should create a game room', async () => {
-        // Generate a test JWT
-        const secretKey = process.env.SECRET_KEY; 
-        const payload = { email: 'hvmouse@gmail.com' }; // replace with your payload
-        const testJwt = jwt.sign(payload, secretKey);
+  it('should create a game room', async () => {
+    // Generate a test JWT
+    const secretKey = process.env.SECRET_KEY;
+    const payload = { email: 'hvmouse@gmail.com' }; // replace with your payload
+    const testJwt = jwt.sign(payload, secretKey);
 
-        const testPlayer = 'Hugo';
+    const testPlayer = 'Hugo';
 
-        const res = await request(app).post('/games').send({ jwt: testJwt, player: testPlayer }).expect(200);
+    const res = await request(app).post('/games').send({ jwt: testJwt, player: testPlayer }).expect(200);
 
-        expect(res.body).toHaveProperty('code');
-    });
+    expect(res.body).toHaveProperty('code');
+  });
 });
