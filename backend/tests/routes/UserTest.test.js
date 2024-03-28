@@ -1,34 +1,63 @@
 const request = require('supertest');
 const express = require('express');
 const router = require('../../routes/userRoutes');
+const playerController = require('../../controllers/PlayerController');
+const { pool } = require('../../db/index');
 
 const app = express();
 app.use(express.json());
-app.use('/', router);
+
+// Test authentication middleware
+app.use((req, res, next) => {
+  req.user = {
+    email: 'test@example.com',
+  };
+  req.isAuthenticated = () => true;
+  next();
+});
+
+app.use('/test', router);
+
+afterAll(() => {
+  pool.end();
+});
 
 describe('Player Routes', () => {
-  it('GET /get/:myID - should fetch user info', async () => {
-    const myID = 'test-id'; // replace with a test id
-    const res = await request(app).get(`/get/${myID}`);
+  let testPlayer;
+
+  beforeEach(async () => {
+    // Inserts a test player before each test
+    testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password');
+  });
+
+  afterEach(async () => {
+    // Deletes the test player after each test
+    await playerController.deletePlayer('test@example.com');
+  });
+
+  it('should get user info', async () => {
+    const res = await request(app)
+      .get('/test/get/test@example.com')
+      .send();
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('name');
     expect(res.body).toHaveProperty('email');
-    // add more assertions based on the structure of your user info
   });
 
-  it('POST /update/:myID - should update user info', async () => {
-    const myID = 'test-id'; // replace with a test id
-    const res = await request(app).post(`/update/${myID}`).send({
-      username: 'new-username', // replace with test data
-      password: 'new-password', // replace with test data
-    });
+  it('should update user info', async () => {
+    const res = await request(app)
+      .post('/test/update/test@example.com')
+      .send({
+        username: 'test',
+        password: 'password'
+      });
     expect(res.statusCode).toEqual(200);
-    expect(res.text).toEqual('User updated');
+    expect(res.text).toEqual('User updated test@example.com');
   });
 
-  it('DELETE /delete/:myID - should delete user', async () => {
-    const myID = 'test-id'; // replace with a test id
-    const res = await request(app).delete(`/delete/${myID}`);
+  it('should delete a user', async () => {
+    const res = await request(app)
+      .delete('/test/delete/test@example.com')
+      .send();
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('User deleted');
   });

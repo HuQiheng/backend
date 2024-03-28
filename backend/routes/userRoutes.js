@@ -27,7 +27,7 @@ router.post('/update/:email', checkAuthenticated, async (req, res) => {
     console.log('Password: ' + req.body.password);
     if (req.user.email === req.params.email) {
       const userInfo = await playerController.updatePlayer(req.params.email, req.body.username, req.body.password);
-      res.send('User updated ' + userInfo.rows[0]);
+      res.send('User updated ' + userInfo.rows[0].email.trim());
     }
   } catch (error) {
     console.error('Error updating user info', error);

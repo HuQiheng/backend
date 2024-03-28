@@ -13,7 +13,7 @@ const insertPlayer = async (email, username, password) => {
 
 const updatePlayer = async (email, username, password) => {
   try {
-    const query = `UPDATE Player SET username = $2, password = $3 WHERE email = $1`;
+    const query = `UPDATE Player SET username = $2, password = $3 WHERE email = $1 RETURNING *`;
     const values = [email, username, password];
     const result = await db.query(query, values);
     return result;
