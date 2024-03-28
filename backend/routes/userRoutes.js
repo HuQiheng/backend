@@ -32,6 +32,10 @@ router.post('/auth', async (req, res) => {
     }
     //genero el jwt
     const token = jwt.sign({email}, process.env.SECRET_KEY, {expiresIn: '1h'});
+    
+    // Asociar el socketio al usuario
+    io.on('connection', (socket) => {
+    });
 
     req.session.userId = userid;
     res.send({status: 'success', userId: userid});
