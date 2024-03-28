@@ -1,9 +1,14 @@
 const express = require('express');
 const {OAuth2Client} = require('google-auth-library');
 const jwt = require('jsonwebtoken');
+const http = require('http');
+const socketIo = require('socket.io');
 const router = express.Router(); // Create a new router
 require('dotenv').config();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
 router.post('/auth', async (req, res) => {
   const token = req.body.token;
@@ -30,7 +35,7 @@ router.post('/auth', async (req, res) => {
 
     req.session.userId = userid;
     res.send({status: 'success', userId: userid});
-    return res.status(200).json({token});
+    return res.status(200).json({token, io});
 
     // Save session id and return response
 
