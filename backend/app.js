@@ -40,32 +40,8 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
-const userRoutes = require("./routes/userRoutes");
-app.use("/user", userRoutes);
-
-
-// Sample payload for the JWT
-const payload = {
-  userId: '1',
-  username: 'Ahmed',
-  email: 'akarafy@gmail.com',
-  at_hash: 'contrasñea'
-  // Add any other claims you want to include in the token
-};
-
-// Secret key to sign the token (keep it secret and secure)
-const secretKey = process.env.SECRET_KEY;
-
-// Options for JWT generation (optional)
-const options = {
-  expiresIn: '1h', // Token expires in 1 hour
-  // Add any other options as needed
-};
-
-// Generate the JWT
-const token = jwt.sign(payload, secretKey, options);
-
-console.log('Generated JWT:', token);
+const authRoutes = require("./routes/authRoutes");
+app.use("/auth",authRoutes);
 
 
 // General error management

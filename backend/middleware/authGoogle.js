@@ -11,14 +11,13 @@ passport.use(
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.SECRET_KEY,
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
-        scope:['profile', 'email'],
-    }, async (accesToken, refreshToken, profile, done) => {
+        scope:['email','profile'],
+    }, async (accesToken, refreshToken, profile,done) => {
+        console.log(profile);
         //Accces user google profile
         const account = profile._json;
-        const email = profile._json.email;
-        console.log(email)
         console.log(account);
-        try {
+        /*try {
             const user = {
                 name: account.name,
                 email: account.email
@@ -41,7 +40,7 @@ passport.use(
 
         } catch (error) {
             done(error);
-        }
+        }*/
     })
 );
 

@@ -10,7 +10,7 @@ router.get('/google', passport.authenticate("google",{
 }));
 
 router.get('/google/callback', 
-  passport.authenticate("google", {session: true}), (req,res) =>{
+  passport.authenticate("google", {session: true, scope: ['email','profile']}), (req,res) =>{
     res.send(req.token);
 });
 module.exports = router; // Export the router
