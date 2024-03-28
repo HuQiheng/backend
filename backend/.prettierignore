@@ -78,10 +78,7 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
-<<<<<<< HEAD
-=======
 backend/*.env
->>>>>>> ramaAuxiliar
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -132,7 +129,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-<<<<<<< HEAD
-=======
 
->>>>>>> ramaAuxiliar
