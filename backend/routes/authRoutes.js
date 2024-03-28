@@ -5,12 +5,19 @@ require('dotenv').config();
 
 
 //Use google strategy as middleware
+//We want the user info profile and the email
 router.get('/google', passport.authenticate("google",{
-  scope: "profile",
+  scope: [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email'
+  ]
 }));
 
 router.get('/google/callback', 
-  passport.authenticate("google", {session: true, scope: ['email','profile']}), (req,res) =>{
+  passport.authenticate("google", {session: true, scope: [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email'
+  ]}), (req,res) =>{
     res.send(req.token);
 });
 module.exports = router; // Export the router

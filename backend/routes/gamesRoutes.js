@@ -1,6 +1,5 @@
 const express = require('express');
-const Game = require('../Game');
-const { validateJWT } = require('../auth/auth');
+const Game = require('../middleware/game');
 
 const router = express.Router();
 

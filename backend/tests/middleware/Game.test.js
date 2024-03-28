@@ -1,6 +1,6 @@
 // Game.test.js
 // importar Game
-const { createRoom, joinRoom, leaveRoom, rooms } = require('./Game');
+const { createRoom, joinRoom, leaveRoom, rooms } = require('../../middleware/game');
 const { serverSocket, cleanUp } =  require('socket.io-client');
 
 // Prueba crear sala

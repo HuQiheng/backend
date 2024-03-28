@@ -7,13 +7,16 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 require("./middleware/authGoogle");
 const jwt = require('jsonwebtoken');
+
 //Enable comuniccation with our fronted
 app.use(cors({
   credentials: true,
   origin: process.env.CLIENT_URL,
 }))
+
 //Body parser for post and update petitions
 app.use(bodyParser.json());
+
 //Every petition will have a session information
 app.use(session({
   //You need to have the secret to generate the cookies
@@ -40,6 +43,7 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
+//Authentification route
 const authRoutes = require("./routes/authRoutes");
 app.use("/auth",authRoutes);
 

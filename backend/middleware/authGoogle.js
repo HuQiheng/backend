@@ -1,7 +1,6 @@
 //Requires
 const passport = require('passport');
 const {Strategy: GoogleStrategy} = require('passport-google-oauth20');
-const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const Player = require("../controllers/PlayerController");
 
@@ -13,43 +12,51 @@ passport.use(
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
         scope:['email','profile'],
     }, async (accesToken, refreshToken, profile,done) => {
-        console.log(profile);
         //Accces user google profile
         const account = profile._json;
+        const email = profile.emails[0].value;
+        console.log("Email: " + email)
         console.log(account);
-        /*try {
+        try {
             const user = {
                 name: account.name,
-                email: account.email
+                email: account.email,
+                password: account.sub
             };
             //We look if the user exists
-            const query = await Player.selectPlayeByname(account.name);
+            const query = await Player.selectPlayer(email);
             if(query.rows.length === 0) {
                 //create user
-                await Player.insertPlayer(account.email, account.name, account.password);
-                //WE NEED THE TOKEN STORED AND VERIFY
-
-            } else {
-                //The user does not exist generate the token and store it
-                await Player.insertPlayer(account.email, account.name, account.password);
-            }
-            const secretKey = process.env.JWT_SECRET;
-            const token = jwt.sign(user, secretKey);
-            console.log(token);
-            done(null,token);
+                await Player.insertPlayer(email, account.name, account.sub);
+                
+            } 
+            //If the user exists no action is needed just return the user
+            done(null,user);
 
         } catch (error) {
             done(error);
-        }*/
+        }
     })
 );
 
+//ntoe: user is stored in req.session.passport.user.{user} use it if its needed
+//With serialize and deserializa this information is attached to  req.user.{auth_user}
 
 //Just the most simple confguration
-passport.serializeUser((token, done) => {
-    done(null,token);
+passport.serializeUser((user, done) => {
+    done(null,user);
 });
 
-passport.deserializeUser((token, done) => {
-    done(null,token)
+passport.deserializeUser((user, done) => {
+    done(null,user)
 });
+
+
+//Middleware to check if the user is logged if it's not redirect them to the login
+checkAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) { 
+        return next(); 
+    }
+    //Redirect them to the login
+    res.redirect("/google")
+}

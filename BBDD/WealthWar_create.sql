@@ -3,7 +3,7 @@ CREATE TABLE Player
 (
    email CHAR(50) PRIMARY KEY,
    username CHAR(20) NOT NULL,
-   password CHAR(20) NOT NULL
+   password CHAR(30) NOT NULL
 );
 
 -- Game table creation
