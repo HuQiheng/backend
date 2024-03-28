@@ -72,8 +72,8 @@ if(process.env.MODE_ENV === 'development'){
 else{
   //Bring up https server
   const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem')
+    key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem')
   };
   host = process.env.CLIENT_URL;
   https.createServer(options, app).listen(3010, host, () => {
