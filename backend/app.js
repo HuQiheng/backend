@@ -58,6 +58,14 @@ app.use((err, req, res, next) => {
   res.status(500).send('¡Algo salió mal!');
 });
 
-app.listen(process.env.PORT_LISTEN || 3010, () => {
-  console.log('Server is listening on port 3010');
+let host;
+if(process.env.MODE_ENV === 'development'){
+  host = 'localhost';
+}
+else{
+  host = process.env.CLIENT_URL;
+}
+
+app.listen(3010, host,() => {
+  console.log(`Server is listening on ${host}:${3010}`);;
 });
