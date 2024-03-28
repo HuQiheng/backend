@@ -5,6 +5,10 @@ const cors = require('cors');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const passport = require('passport');
+
+const https = require('https');
+const fs = require('fs');
+
 require('./middleware/authGoogle');
 const jwt = require('jsonwebtoken');
 
@@ -61,11 +65,21 @@ app.use((err, req, res, next) => {
 let host;
 if(process.env.MODE_ENV === 'development'){
   host = 'localhost';
+  app.listen(3010, host,() => {
+    console.log(`Server is listening on ${host}:${3010}`);;
+  });
 }
 else{
+  //Bring up https server
+  const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem')
+  };
   host = process.env.CLIENT_URL;
+  https.createServer(options, app).listen(3010, host, () => {
+    console.log(`Server is listening on https://${host}:3010`);
+  });
 }
 
-app.listen(3010, host,() => {
-  console.log(`Server is listening on ${host}:${3010}`);;
-});
+
+
