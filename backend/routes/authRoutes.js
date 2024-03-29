@@ -14,7 +14,7 @@ router.get(
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: true, successRedirect: '/', failureRedirect: '/auth/google' }),
+  passport.authenticate('google', { session: true, successRedirect: 'https://wealthwars.games/dashboard', failureRedirect: '/auth/google' }),
   (req, res) => {
     console.log('Devuelto ' + JSON.stringify(req.user));
     res.send(req.user);
