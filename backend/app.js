@@ -56,6 +56,9 @@ app.use('/auth', authRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/users', userRoutes);
 
+const gameroutes = require('./routes/gamesRoutes');
+app.use('/games',gameroutes);
+
 // General error management
 app.use((err, req, res, next) => {
   console.error(err.stack);

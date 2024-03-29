@@ -1,27 +1,20 @@
 const express = require('express');
 const Game = require('../middleware/game');
-
+const socket = require('socket.io')();
 const router = express.Router();
+const checkAuthenticated = require('../middleware/authGoogle');
+// Route to create a room game, user needs to be authenticated
+router.post('/create',checkAuthenticated, async (req, res) => {
+  // Take the player from de body
+  const player = req.body.player;
 
-// Ruta para crear una sala de juego
-router.post('/games', async (req, res) => {
-  // Extraer el JWT del cuerpo de la solicitud
-  const { jwt, player } = req.body;
+  //Check first if the user is in another game
 
-  // Validar el JWT
-  // Comenta las siguientes líneas si quieres deshabilitar la validación temporalmente
-  /*
-    const isValid = await validateJWT(jwt);
-    if (!isValid) {
-        return res.status(401).json({ error: 'Invalid token' });
-    }
-    */
-
-  // Crear una nueva sala de juego
+  // Create a new game
   const room = Math.random().toString(36).substring(2, 8).toUpperCase();
-  Game.createRoom(player, room);
+  socket.emit('createRoom', room);
 
-  // Devolver el código de la sala de juego
+  // Return to the user the code
   res.json({ code: Game.rooms.get(room) });
 });
 
