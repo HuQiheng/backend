@@ -36,7 +36,14 @@ router.get(
       res.redirect('/?user=' + userData);
     }
     else{
-      res.redirect('https://wealthwars.games/dashboard?user=' + userData);
+      //We distinguish between development and production
+      if(process.env.MODE_ENV === 'development'){
+        res.redirect('http://localhost:3000/dashboard?user=' + userData);
+      }
+      else{
+        res.redirect('https://wealthwars.games/dashboard?user=' + userData);
+      }
+      
     }
     console.log('Devuelto ' + JSON.stringify(req.user));
     
