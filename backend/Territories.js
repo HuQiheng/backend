@@ -1,7 +1,13 @@
 // Process territories.json for take information about territories
 const fs = require('fs');
 const data = require('./territories.json');
+const {rooms } = require('./middleware/game.js');
 
+// Players in the room
+const players = [...rooms.keys()];
+console.log(players);
+
+/*
 const players = [{
     name: 'Jaime',
     email: 'jaime@gmail.com',
@@ -23,7 +29,7 @@ const players = [{
     picture: 'sfddsff'
 }
 ];
-
+*/
 // Assign territories
 function assignTerritories(players, data) {
     const territoryAssignment = {};
