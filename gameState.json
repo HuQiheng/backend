@@ -1,256 +1,258 @@
 {
     "turn": 0,
-    "players": [],
+    "players": [
+        "Jaime"
+    ],
     "map": {
         "A": {
             "name": "Alicante",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "AB": {
             "name": "Albacete",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "AL": {
             "name": "Alentejo - Algarve",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "AM": {
             "name": "Almería",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "AS": {
             "name": "Ávila - Segovia",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "BA": {
             "name": "Badajoz",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "BG": {
             "name": "Barcelona - Gerona",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "BU": {
             "name": "Burgos",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "C": {
             "name": "La Coruña",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "CC": {
             "name": "Cáceres",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "CO": {
             "name": "Córdoba",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "CR": {
             "name": "Ciudad Real",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "CS": {
             "name": "Castellón",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "CU": {
             "name": "Cuenca",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "GR": {
             "name": "Granada",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "GU": {
             "name": "Guadalajara",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "H": {
             "name": "Huelva",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "HU": {
             "name": "Huesca",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "J": {
             "name": "Jaén",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "L": {
             "name": "Lérida",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "LE": {
             "name": "León",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "LN": {
             "name": "La Rioja - Navarra",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "LU": {
             "name": "Lugo",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "M": {
             "name": "Madrid",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "MC": {
             "name": "Málaga - Cádiz",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "MU": {
             "name": "Murcia",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "O": {
             "name": "Asturias",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "PC": {
             "name": "Portugal Centro",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "PN": {
             "name": "Portugal Norte",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "PO": {
             "name": "Pontevedra - Orense",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "PV": {
             "name": "País Vasco",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "S": {
             "name": "Cantabria",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "SA": {
             "name": "Salamanca",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "SE": {
             "name": "Sevilla",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "SO": {
             "name": "Soria",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "T": {
             "name": "Tarragona",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "TE": {
             "name": "Teruel",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "TO": {
             "name": "Toledo",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "V": {
             "name": "Valencia",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "VP": {
             "name": "Valladolid - Palencia",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "Z": {
             "name": "Zaragoza",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "ZA": {
             "name": "Zamora",
-            "player": null,
+            "player": 0,
             "troops": 3,
             "factories": 0
         }
