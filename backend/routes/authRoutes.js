@@ -38,10 +38,10 @@ router.get(
     else{
       //We distinguish between development and production
       if(process.env.MODE_ENV === 'development'){
-        res.redirect('http://localhost:3000/dashboard?user=' + userData);
+        res.redirect('http://localhost:3000/signin?user=' + userData);
       }
       else{
-        res.redirect('https://wealthwars.games/dashboard?user=' + userData);
+        res.redirect('https://wealthwars.games/signin?user=' + userData);
       }
       
     }
