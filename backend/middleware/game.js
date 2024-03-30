@@ -29,7 +29,10 @@ function createRoom(socketId, room) {
 function joinRoom(socketId, room, code) {
   // Verifica si la sala existe y si el código es correcto
   let realRoom = [...rooms.keys()].find((r) => r === room);
-  c = sids.get(socketId);
+  //let c = sids.get(socketId);
+  let p = rooms.get(room);
+  const pl = Array.from(p);
+  let c = sids.get(pl[0]);
   if (realRoom && c && c.code == code) {
     rooms.get(room).add(socketId);
     sids.set(socketId, { room, code });

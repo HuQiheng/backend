@@ -1,18 +1,20 @@
 // Process territories.json for take information about territories
 const fs = require('fs');
 const data = require('./territories.json');
-const { sids, rooms, joinRoom, createRoom } = require('./middleware/game.js');
+const { rooms, joinRoom, createRoom } = require('./middleware/game.js');
 
 //Player create a room and join
 const player1 = 'Jaime';
+const player2 = 'Javier';
+const player3 = 'Jorge';
+const player4 = 'Job';
 const room1 = 'prueba1';
 createRoom(player1, room1);
 joinRoom(player1, room1, 3);
+joinRoom(player2, room1, 3);
+joinRoom(player3, room1, 3);
+joinRoom(player4, room1, 3);
 
-// Get players in the room and number of players
-const p = rooms.get(room1);
-const players = Array.from(p);
-console.log(players);
 /*
 const players = [{
     name: 'Jaime',
@@ -72,6 +74,9 @@ function getTerritories(players, data) {
 
     return state;
 }
+
+const p = rooms.get(room1);
+const players = Array.from(p);
 
 // Guardar el estado del juego en un archivo
 fs.writeFileSync('gameState.json', JSON.stringify(getTerritories(players, data), null, 4));
