@@ -20,7 +20,7 @@
   "description": "Backend of the group 12 at Proyecto Software",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon ./server/app.js",
     "test": "jest --detectOpenHandles tests/**/**.test.js",
     "pretty": "npx prettier . --write"
   },

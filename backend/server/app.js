@@ -1,21 +1,14 @@
-const express = require('express');
 require('dotenv').config();
+const express = require('express');
 const app = express();
 const cors = require('cors');
-
+const {sessionMiddleware} = require('../middleware/serveMiddleware');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const sharedsession = require("express-socket.io-session");
-const socketIo = require('socket.io');
-
-const https = require('https');
-const fs = require('fs');
 
 require('../middleware/authGoogle');
 
-//For security reasons we only allow origins from our client url and localhost port 3000
-const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:3000'];
-//Enable comuniccation with our fronted
+//Enable cros comunication
 app.use(
   cors({
     credentials: true,
@@ -24,20 +17,12 @@ app.use(
 
 //Body parser for post and update petitions
 app.use(bodyParser.json());
-
-
-
-app.use(expressSession);
+app.use(sessionMiddleware);
 
 //Passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Configure Socket.IO to share the Express session
-let io = socketIo();
-io.use(sharedsession(expressSession, {
-  autoSave: true
-}));
 
 // Main page route
 app.get('/', (req, res) => {
@@ -45,7 +30,7 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
-//Authentication route
+//Used routes
 const authRoutes = require('../routes/authRoutes');
 app.use('/auth', authRoutes);
 
@@ -61,21 +46,45 @@ app.use((err, req, res, next) => {
   res.status(500).send('¡Algo salió mal!');
 });
 
-let host;
+
+//Where using socket io, for game states
+const { Server } = require("socket.io");
+
+//Ditinguish between development and production
 if(process.env.MODE_ENV === 'development'){
-  host = 'localhost';
-  app.listen(3010, host,() => {
+  
+  //Create an http server
+  const { createServer } = require("node:http");
+  const httpServer = createServer(app);
+  
+  //Use same session context as express
+  const io = new Server(httpServer);
+  io.engine.use(sessionMiddleware);
+
+  //Listen
+  const host = 'localhost';
+  httpServer.listen(3010, host,() => {
     console.log(`Server is listening on ${host}:${3010}`);
   });
 }
 else{
-  //Bring up https server
+  //Create an https server
+  const https = require('https');
+  const fs = require('fs');
+  
   const options = {
     key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem')
   };
-  host = process.env.CLIENT_URL;
-  https.createServer(options, app).listen(3010, host, () => {
+  const httpsServer = https.createServer(options, app);
+
+  //Using same session context as express
+  const io = new Server(httpsServer);
+  io.engine.use(sessionMiddleware);
+
+  //Listen
+  const host = process.env.CLIENT_URL;
+  httpsServer.listen(3010, host, () => {
     console.log(`Server is listening on https://${host}:3010`);
   });
 }

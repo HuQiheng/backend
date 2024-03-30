@@ -1,6 +1,6 @@
 const session = require('express-session');
 
-//Every petition will have a session information
+//Every petition will have a session information, we use this as a middleware for express and socket
 const sessionMiddleware = session({
     //You need to have the secret to generate the cookies
     secret: process.env.COOKIE_SECRET,
@@ -14,4 +14,8 @@ const sessionMiddleware = session({
     saveUninitialized: false,
 });
 
-module.exports = {sessionMiddleware};
+//Just a wrapper for socket io 
+const wrap = expressMiddleware => (socket, next) => 
+expressMiddleware(socket.request, {}, next);
+
+module.exports = {sessionMiddleware, wrap};
