@@ -13,3 +13,5 @@ const sessionMiddleware = session({
     resave: false,
     saveUninitialized: false,
 });
+
+module.exports = {sessionMiddleware};
