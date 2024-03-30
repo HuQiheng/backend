@@ -4,6 +4,7 @@ const data = require('./territories.json');
 const { rooms, joinRoom, createRoom } = require('./middleware/game.js');
 
 //Player create a room and join
+
 const player1 = 'Jaime';
 const player2 = 'Javier';
 const player3 = 'Jorge';
@@ -14,6 +15,7 @@ joinRoom(player1, room1, 3);
 joinRoom(player2, room1, 3);
 joinRoom(player3, room1, 3);
 joinRoom(player4, room1, 3);
+
 
 /*
 const players = [{
@@ -75,8 +77,10 @@ function getTerritories(players, data) {
     return state;
 }
 
-const p = rooms.get(room1);
-const players = Array.from(p);
+function getPlayers(room) {
+    const p = rooms.get(room);
+    return Array.from(p);
+}
 
 // Guardar el estado del juego en un archivo
-fs.writeFileSync('gameState.json', JSON.stringify(getTerritories(players, data), null, 4));
+fs.writeFileSync('gameState.json', JSON.stringify(getTerritories(getPlayers(room1), data), null, 4));
