@@ -36,9 +36,13 @@ function joinRoom(socketId, room, code) {
   if (realRoom && c && c.code == code) {
     rooms.get(room).add(socketId);
     sids.set(socketId, { room, code });
+    let p1 = rooms.get(room);
+    const pl1 = Array.from(p1);
     console.log(`Jugador ${socketId} se conectó a la sala ${room}`);
     socketEmit(socketId, 'Acceso a sala', room);
     socketBroadcastToOthers(socketId, 'Jugador conectado', room, code);
+    //Notificar jugadores dentro de la sala
+    socketBroadcast(socketId, 'Jugadores conectados', room, code, pl1);
   } else {
     console.log(`Jugador ${socketId} no pudo unirse a la sala ${room}`);
     socketEmit(socketId, 'Error de unión a la sala', room);
@@ -71,6 +75,18 @@ function socketEmit(socketId, event, data) {
   console.log(`Emitiendo evento ${event} con código ${data} a ${socketId}`);
 
   io.to(socketId).emit(event, data);
+}
+
+// Envio de mensajes a todos los sockets de la sala
+function socketBroadcast(socketId, event, room, data, players) {
+  rooms.get(room).forEach((sid) => {
+      emit(sid, event, room, data, players);
+  });
+}
+
+function emit(socketId, event, room, data, players) {
+  console.log(`Emitiendo evento ${event} a la sala ${room}: ${players} con código ${data} a ${socketId}`);
+  io.to(socketId).emit(event, data, players);
 }
 
 // Conexion de un socket
