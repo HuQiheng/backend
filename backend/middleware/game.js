@@ -90,6 +90,15 @@ function emit(socketId, event, room, data, players) {
   io.to(socketId).emit(event, data, players);
 }
 
+// Funcion para iniciar partida en una sala
+function startGame(socketId, room) {
+  const p = rooms.get(room);
+  const pl = Array.from(p);
+  console.log(`Iniciando partida en la sala ${room}`);
+  socketBroadcast(socketId, 'Iniciar partida', room, pl);
+  return 'Partida iniciada';
+}
+
 // Conexion de un socket
 io.on('connection', (socket) => {
     // Comprueba si el cliente está autenticado
@@ -118,4 +127,4 @@ io.on('connection', (socket) => {
     }
 });
 
-module.exports = { createRoom, joinRoom, leaveRoom, rooms, server, io };
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, server, io };
