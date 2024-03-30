@@ -9,25 +9,25 @@
     "map": {
         "A": {
             "name": "Alicante",
-            "player": 3,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "AB": {
             "name": "Albacete",
-            "player": 1,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
         "AL": {
             "name": "Alentejo - Algarve",
-            "player": 0,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "AM": {
             "name": "Almería",
-            "player": 2,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
@@ -39,31 +39,31 @@
         },
         "BA": {
             "name": "Badajoz",
-            "player": 2,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "BG": {
             "name": "Barcelona - Gerona",
-            "player": 1,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "BU": {
             "name": "Burgos",
-            "player": 0,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "C": {
             "name": "La Coruña",
-            "player": 2,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "CC": {
             "name": "Cáceres",
-            "player": 1,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
@@ -75,7 +75,7 @@
         },
         "CR": {
             "name": "Ciudad Real",
-            "player": 3,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
@@ -87,7 +87,7 @@
         },
         "CU": {
             "name": "Cuenca",
-            "player": 2,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
@@ -99,7 +99,7 @@
         },
         "GU": {
             "name": "Guadalajara",
-            "player": 0,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
@@ -111,37 +111,37 @@
         },
         "HU": {
             "name": "Huesca",
-            "player": 0,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "J": {
             "name": "Jaén",
-            "player": 0,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "L": {
             "name": "Lérida",
-            "player": 2,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "LE": {
             "name": "León",
-            "player": 1,
+            "player": 3,
             "troops": 3,
             "factories": 0
         },
         "LN": {
             "name": "La Rioja - Navarra",
-            "player": 3,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "LU": {
             "name": "Lugo",
-            "player": 0,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
@@ -165,25 +165,25 @@
         },
         "O": {
             "name": "Asturias",
-            "player": 3,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
         "PC": {
             "name": "Portugal Centro",
-            "player": 3,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "PN": {
             "name": "Portugal Norte",
-            "player": 1,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
         "PO": {
             "name": "Pontevedra - Orense",
-            "player": 3,
+            "player": 1,
             "troops": 3,
             "factories": 0
         },
@@ -195,19 +195,19 @@
         },
         "S": {
             "name": "Cantabria",
-            "player": 1,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
         "SA": {
             "name": "Salamanca",
-            "player": 1,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
         "SE": {
             "name": "Sevilla",
-            "player": 3,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
@@ -225,13 +225,13 @@
         },
         "TE": {
             "name": "Teruel",
-            "player": 0,
+            "player": 2,
             "troops": 3,
             "factories": 0
         },
         "TO": {
             "name": "Toledo",
-            "player": 1,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },
@@ -249,7 +249,7 @@
         },
         "Z": {
             "name": "Zaragoza",
-            "player": 2,
+            "player": 0,
             "troops": 3,
             "factories": 0
         },

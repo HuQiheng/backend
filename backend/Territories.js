@@ -9,6 +9,7 @@ const player1 = 'Jaime';
 const player2 = 'Javier';
 const player3 = 'Jorge';
 const player4 = 'Job';
+const player5 = 'Jorge1';
 const room1 = 'prueba1';
 createRoom(player1, room1);
 joinRoom(player1, room1, 3);

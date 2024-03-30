@@ -30,14 +30,15 @@ function joinRoom(socketId, room, code) {
   // Verifica si la sala existe y si el código es correcto
   let realRoom = [...rooms.keys()].find((r) => r === room);
   //let c = sids.get(socketId);
-  let p = rooms.get(room);
+  p = rooms.get(room);
   const pl = Array.from(p);
-  let c = sids.get(pl[0]);
-  if (realRoom && c && c.code == code) {
+  c = sids.get(pl[0]);
+  s = p.size;
+  if (realRoom && c && c.code == code && s < 4) {
     rooms.get(room).add(socketId);
     sids.set(socketId, { room, code });
-    let p1 = rooms.get(room);
-    const pl1 = Array.from(p1);
+    p = rooms.get(room);
+    const pl1 = Array.from(p);
     console.log(`Jugador ${socketId} se conectó a la sala ${room}`);
     socketEmit(socketId, 'Acceso a sala', room);
     socketBroadcastToOthers(socketId, 'Jugador conectado', room, code);
