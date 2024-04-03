@@ -4,7 +4,7 @@ const sids = new Map();
 const rooms = new Map();
 
 // Creates a room and returns a unique code to join it
-function createRoom(socketId, room) {
+function createRoom(io,socketId, room) {
   if (rooms.has(room)) {
     return 'Error: La sala ya existe';
   }
@@ -16,14 +16,14 @@ function createRoom(socketId, room) {
   sids.set(socketId, { room, code });
   console.log(`Jugador ${socketId} creó la sala ${room} con código de acceso ${code}`);
 
-  socketEmit(socketId, 'Codigo de acceso', code);
-  socketBroadcastToOthers(socketId, 'Sala creada', room, code);
+  socketEmit(io,socketId, 'Acces code', code);
+ // socketBroadcastToOthers(socketId, 'Sala creada', room, code);
 
   return 'Sala creada con éxito';
 }
 
 // Función para unirse a una sala existente por codigo de invitacion
-function joinRoom(socketId, room, code) {
+function joinRoom(io,socketId, room, code) {
   // Verifica si la sala existe y si el código es correcto
   let realRoom = [...rooms.keys()].find((r) => r === room);
   //let c = sids.get(socketId);
@@ -37,10 +37,10 @@ function joinRoom(socketId, room, code) {
     p = rooms.get(room);
     const pl1 = Array.from(p);
     console.log(`Jugador ${socketId} se conectó a la sala ${room}`);
-    socketEmit(socketId, 'Acceso a sala', room);
-    socketBroadcastToOthers(socketId, 'Jugador conectado', room, code);
+    socketEmit(io,socketId, 'Acceso a sala', room);
+    socketBroadcastToOthers(io,socketId, 'Jugador conectado', room, code);
     //Notificar jugadores dentro de la sala
-    socketBroadcast(socketId, 'Jugadores conectados', room, code, pl1);
+    socketBroadcast(io,socketId, 'Jugadores conectados', room, code, pl1);
   } else {
     console.log(`Jugador ${socketId} no pudo unirse a la sala ${room}`);
     socketEmit(socketId, 'Error de unión a la sala', room);
@@ -60,31 +60,31 @@ function leaveRoom(socketId) {
 }
 
 // Envia mensaje a todos los sockets de la sala excepto al que lo envía
-function socketBroadcastToOthers(socketId, event, room, data) {
+function socketBroadcastToOthers(io,socketId, event, room, data) {
   rooms.get(room).forEach((sid) => {
     if (sid !== socketId) {
-      socketEmit(sid, event, data);
+      socketEmit(io,sid, event, data);
     }
   });
 }
 
 // Envio de mensajes individuales
-function socketEmit(socketId, event, data) {
+function socketEmit(io,socketId, event, data) {
   console.log(`Emitiendo evento ${event} con código ${data} a ${socketId}`);
 
   io.to(socketId).emit(event, data);
 }
 
 // Envio de mensajes a todos los sockets de la sala
-function socketBroadcast(socketId, event, room, data, players) {
+function socketBroadcast(io,socketId, event, room, data, players) {
   rooms.get(room).forEach((sid) => {
-      emit(sid, event, room, data, players);
+      emit(io,sid, event, room, data, players);
   });
 }
 
-function emit(socketId, event, room, data, players) {
+function emit(io,socketId, event, room, data, players) {
   console.log(`Emitiendo evento ${event} a la sala ${room}: ${players} con código ${data} a ${socketId}`);
-  io.to(socketId).emit(event, data, players);
+  io.to(socketId).emit(io,event, data, players);
 }
 
 // Funcion para iniciar partida en una sala

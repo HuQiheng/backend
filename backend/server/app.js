@@ -47,11 +47,15 @@ app.use((err, req, res, next) => {
 
 
 
-//To remove only tries for the socket io
+//To remove only tries for the socket io !!!!
 app.set('view engine', 'ejs');
 
-app.get('/connect', (req, res) =>{
+app.get('/create', (req, res) =>{
   res.render('createRoom');
+});
+
+app.get('/join', (req, res) => {
+  res.render('joinRoom');
 });
 
 //Where using socket io, for game states
@@ -128,10 +132,10 @@ io.on('connection', (socket) => {
     console.log("User authenticated: " + JSON.stringify(user));
       // Guarda el socketId en la sesión
       // Crear sala
-      socket.on('createRoom', (room) => createRoom(socket.id, room));
+      socket.on('createRoom', (room) => createRoom(io,socket.id, room));
 
       // Unirse a sala
-      socket.on('joinRoom', (room, code) => joinRoom(socket.id, room, code));
+      socket.on('joinRoom', (room, code) => joinRoom(io,socket.id, room, code));
 
       // Salir de sala
       socket.on('leaveRoom', () => leaveRoom(socket.id));
