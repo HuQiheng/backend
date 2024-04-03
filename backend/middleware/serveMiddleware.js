@@ -14,8 +14,15 @@ const sessionMiddleware = session({
     saveUninitialized: false,
 });
 
-//Just a wrapper for socket io 
-const wrap = expressMiddleware => (socket, next) => 
-expressMiddleware(socket.request, {}, next);
+const onlyForHandshake = (middleware) => {
+  return (req, res, next) => {
+    const isHandshake = req._query.sid === undefined;
+    if (isHandshake) {
+      middleware(req, res, next);
+    } else {
+      next();
+    }
+  };
+}
 
-module.exports = {sessionMiddleware, wrap};
+module.exports = {sessionMiddleware, onlyForHandshake};

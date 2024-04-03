@@ -56,6 +56,7 @@ passport.deserializeUser((user, done) => {
 });
 
 //Middleware to check if the user is logged if it's not redirect them to the login
+//This is for the express session
 checkAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();

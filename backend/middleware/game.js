@@ -1,7 +1,4 @@
 // Game.js
-const server = require('http').createServer();
-const io = require('socket.io')(server);
-
 // Genero los conjuntos
 const sids = new Map();
 const rooms = new Map();
@@ -99,32 +96,4 @@ function startGame(socketId, room) {
   return 'Partida iniciada';
 }
 
-// Conexion de un socket
-io.on('connection', (socket) => {
-    // Comprueba si el cliente está autenticado
-    if (checkAuthenticated(socket.handshake.session)) {
-        // Guarda el socketId en la sesión
-        socket.handshake.session.socketId = socket.id;
-        socket.handshake.session.save();
-
-        // Crear sala
-        socket.on('createRoom', (room) => createRoom(socket.id, room));
-
-        // Unirse a sala
-        socket.on('joinRoom', (room, code) => joinRoom(socket.id, room, code));
-
-        // Salir de sala
-        socket.on('leaveRoom', () => leaveRoom(socket.id));
-
-        // Desconexion de un socket
-        socket.on('disconnect', () => {
-            console.log(`Jugador ${socket.id} desconectado`);
-            leaveRoom(socket.id);
-        });
-    } else {
-        // Si el cliente no está autenticado, desconéctalo
-        socket.disconnect();
-    }
-});
-
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, server, io };
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};

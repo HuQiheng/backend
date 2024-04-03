@@ -2,11 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const {sessionMiddleware} = require('../middleware/serveMiddleware');
+const {sessionMiddleware, onlyForHandshake} = require('../middleware/serveMiddleware');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
-require('../middleware/authGoogle');
+const checkAuthenticated = require('../middleware/authGoogle');
+
 
 //Enable cros comunication
 app.use(
@@ -37,8 +38,6 @@ app.use('/auth', authRoutes);
 const userRoutes = require('../routes/userRoutes');
 app.use('/users', userRoutes);
 
-const gameroutes = require('../routes/gamesRoutes');
-app.use('/games',gameroutes);
 
 // General error management
 app.use((err, req, res, next) => {
@@ -47,25 +46,26 @@ app.use((err, req, res, next) => {
 });
 
 
+
+//To remove only tries for the socket io
+app.set('view engine', 'ejs');
+
+app.get('/connect', (req, res) =>{
+  res.render('createRoom');
+});
+
 //Where using socket io, for game states
 const { Server } = require("socket.io");
-
-//Ditinguish between development and production
+const { checkAuthenticatedSocketIO } = require('../middleware/authGoogle');
+//Io definition
+let io;
+let server;
 if(process.env.MODE_ENV === 'development'){
-  
-  //Create an http server
-  const { createServer } = require("node:http");
-  const httpServer = createServer(app);
-  
-  //Use same session context as express
-  const io = new Server(httpServer);
-  io.engine.use(sessionMiddleware);
-
-  //Listen
-  const host = 'localhost';
-  httpServer.listen(3010, host,() => {
-    console.log(`Server is listening on ${host}:${3010}`);
-  });
+   //Create an http server
+   const { createServer } = require("node:http");
+   server = createServer(app);
+   
+ 
 }
 else{
   //Create an https server
@@ -76,15 +76,71 @@ else{
     key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem')
   };
-  const httpsServer = https.createServer(options, app);
+  server = https.createServer(options, app);
 
-  //Using same session context as express
-  const io = new Server(httpsServer);
-  io.engine.use(sessionMiddleware);
 
-  //Listen
+}
+
+//Use same session context as express and passport
+io = new Server(server);
+io.engine.use(sessionMiddleware);
+io.engine.use(onlyForHandshake(passport.session()));
+
+//IO error management
+io.engine.use(
+  onlyForHandshake((req, res, next) => {
+    if (req.user) {
+      next();
+    } else {
+      console.log("Unauthorized user")
+      res.writeHead(401);
+      res.end();
+    }
+  }),
+);
+
+
+//Listening
+if(process.env.MODE_ENV === 'development'){
+  const host = 'localhost';
+  server.listen(3010, host,() => {
+    console.log(`Server is listening on ${host}:${3010}`);
+  });
+}
+else{
   const host = process.env.CLIENT_URL;
-  httpsServer.listen(3010, host, () => {
+  server.listen(3010, host, () => {
     console.log(`Server is listening on https://${host}:3010`);
   });
 }
+
+
+const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('../middleware/game');
+// Conexion de un socket
+io.on('connection', (socket) => {
+  console.log(socket.id);
+  //The session
+  const session = socket.request.session;
+  //The user
+  const user = socket.request.user;
+  console.log("Socket ID: " + socket.id);
+  // Comprueba si el cliente está autenticado
+    console.log("User authenticated: " + JSON.stringify(user));
+      // Guarda el socketId en la sesión
+      // Crear sala
+      socket.on('createRoom', (room) => createRoom(socket.id, room));
+
+      // Unirse a sala
+      socket.on('joinRoom', (room, code) => joinRoom(socket.id, room, code));
+
+      // Salir de sala
+      socket.on('leaveRoom', () => leaveRoom(socket.id));
+
+      // Desconexion de un socket
+      socket.on('disconnect', () => {
+          console.log(`Jugador ${socket.id} desconectado`);
+          leaveRoom(socket.id);
+      });
+});
+
+module.exports = io;

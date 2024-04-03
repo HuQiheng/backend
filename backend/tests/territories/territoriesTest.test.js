@@ -1,6 +1,6 @@
 // territoriesTest.test.js
-const { assignTerritories, getTerritories } = require('./Territories'); 
-const { joinRoom, createRoom, leaveRoom } = require('./middleware/game.js');
+const { assignTerritories, getTerritories } = require('../../territories/Territories.js'); 
+const { joinRoom, createRoom, leaveRoom } = require('../../middleware/game.js');
 
 describe('Territory Assignment', () => {
     const mockPlayers = ['Player1', 'Player2', 'Player3'];

@@ -1,7 +1,7 @@
 // Process territories.json for take information about territories
 const fs = require('fs');
-const data = require('./territories.json');
-const { rooms } = require('./middleware/game.js');
+const data = require('../territories.json');
+const { rooms } = require('../middleware/game.js');
 
 // Assign territories
 function assignTerritories(players, data) {
