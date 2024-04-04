@@ -1,0 +1,166 @@
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const {sessionMiddleware, onlyForHandshake} = require('../middleware/serveMiddleware');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+
+const checkAuthenticated = require('../middleware/authGoogle');
+
+
+//Enable cros comunication
+app.use(
+  cors({
+    credentials: true,
+  })
+);
+
+//Body parser for post and update petitions
+app.use(bodyParser.json());
+app.use(sessionMiddleware);
+
+//Passport for authentication
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// Main page route
+app.get('/', (req, res) => {
+  // Only greets
+  res.send('Bienvenido a la página de inicio');
+});
+
+//Used routes
+const authRoutes = require('../routes/authRoutes');
+app.use('/auth', authRoutes);
+
+const userRoutes = require('../routes/userRoutes');
+app.use('/users', userRoutes);
+
+
+// General error management
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('¡Algo salió mal!');
+});
+
+
+
+//To remove only tries for the socket io !!!!
+app.set('view engine', 'ejs');
+
+app.get('/create', (req, res) =>{
+  res.render('createRoom');
+});
+
+app.get('/join', (req, res) => {
+  res.render('joinRoom');
+});
+
+
+app.get('/start', (req,res) => {
+  res.render('startGame');
+});
+
+app.get('/leave', (req,res) => {
+  res.render('leaveRoom');
+});
+
+//Where using socket io, for game states
+const { Server } = require("socket.io");
+const { checkAuthenticatedSocketIO } = require('../middleware/authGoogle');
+//Io definition
+let io;
+let server;
+if(process.env.MODE_ENV === 'development'){
+   //Create an http server
+   const { createServer } = require("node:http");
+   server = createServer(app);
+   
+ 
+}
+else{
+  //Create an https server
+  const https = require('https');
+  const fs = require('fs');
+  
+  const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/wealthwars.games/fullchain.pem')
+  };
+  server = https.createServer(options, app);
+
+
+}
+
+//Use same session context as express and passport
+io = new Server(server);
+io.engine.use(sessionMiddleware);
+io.engine.use(onlyForHandshake(passport.session()));
+
+//IO error management
+io.engine.use(
+  onlyForHandshake((req, res, next) => {
+    if (req.user) {
+      next();
+    } else {
+      console.log("Unauthorized user")
+      res.writeHead(401);
+      res.end();
+    }
+  }),
+);
+
+
+//Listening
+if(process.env.MODE_ENV === 'development'){
+  const host = 'localhost';
+  server.listen(3010, host,() => {
+    console.log(`Server is listening on ${host}:${3010}`);
+  });
+}
+else{
+  const host = process.env.CLIENT_URL;
+  server.listen(3010, host, () => {
+    console.log(`Server is listening on https://${host}:3010`);
+  });
+}
+
+
+const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('../middleware/game');
+
+// As socket ids are volatile through pages, we keep track of pairs email-socket
+const emailToSocket = new Map();
+// Conexion de un socket
+io.on('connection', (socket) => {
+  //The session
+  const session = socket.request.session;
+  //The user
+  const user = socket.request.user;
+
+  //Create a new pair, the user is associated with that socket
+  emailToSocket.set(user.email, socket);
+  console.log("Socket ID: " + socket.id);
+  console.log("User authenticated: " + JSON.stringify(user));
+    
+  // Create lobby
+  socket.on('createRoom', (room) => createRoom(socket, user, room));
+
+  // Join lobby
+  socket.on('joinRoom', (room, code) => joinRoom(socket, user, room, code));
+
+  //Start a game
+  socket.on('startGame', (room) => startGame(emailToSocket, room));
+  // Leave a lobby
+  socket.on('leaveRoom', () => leaveRoom(socket,user));
+
+  // Desconexion de un socket
+  socket.on('disconnect', () => {
+      console.log(`Jugador ${user.email} desconectado`);
+      emailToSocket.delete(user.email);
+      leaveRoom(socket,user);
+  });
+});
+
+module.exports = io;
