@@ -4,75 +4,103 @@ const sids = new Map();
 const rooms = new Map();
 
 // Creates a room and returns a unique code to join it
-function createRoom(io,socketId, room) {
+function createRoom(socket, user, room) {
   if (rooms.has(room)) {
     return 'Error: La sala ya existe';
   }
+  //We create a new room
   rooms.set(room, new Set());
-  rooms.get(room).add(socketId);
-  
-  const code = 3;
-  // Crear la partida en la BD y el código que devuelva que sea el de acceso
-  sids.set(socketId, { room, code });
-  console.log(`Jugador ${socketId} creó la sala ${room} con código de acceso ${code}`);
+  rooms.get(room).add(user.email);
 
-  socketEmit(io,socketId, 'Acces code', code);
+  const code = 3;
+  
+  //A user can only connect to a room simultaneously
+  sids.set(user.email, { room, code });
+  console.log(`Jugador ${user.name} creó la sala ${room} con código de acceso ${code}`);
+
+
+  socketEmit(socket, 'Acces code', code);
  // socketBroadcastToOthers(socketId, 'Sala creada', room, code);
 
+ console.log("EN CREATE: ");
+ console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
   return 'Sala creada con éxito';
 }
 
-// Función para unirse a una sala existente por codigo de invitacion
-function joinRoom(io,socketId, room, code) {
-  // Verifica si la sala existe y si el código es correcto
-  let realRoom = [...rooms.keys()].find((r) => r === room);
-  //let c = sids.get(socketId);
-  p = rooms.get(room);
-  const pl = Array.from(p);
-  c = sids.get(pl[0]);
-  s = p.size;
-  if (realRoom && c && c.code == code && s < 4) {
-    rooms.get(room).add(socketId);
-    sids.set(socketId, { room, code });
-    p = rooms.get(room);
-    const pl1 = Array.from(p);
-    console.log(`Jugador ${socketId} se conectó a la sala ${room}`);
-    socketEmit(io,socketId, 'Acceso a sala', room);
-    socketBroadcastToOthers(io,socketId, 'Jugador conectado', room, code);
-    //Notificar jugadores dentro de la sala
-    socketBroadcast(io,socketId, 'Jugadores conectados', room, code, pl1);
+// Function to join an existing Room
+function joinRoom(socket, user, room, code) {
+  console.log("EN JOIN:");
+  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
+  // Check if the room exists
+  const roomExists = rooms.has(room);
+  if (roomExists) {
+    const playersInRoom = rooms.get(room);
+    const firstPlayerInRoom = Array.from(playersInRoom)[0];
+    const firstPlayerDetails = sids.get(firstPlayerInRoom);
+    console.log("Jugador: " + firstPlayerDetails);
+    console.log("Codigo   " + firstPlayerDetails.code);
+    console.log("Codigo proprocinado " + code);
+    console.log("Jugadores " + playersInRoom.size);
+    if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
+      // Add the user email to connected playeers for the game
+      playersInRoom.add(user.email);
+      rooms.set(room, playersInRoom);
+      sids.set(user.email, { room, code });
+
+      console.log(`Player ${user.name} joined room ${room}`);
+      socketEmit(socket, 'Room access', room);
+      socketBroadcastToRoom(socket, 'Player joined', room, code);
+      
+      // Notify players in the room
+      const playersList = Array.from(playersInRoom);
+      socketBroadcastToRoom(socket, 'Connected players', room, playersList);
+    } else {
+      console.log(`Player ${user.name} could not join room ${room}`);
+      socketEmit(socket, 'Room join error', room);
+    }
   } else {
-    console.log(`Jugador ${socketId} no pudo unirse a la sala ${room}`);
-    socketEmit(socketId, 'Error de unión a la sala', room);
+    console.log(`Room ${room} does not exist`);
+  }
+}
+
+
+// Function that starts a game 
+function startGame(emailToSocket, room) {
+  const playersInRoom = rooms.get(room);
+  
+  if (playersInRoom) {
+    playersInRoom.forEach((email) => {
+      sendingThroughEmail(emailToSocket, email, 'game starting',room);
+    });
+    console.log(`Game starting in room ${room}`);
+  } else {
+    console.log(`No players in room ${room}`);
   }
 }
 
 // Función para salir de una sala
-function leaveRoom(socketId) {
-  const room = sids.get(socketId);
-  if (room.room) {
-    rooms.get(room.room).delete(socketId);
-    sids.delete(socketId);
-    console.log(`Jugador ${socketId} abandonó la sala ${room.room}`);
-    socketEmit(socketId, 'Salida de sala', room.room);
-    socketBroadcastToOthers(socketId, 'Jugador abandonó sala', room.room, room.code);
+function leaveRoom(socket, user) {
+  const userEntry = sids.get(user.email);
+
+  //We check if user has a room asigned
+  if (userEntry) {
+    rooms.get(userEntry.room).delete(user.email);
+    sids.delete(user.email);
+    console.log(`Jugador ${user.email} abandonó la sala ${userEntry.room}`);
+    socketBroadcastToRoom(socket, 'Player left room', userEntry.room, user.name);
   }
 }
 
-// Envia mensaje a todos los sockets de la sala excepto al que lo envía
-function socketBroadcastToOthers(io,socketId, event, room, data) {
-  rooms.get(room).forEach((sid) => {
-    if (sid !== socketId) {
-      socketEmit(io,sid, event, data);
-    }
-  });
+// Send a message to all users in a room, note: doesnt send to itself
+function socketBroadcastToRoom(socket, event, room, data) {
+  socket.to(room).emit(event,data)
 }
 
-// Envio de mensajes individuales
-function socketEmit(io,socketId, event, data) {
-  console.log(`Emitiendo evento ${event} con código ${data} a ${socketId}`);
+// Send a message to a specific user
+function socketEmit(socket, event, data) {
+  console.log(`Emitiendo evento ${event} con código ${data} a ${socket.id}`);
 
-  io.to(socketId).emit(event, data);
+  socket.emit(event, data);
 }
 
 // Envio de mensajes a todos los sockets de la sala
@@ -82,18 +110,20 @@ function socketBroadcast(io,socketId, event, room, data, players) {
   });
 }
 
-function emit(io,socketId, event, room, data, players) {
+function emit(io,socket, event, room, data, players) {
   console.log(`Emitiendo evento ${event} a la sala ${room}: ${players} con código ${data} a ${socketId}`);
-  io.to(socketId).emit(io,event, data, players);
+  socket.emit(event, data, players);
 }
 
-// Funcion para iniciar partida en una sala
-function startGame(socketId, room) {
-  const p = rooms.get(room);
-  const pl = Array.from(p);
-  console.log(`Iniciando partida en la sala ${room}`);
-  socketBroadcast(socketId, 'Iniciar partida', room, pl);
-  return 'Partida iniciada';
+
+// Given an email it emits an event to the corresponding socket
+function sendingThroughEmail(emailToSocket, user, event, data) {
+  const socket = emailToSocket.get(user);
+  if (socket) {
+    socket.emit(event, data);
+  } else {
+    console.log(`No socket found for email ${user.email}`);
+  }
 }
 
 module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};

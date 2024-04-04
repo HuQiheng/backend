@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Start Game</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="startGameForm">
+    <input type="text" id="roomName" placeholder="Enter room name">
+    <button type="submit">Start Game</button>
+  </form>
+
+  <script>
+    const socket = io('http://localhost:3010');
+
+    document.getElementById('startGameForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const roomName = document.getElementById('roomName').value;
+      socket.emit('startGame', roomName);
+    });
+
+    socket.on('game starting', (room) => {
+      console.log(`Game started in room "${room}"`);
+    });
+
+    socket.on('Player left room', (room) => {
+      console.log(`User left room "${room}"`);
+    });
+  </script>
+</body>
+</html>
+
