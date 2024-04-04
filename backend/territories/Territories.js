@@ -110,30 +110,30 @@ function nextTurn(state) {
 }
 
 // Buy actives
-function buyActives(state, player, type, numActives) {
+function buyActives(state, player, type, territory, numActives) {
     const map = state.map;
-    if (type === 'troops') {
-        if (numActives == 5 && player.coins >= 7) {
-            player.coins -= 7;
-            player.troops += 5;
-        }
-        else if (numActives == 10 && player.coins >= 14) {
-            player.coins -= 14;
-            player.troops += 10;
-        }
-        else if(player.coins >= 2*numActives){
-            player.coins -= 2*numActives;
-            player.troops += numActives;
-        }
-        else {
-            console.log('Not enough coins');
-        }
-    } else if (type === 'factory' && numActives == 1) {
-        if (player.coins >= 15) {
-            player.coins -= 15;
-            player.factories += 1;
+    if (type === 'factory') {
+        var cost = 15;
+    }
+    else if (type === 'troop' && numActives == 5) {
+        var cost = 5;
+    }
+    else if (type === 'troop' && numActives == 10) {
+        var cost = 10;
+    }
+    else if (type === 'troop') {
+        var cost = 2 * numActives;
+    }
+    if (player.coins >= cost && map[territory].player === player) {
+        if (type === 'factory' && map[territory].factories === 0) {
+            player.coins -= cost;
+            map[territory].factories += numActives;
+        } else {
+            player.coins -= cost;
+            map[territory].troops += numActives;
         }
     }
+
 }
 
 module.exports = {
