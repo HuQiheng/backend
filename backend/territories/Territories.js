@@ -29,7 +29,7 @@ function getTerritories(players, data, room) {
         const territory = data[i];
         map[i] = {
             name: territory.name,
-            player: territoryAssignment[i], // Without player asigned yet
+            player: territoryAssignment[i], 
             troops: 3, // Initial troops
             factories: 0
         };
@@ -40,12 +40,73 @@ function getTerritories(players, data, room) {
         players: players,
         map: map
     };
-    // Guardar el estado del juego en un archivo
+    // Store the game state in an external file
     fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
     return state;
+}
+
+// Move troops
+function moveTroops(state, from, to, troops) {
+    const map = state.map;
+    if ((map[from].troops - troops) >= 1) {
+        if (map[from].player !== map[to].player) {
+            if (troops > map[to].troops) {
+                map[to].player = map[from].player;
+                map[to].troops = troops - map[to].troops;
+                map[from].troops -= troops;
+            } else {
+                map[to].troops -= troops;
+                map[from].troops -= troops;
+            }
+        } else {
+            map[to].troops += troops;
+            map[from].troops -= troops;
+        }
+    } 
+}
+
+// Surrender
+function surrender(state, player) {
+    const map = state.map;
+    for (const i in map) {
+        if (map[i].player === player) {
+            state.players = state.players.filter(p => p !== player);
+            // asign territory to another player
+            let j = Math.floor(Math.random() * state.players.length);
+            while (j === player) {
+                j = Math.floor(Math.random() * state.players.length);
+            }
+            map[i].player = j;
+        }
+    }
+}
+
+// Shift management
+function nextTurn(state) {
+    state.turn = (state.turn + 1) % state.players.length;
+}
+
+// Buy actives
+function buyActives(state, player, type) {
+    const map = state.map;
+    if (type === 'troops') {
+        if (player.coins >= 3) {
+            player.coins -= 3;
+            player.troops += 1;
+        }
+    } else if (type === 'factory') {
+        if (player.coins >= 10) {
+            player.coins -= 10;
+            player.factories += 1;
+        }
+    }
 }
 
 module.exports = {
     assignTerritories,
     getTerritories, 
+    moveTroops,
+    nextTurn,
+    surrender,
+    buyActives,
 };
