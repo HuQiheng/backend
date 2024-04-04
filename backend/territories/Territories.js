@@ -48,6 +48,17 @@ function getTerritories(players, data, room) {
 // Move troops
 function moveTroops(state, from, to, troops) {
     const map = state.map;
+    if (map[from].player === map[to].player) {
+        if ((map[from].troops - troops) >= 1) {
+            map[from].troops -= troops;
+            map[to].troops += troops;
+        }
+    }
+}
+
+// Attack territories
+function attackTerritories(state, from, to, troops) {
+    const map = state.map;
     if ((map[from].troops - troops) >= 1) {
         if (map[from].player !== map[to].player) {
             if (troops > map[to].troops) {
@@ -83,20 +94,43 @@ function surrender(state, player) {
 
 // Shift management
 function nextTurn(state) {
+    // asign coins in each turn
+    state.players.forEach((player, i) => {
+        for (const j in state.map) {
+            if (state.map[j].player === i) {
+                player.coins += 1;
+            }
+            if(state.map[j].factories > 0){
+                player.coins += 4;
+            }
+        }
+    });
+    // change the current player
     state.turn = (state.turn + 1) % state.players.length;
 }
 
 // Buy actives
-function buyActives(state, player, type) {
+function buyActives(state, player, type, numActives) {
     const map = state.map;
     if (type === 'troops') {
-        if (player.coins >= 3) {
-            player.coins -= 3;
-            player.troops += 1;
+        if (numActives == 5 && player.coins >= 7) {
+            player.coins -= 7;
+            player.troops += 5;
         }
-    } else if (type === 'factory') {
-        if (player.coins >= 10) {
-            player.coins -= 10;
+        else if (numActives == 10 && player.coins >= 14) {
+            player.coins -= 14;
+            player.troops += 10;
+        }
+        else if(player.coins >= 2*numActives){
+            player.coins -= 2*numActives;
+            player.troops += numActives;
+        }
+        else {
+            console.log('Not enough coins');
+        }
+    } else if (type === 'factory' && numActives == 1) {
+        if (player.coins >= 15) {
+            player.coins -= 15;
             player.factories += 1;
         }
     }
@@ -109,4 +143,5 @@ module.exports = {
     nextTurn,
     surrender,
     buyActives,
+    attackTerritories,
 };
