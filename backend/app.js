@@ -9,6 +9,7 @@ const passport = require('passport');
 //Enable cors comunication
 app.use(
   cors({
+    origin: "*",
     credentials: true,
   })
 );
