@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const {sessionMiddleware, onlyForHandshake} = require('../middleware/serveMiddleware');
+const {sessionMiddleware, onlyForHandshake} = require('./middleware/serveMiddleware');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
@@ -29,10 +29,10 @@ app.get('/', (req, res) => {
 });
 
 //Used routes
-const authRoutes = require('../routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
 
-const userRoutes = require('../routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 app.use('/users', userRoutes);
 
 
@@ -101,7 +101,7 @@ else{
 }
 
 
-const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('../middleware/game');
+const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('./middleware/game');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
