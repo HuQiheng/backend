@@ -1,6 +1,6 @@
 // Process territories.json for take information about territories
 const fs = require('fs');
-const data = require('../territories.json');
+const data = require('./territories.json');
 const { rooms } = require('../middleware/game.js');
 
 // Assign territories
@@ -21,7 +21,7 @@ function getPlayers(room) {
 }
 
 // Map territories
-function getTerritories(players, data, room) {
+function getTerritories(data, room) {
     const map = {};
     players = getPlayers(room);
     const territoryAssignment = assignTerritories(players, data);
@@ -45,35 +45,47 @@ function getTerritories(players, data, room) {
     return state;
 }
 
-// Move troops
-function moveTroops(state, from, to, troops) {
+// A Player Move troops
+function moveTroops(state, from, to, troops, player) {
     const map = state.map;
-    if (map[from].player === map[to].player) {
+    if (state.turn === player) {
         if ((map[from].troops - troops) >= 1) {
-            map[from].troops -= troops;
-            map[to].troops += troops;
+            if (map[from].player === player && map[to].player === player) {
+                map[to].troops += troops;
+                map[from].troops -= troops;
+            } else {
+                console.log("Territories are owned by different players");
+            }
+        } else {
+            console.log("No troops available");
         }
+    } else {
+        console.log("Not your turn");
     }
 }
 
-// Attack territories
-function attackTerritories(state, from, to, troops) {
+// Player Attack territories
+function attackTerritories(state, from, to, troops, player) {
     const map = state.map;
-    if ((map[from].troops - troops) >= 1) {
-        if (map[from].player !== map[to].player) {
-            if (troops > map[to].troops) {
-                map[to].player = map[from].player;
-                map[to].troops = troops - map[to].troops;
+    if (state.turn === player) {
+        if ((map[from].troops - troops) >= 1) {
+            if (map[from].player === player && map[to].player !== player) {
+                if (troops > map[to].troops) {
+                    map[to].troops = troops - map[to].troops;
+                    map[to].player = player;
+                } else {
+                    map[to].troops -= troops;
+                }
                 map[from].troops -= troops;
             } else {
-                map[to].troops -= troops;
-                map[from].troops -= troops;
+                console.log("Territories are owned by the same player");
             }
         } else {
-            map[to].troops += troops;
-            map[from].troops -= troops;
+            console.log("No troops available");
         }
-    } 
+    } else {
+        console.log("Not your turn");
+    }
 }
 
 // Surrender
@@ -90,22 +102,22 @@ function surrender(state, player) {
             map[i].player = j;
         }
     }
+    nextTurn(state);
 }
 
 // Shift management
 function nextTurn(state) {
-    // asign coins in each turn
-    state.players.forEach((player, i) => {
-        for (const j in state.map) {
-            if (state.map[j].player === i) {
-                player.coins += 1;
-            }
-            if(state.map[j].factories > 0){
-                player.coins += 4;
+    const currentPlayer = state.players[state.turn];
+    // Asign coins to the current player
+    for (const j in state.map) {
+        if (state.map[j].player === state.turn) {
+            currentPlayer.coins += 1;
+            if (state.map[j].factories > 0) {
+                currentPlayer.coins += 4;
             }
         }
-    });
-    // change the current player
+    }
+    // Shift
     state.turn = (state.turn + 1) % state.players.length;
 }
 
@@ -128,12 +140,15 @@ function buyActives(state, player, type, territory, numActives) {
         if (type === 'factory' && map[territory].factories === 0) {
             player.coins -= cost;
             map[territory].factories += numActives;
-        } else {
+        } else if (type === 'factory' && map[territory].factories > 0) {
+            console.log("Territory already has a factory");
+        } else if (type === 'troop') {
             player.coins -= cost;
             map[territory].troops += numActives;
         }
+    } else {
+        console.log("Not enough coins or territory is not owned by the player");
     }
-
 }
 
 module.exports = {
