@@ -58,6 +58,15 @@ app.get('/join', (req, res) => {
   res.render('joinRoom');
 });
 
+
+app.get('/start', (req,res) => {
+  res.render('startGame');
+});
+
+app.get('/leave', (req,res) => {
+  res.render('leaveRoom');
+});
+
 //Where using socket io, for game states
 const { Server } = require("socket.io");
 const { checkAuthenticatedSocketIO } = require('../middleware/authGoogle');
@@ -120,31 +129,38 @@ else{
 
 
 const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('../middleware/game');
+
+// As socket ids are volatile through pages, we keep track of pairs email-socket
+const emailToSocket = new Map();
 // Conexion de un socket
 io.on('connection', (socket) => {
-  console.log(socket.id);
   //The session
   const session = socket.request.session;
   //The user
   const user = socket.request.user;
+
+  //Create a new pair, the user is associated with that socket
+  emailToSocket.set(user.email, socket);
   console.log("Socket ID: " + socket.id);
-  // Comprueba si el cliente está autenticado
-    console.log("User authenticated: " + JSON.stringify(user));
-      // Guarda el socketId en la sesión
-      // Crear sala
-      socket.on('createRoom', (room) => createRoom(io,socket.id, room));
+  console.log("User authenticated: " + JSON.stringify(user));
+    
+  // Create lobby
+  socket.on('createRoom', (room) => createRoom(socket, user, room));
 
-      // Unirse a sala
-      socket.on('joinRoom', (room, code) => joinRoom(io,socket.id, room, code));
+  // Join lobby
+  socket.on('joinRoom', (room, code) => joinRoom(socket, user, room, code));
 
-      // Salir de sala
-      socket.on('leaveRoom', () => leaveRoom(socket.id));
+  //Start a game
+  socket.on('startGame', (room) => startGame(emailToSocket, room));
+  // Leave a lobby
+  socket.on('leaveRoom', () => leaveRoom(socket,user));
 
-      // Desconexion de un socket
-      socket.on('disconnect', () => {
-          console.log(`Jugador ${socket.id} desconectado`);
-          leaveRoom(socket.id);
-      });
+  // Desconexion de un socket
+  socket.on('disconnect', () => {
+      console.log(`Jugador ${user.email} desconectado`);
+      emailToSocket.delete(user.email);
+      leaveRoom(socket,user);
+  });
 });
 
 module.exports = io;

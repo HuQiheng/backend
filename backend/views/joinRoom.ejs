@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Join Room</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="joinRoomForm">
+    <input type="text" id="roomName" placeholder="Enter room name">
+    <input type="text" id="accessCode" placeholder="Enter access code">
+    <button type="submit">Join Room</button>
+  </form>
+
+  <script>
+    const socket = io('http://localhost:3010');
+
+    document.getElementById('joinRoomForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const roomName = document.getElementById('roomName').value;
+      const accessCode = document.getElementById('accessCode').value;
+      socket.emit('joinRoom', roomName, accessCode);
+    });
+
+    socket.on('Room access', (room, code) => {
+      console.log(`Joined room "${room}" with access code: ${code}`);
+    });
+    
+    socket.on('Connected players', (room, code) => {
+      console.log(`Joined room "${room}" with access code: ${code}`);
+    });
+  </script>
+</body>
+</html>
