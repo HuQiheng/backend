@@ -39,6 +39,6 @@ jobs:
           rm -rf /var/www/backend
           mkdir /var/www/backend
           mv /var/backend/temp/backend/* /var/www/backend
-          echo "ENV_VAR=${{ secrets.ENV_VAR }}" > /var/www/backend/.env
+          echo "${{ secrets.ENV_VAR }}" > /var/www/backend/.env
           cd /var/www/backend
           npm install --omit=dev
