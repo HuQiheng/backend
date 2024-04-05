@@ -42,6 +42,9 @@ router.delete('/delete/:email', checkAuthenticated, async (req, res) => {
       await playerController.deletePlayer(req.params.email);
       res.send('User deleted');
     }
+    else {
+      res.status(403).send('Forbidden');
+    }
   } catch (error) {
     console.error('Error deleting user', error);
     res.status(500).send('Internal Server Error');
