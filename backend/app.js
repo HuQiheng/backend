@@ -6,10 +6,7 @@ const {sessionMiddleware, onlyForHandshake} = require('../middleware/serveMiddle
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
-const checkAuthenticated = require('../middleware/authGoogle');
-
-
-//Enable cros comunication
+//Enable cors comunication
 app.use(
   cors({
     credentials: true,
@@ -46,30 +43,8 @@ app.use((err, req, res, next) => {
 });
 
 
-
-//To remove only tries for the socket io !!!!
-app.set('view engine', 'ejs');
-
-app.get('/create', (req, res) =>{
-  res.render('createRoom');
-});
-
-app.get('/join', (req, res) => {
-  res.render('joinRoom');
-});
-
-
-app.get('/start', (req,res) => {
-  res.render('startGame');
-});
-
-app.get('/leave', (req,res) => {
-  res.render('leaveRoom');
-});
-
 //Where using socket io, for game states
 const { Server } = require("socket.io");
-const { checkAuthenticatedSocketIO } = require('../middleware/authGoogle');
 //Io definition
 let io;
 let server;
@@ -77,8 +52,6 @@ if(process.env.MODE_ENV === 'development'){
    //Create an http server
    const { createServer } = require("node:http");
    server = createServer(app);
-   
- 
 }
 else{
   //Create an https server
@@ -95,7 +68,7 @@ else{
 }
 
 //Use same session context as express and passport
-io = new Server(server);
+io = new Server(server, { cors: { origin: "*"}});
 io.engine.use(sessionMiddleware);
 io.engine.use(onlyForHandshake(passport.session()));
 

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const session = require('express-session');
 
 //Every petition will have a session information, we use this as a middleware for express and socket
