@@ -102,7 +102,6 @@ function surrender(state, player) {
             map[i].player = j;
         }
     }
-    nextTurn(state);
 }
 
 // Shift management
@@ -150,6 +149,45 @@ function buyActives(state, player, type, territory, numActives) {
         console.log("Not enough coins or territory is not owned by the player");
     }
 }
+const { joinRoom, createRoom, leaveRoom } = require('../middleware/game.js');
+while(true) {
+    //test
+    const state = getTerritories(data, mockRoom);
+    console.log('Turn: ', state.turn);
+    console.log('Players: ', state.players);
+    for (let i=0;i<state.players.length;i++) {
+        console.log('Player: ', state.players[i]);
+        for (const j in state.map) {
+            if (state.map[j].player === i) {
+                console.log(j, state.map[j]);
+            }
+        }
+    };
+    let command = prompt(`Enter your command: `);
+    let args = command.split(' ');
+    let cmd = args.shift();
+    switch(cmd) {
+        case 'move':
+            moveTroops(state, args[0], args[1], parseInt(args[2]), state.turn);
+            break;
+        case 'attack':
+            attackTerritories(state, args[0], args[1], parseInt(args[2]), state.turn);
+            break;
+        case 'surrender':
+            surrender(state, state.turn);
+            break;
+        case 'next':
+            nextTurn(state);
+            break;
+        case 'buy':
+            buyActives(state, state.players[state.turn], args[0], args[1], parseInt(args[2]));
+            break;
+        default:
+            console.log('Invalid command');
+    }
+};
+
+
 
 module.exports = {
     assignTerritories,
