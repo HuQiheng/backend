@@ -7,12 +7,23 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 
 //Enable cors comunication
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+const allowedOrigins = ['http://localhost:3000', 'https://wealthwars.games:3010', 'https://accounts.google.com'];
+
+app.use(cors({
+  origin: function(origin, callback){
+    console.log("Origen  " + origin);
+    // allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      console.log("CORS not allowed");
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    console.log("Allowed");
+    return callback(null, true);
+  },
+  credentials: true,
+}));
 
 //Body parser for post and update petitions
 app.use(bodyParser.json());
