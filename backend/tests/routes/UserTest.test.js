@@ -27,7 +27,7 @@ describe('Player Routes', () => {
 
   beforeEach(async () => {
     // Inserts a test player before each test
-    testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password');
+    testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password', 'testPicture');
   });
 
   afterEach(async () => {
@@ -48,7 +48,8 @@ describe('Player Routes', () => {
       .post('/test/update/test@example.com')
       .send({
         username: 'test',
-        password: 'password'
+        password: 'password',
+        picture: 'testPicture2'
       });
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('User updated test@example.com');
