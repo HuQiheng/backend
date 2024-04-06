@@ -1,5 +1,5 @@
 const session = require('express-session');
-
+require('dotenv').config();
 //Every petition will have a session information, we use this as a middleware for express and socket
 const sessionMiddleware = session({
     //You need to have the secret to generate the cookies

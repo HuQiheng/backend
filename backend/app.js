@@ -9,12 +9,23 @@ const passport = require('passport');
 
 
 
-//Enable cros comunication
-app.use(
-  cors({
-    credentials: true,
-  })
-);
+const allowedOrigins = ['http://localhost:3000', 'https://wealthwars.games:3010', 'https://accounts.google.com'];
+
+app.use(cors({
+  origin: function(origin, callback){
+    console.log("Origen  " + origin);
+    // allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      console.log("CORS not allowed");
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    console.log("Allowed");
+    return callback(null, true);
+  },
+  credentials: true,
+}));
 
 //Body parser for post and update petitions
 app.use(bodyParser.json());
@@ -95,7 +106,7 @@ else{
 }
 
 //Use same session context as express and passport
-io = new Server(server);
+io = new Server(server, { cors: { origin: '*'}});
 io.engine.use(sessionMiddleware);
 io.engine.use(onlyForHandshake(passport.session()));
 
@@ -162,5 +173,3 @@ io.on('connection', (socket) => {
       leaveRoom(socket,user);
   });
 });
-
-module.exports = io;
