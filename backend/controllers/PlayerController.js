@@ -1,9 +1,9 @@
 const db = require('../db/index.js');
 
-const insertPlayer = async (email, username, password) => {
+const insertPlayer = async (email, username, password, picture) => {
   try {
-    const query = `INSERT INTO Player (email, username, password) VALUES ($1, $2, $3)`;
-    const values = [email, username, password];
+    const query = `INSERT INTO Player (email, username, password, picture) VALUES ($1, $2, $3, $4)`;
+    const values = [email, username, password, picture];
     const result = await db.query(query, values);
     return result;
   } catch (error) {
@@ -11,10 +11,10 @@ const insertPlayer = async (email, username, password) => {
   }
 };
 
-const updatePlayer = async (email, username, password) => {
+const updatePlayer = async (email, username, password, picture) => {
   try {
-    const query = `UPDATE Player SET username = $2, password = $3 WHERE email = $1 RETURNING *`;
-    const values = [email, username, password];
+    const query = `UPDATE Player SET username = $2, password = $3, picture = $4 WHERE email = $1 RETURNING *`;
+    const values = [email, username, password, picture];
     const result = await db.query(query, values);
     return result;
   } catch (error) {
