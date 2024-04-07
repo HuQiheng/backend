@@ -107,12 +107,13 @@ else{
 
 //Use same session context as express and passport
 io = new Server(server, { cors: { origin: '*'}});
-io.engine.use(sessionMiddleware);
+io.engine.use(onlyForHandshake(sessionMiddleware));
 io.engine.use(onlyForHandshake(passport.session()));
 
 //IO error management
 io.engine.use(
   onlyForHandshake((req, res, next) => {
+    console.log(req)
     if (req.user) {
       next();
     } else {
