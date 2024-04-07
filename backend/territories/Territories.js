@@ -187,7 +187,28 @@ while(true) {
     }
 };
 
-
+// Play game
+function playGame(state) {
+    // While there are more than one player playing
+    while(state.players.length > 1){
+        // En cualquier false se puede rendir
+        for (let phase = 1; phase <= 3; phase++) {
+            if (phase === 1) {
+                // Move troops
+                moveTroops(state, from, to, troops, player);
+            } else if (phase === 2) {
+                // Attack territories
+                attackTerritories(state, from, to, troops, player);
+            } else if (phase === 3) {
+                // Buy actives
+                buyActives(state, player, type, territory, numActives);
+            }
+            // Show the current state of the game
+            showState(state);
+        }
+        nextTurn(state);
+    }
+}
 
 module.exports = {
     assignTerritories,
