@@ -161,7 +161,7 @@ else{
 
 
 const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('./middleware/game');
-const { moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('./territories/Territories');
+const { getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('./territories/Territories');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
@@ -171,6 +171,8 @@ io.on('connection', (socket) => {
   const session = socket.request.session;
   //The user
   const user = socket.request.user;
+
+  const data = require('./territories/territories.json');
 
   //Create a new pair, the user is associated with that socket
   emailToSocket.set(user.email, socket);
@@ -195,43 +197,50 @@ io.on('connection', (socket) => {
       emailToSocket.delete(user.email);
       leaveRoom(socket,user);
   });
-
+  const fs = require('fs');
   // Move troops in a territory
   socket.on('moveTroops', (from, to, troops) => {
-    const room = user.room;
-    const state = rooms[room].state;
+    const room = 'prueba';
+    const pl = rooms.get(room);
+    console.log("Room: " + room);
+    const state = getTerritories(data, room);
     moveTroops(state, from, to, troops, user.email);
+    fs.writeFileSync('moverprueba.json', JSON.stringify(state, null, 4));
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Attack a territory
   socket.on('attack', (from, to, troops) => {
-    const room = user.room;
-    const state = rooms[room].state;
+    const mail = user.email;
+    const room = rooms.get(mail);
+    const state = getTerritories(data, room);
     attackTerritories(state, from, to, troops, user.email);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Surrender
   socket.on('surrender', () => {
-    const room = user.room;
-    const state = rooms[room].state;
+    const mail = user.email;
+    const room = rooms.get(mail);
+    const state = getTerritories(data, room);
     surrender(state, user.email);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Next turn
   socket.on('nextTurn', () => {
-    const room = user.room;
-    const state = rooms[room].state;
+    const mail = user.email;
+    const room = rooms.get(mail);
+    const state = getTerritories(data, room);
     nextTurn(state);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Buy actives
   socket.on('buyActives', (type, territory, numActives) => {
-    const room = user.room;
-    const state = rooms[room].state;
+    const mail = user.email;
+    const room = rooms.get(mail);
+    const state = getTerritories(data, room);
     buyActives(state, user.email, type, territory, numActives);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
