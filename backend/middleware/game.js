@@ -19,7 +19,7 @@ function createRoom(socket, user, room) {
   console.log(`Jugador ${user.name} creó la sala ${room} con código de acceso ${code}`);
 
 
-  socketEmit(socket, 'Acces code', code);
+  socketEmit(socket, 'Access code', code);
  // socketBroadcastToOthers(socketId, 'Sala creada', room, code);
 
  console.log("EN CREATE: ");
