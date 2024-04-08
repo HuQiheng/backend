@@ -149,6 +149,7 @@ function buyActives(state, player, type, territory, numActives) {
         console.log("Not enough coins or territory is not owned by the player");
     }
 }
+/*
 const { joinRoom, createRoom, leaveRoom } = require('../middleware/game.js');
 while(true) {
     //test
@@ -203,13 +204,11 @@ function playGame(state) {
                 // Buy actives
                 buyActives(state, player, type, territory, numActives);
             }
-            // Show the current state of the game
-            showState(state);
         }
         nextTurn(state);
     }
 }
-
+*/
 module.exports = {
     assignTerritories,
     getTerritories, 
