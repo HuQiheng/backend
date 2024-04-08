@@ -78,6 +78,26 @@ app.get('/leave', (req,res) => {
   res.render('leaveRoom');
 });
 
+app.get('/move', (req,res) => {
+  res.render('moveTroops');
+});
+
+app.get('/attack', (req,res) => {
+  res.render('attackTerritories');
+});
+
+app.get('/surrender', (req,res) => {
+  res.render('surrender');
+});
+
+app.get('/next', (req,res) => {
+  res.render('nextTurn');
+});
+
+app.get('/buy', (req,res) => {
+  res.render('buyActives');
+});
+
 //Where using socket io, for game states
 const { Server } = require("socket.io");
 
@@ -141,6 +161,7 @@ else{
 
 
 const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('./middleware/game');
+const { moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('./territories/Territories');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
@@ -164,6 +185,7 @@ io.on('connection', (socket) => {
 
   //Start a game
   socket.on('startGame', (room) => startGame(emailToSocket, room));
+
   // Leave a lobby
   socket.on('leaveRoom', () => leaveRoom(socket,user));
 
@@ -172,5 +194,45 @@ io.on('connection', (socket) => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
       leaveRoom(socket,user);
+  });
+
+  // Move troops in a territory
+  socket.on('moveTroops', (from, to, troops) => {
+    const room = user.room;
+    const state = rooms[room].state;
+    moveTroops(state, from, to, troops, user.email);
+    io.to(room).emit('update', JSON.stringify(state, null, 4));
+  });
+
+  // Attack a territory
+  socket.on('attack', (from, to, troops) => {
+    const room = user.room;
+    const state = rooms[room].state;
+    attackTerritories(state, from, to, troops, user.email);
+    io.to(room).emit('update', JSON.stringify(state, null, 4));
+  });
+
+  // Surrender
+  socket.on('surrender', () => {
+    const room = user.room;
+    const state = rooms[room].state;
+    surrender(state, user.email);
+    io.to(room).emit('update', JSON.stringify(state, null, 4));
+  });
+
+  // Next turn
+  socket.on('nextTurn', () => {
+    const room = user.room;
+    const state = rooms[room].state;
+    nextTurn(state);
+    io.to(room).emit('update', JSON.stringify(state, null, 4));
+  });
+
+  // Buy actives
+  socket.on('buyActives', (type, territory, numActives) => {
+    const room = user.room;
+    const state = rooms[room].state;
+    buyActives(state, user.email, type, territory, numActives);
+    io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 });
