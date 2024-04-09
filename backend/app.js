@@ -162,6 +162,7 @@ else{
 
 const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('./middleware/game');
 const { getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('./territories/Territories');
+const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
@@ -172,7 +173,6 @@ io.on('connection', (socket) => {
   //The user
   const user = socket.request.user;
 
-  const data = require('./territories/territories.json');
 
   //Create a new pair, the user is associated with that socket
   emailToSocket.set(user.email, socket);
@@ -202,8 +202,7 @@ io.on('connection', (socket) => {
   socket.on('moveTroops', (from, to, troops) => {
     const room = 'prueba';
     const pl = rooms.get(room);
-    console.log("Room: " + room);
-    const state = getTerritories(data, room);
+    let state = getTerritories(data, room);
     moveTroops(state, from, to, troops, user.email);
     fs.writeFileSync('moverprueba.json', JSON.stringify(state, null, 4));
     io.to(room).emit('update', JSON.stringify(state, null, 4));

@@ -25,10 +25,8 @@
       socket.emit('moveTroops', { troops, origin, destination });
     });
 
-    socket.on('message', (message) => {
-      const item = document.createElement('li');
-      item.textContent = message;
-      document.getElementById('messages').appendChild(item);
+    socket.on('troops moved', (data) => {
+      console.log(`Moved ${data.troops} troops from ${data.origin} to ${data.destination}`)
     });
   </script>
 </body>

@@ -47,10 +47,12 @@ function getTerritories(data, room) {
 
 // A Player Move troops
 function moveTroops(state, from, to, troops, player) {
-    const map = state.map;
-    if (state.turn === player) {
+    let playerIndex = state.players.indexOf(player);
+    let map = state.map;
+    console.log(map.from);
+    if (state.turn === playerIndex) {
         if ((map[from].troops - troops) >= 1) {
-            if (map[from].player === player && map[to].player === player) {
+            if (map[from].player === playerIndex && map[to].player === playerIndex) {
                 map[to].troops += troops;
                 map[from].troops -= troops;
             } else {
@@ -67,7 +69,7 @@ function moveTroops(state, from, to, troops, player) {
 // Player Attack territories
 function attackTerritories(state, from, to, troops, player) {
     const map = state.map;
-    if (state.turn === player) {
+    if (state.turn === state.players[player]) {
         if ((map[from].troops - troops) >= 1) {
             if (map[from].player === player && map[to].player !== player) {
                 if (troops > map[to].troops) {
