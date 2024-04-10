@@ -22,7 +22,7 @@
       const troops = document.getElementById('troops').value;
       const origin = document.getElementById('origin').value;
       const destination = document.getElementById('destination').value;
-      socket.emit('moveTroops', { troops, origin, destination });
+      socket.emit('moveTroops', origin, destination, troops );
     });
 
     socket.on('troops moved', (data) => {

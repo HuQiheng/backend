@@ -46,10 +46,11 @@ function getTerritories(data, room) {
 }
 
 // A Player Move troops
-function moveTroops(state, from, to, troops, player) {
+function moveTroops(state, from, to, t, player) {
     let playerIndex = state.players.indexOf(player);
     let map = state.map;
-    console.log(map.from);
+    troops = parseInt(t, 10);
+    console.log(from);
     if (state.turn === playerIndex) {
         if ((map[from].troops - troops) >= 1) {
             if (map[from].player === playerIndex && map[to].player === playerIndex) {

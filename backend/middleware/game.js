@@ -147,4 +147,4 @@ function getUsersWithCode(code) {
   return users;
 }
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, sids};

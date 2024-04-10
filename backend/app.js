@@ -159,7 +159,7 @@ else{
 }
 
 
-const {createRoom, joinRoom, leaveRoom, startGame, rooms} = require('./middleware/game');
+const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids} = require('./middleware/game');
 const { getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('./territories/Territories');
 const data = require('./territories/territories.json');
 
@@ -198,9 +198,8 @@ io.on('connection', (socket) => {
   const fs = require('fs');
   // Move troops in a territory
   socket.on('moveTroops', (from, to, troops) => {
-    const room = 'prueba';
-    const pl = rooms.get(room);
-    let state = getTerritories(data, room);
+    const room = sids.get(user.email);
+    let state = getTerritories(data, room.code);
     moveTroops(state, from, to, troops, user.email);
     fs.writeFileSync('moverprueba.json', JSON.stringify(state, null, 4));
     io.to(room).emit('update', JSON.stringify(state, null, 4));
