@@ -27,7 +27,7 @@ function createRoom(socket, user) {
 }
 
 // Function to join an existing Room
-function joinRoom(socket, user, code) {
+function joinRoom(emailToSocket, socket, user, code) {
   console.log("EN JOIN:");
   console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
   // Check if the room exists
@@ -49,11 +49,17 @@ function joinRoom(socket, user, code) {
 
       console.log(`Player ${user.name} joined room woth code ${code}`);
       socketEmit(socket, 'roomAccess', code);
-      socketBroadcastToRoom(socket, 'playerJoined',code, code);
+
+      let usersWithCode = getUsersWithCode(code);
+      usersWithCode.forEach((email) => {
+        console.log("Emails: " + email);
+        sendingThroughEmail(emailToSocket, email, 'playerJoined',code);
+        sendingThroughEmail(emailToSocket, email, 'connectedPlayers',code);
+      });
+      //socketBroadcastToRoom(socket, 'playerJoined',code, code);
       
       // Notify players in the room
-      const playersList = Array.from(playersInRoom);
-      socketBroadcastToRoom(socket, 'connectedPlayers', code, playersList);
+      //socketBroadcastToRoom(socket, 'connectedPlayers', code, playersList);
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
@@ -88,14 +94,19 @@ function startGame(emailToSocket, code) {
 }
 
 // Función para salir de una sala
-function leaveRoom(socket, user) {
+function leaveRoom(emailToSocket, user) {
   const userEntry = sids.get(user.email);
   //We check if user has a room asigned
   if (userEntry) {
     rooms.get(Number(userEntry.code)).delete(user.email);
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${userEntry.code}`);
-    socketBroadcastToRoom(socket, 'playerLeftRoom', userEntry.code, user.name);
+    let usersWithCode = getUsersWithCode(code);
+    usersWithCode.forEach((email) => {
+      console.log("Emails: " + email);
+      sendingThroughEmail(emailToSocket, email, 'playerLeftRoom',code);
+    });
+    //socketBroadcastToRoom(socket, 'playerLeftRoom', userEntry.code, user.name);
   }
 }
 
