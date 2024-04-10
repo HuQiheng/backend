@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 
 //Enable cors comunication
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3010', 'https://wealthwars.games:3010', 'https://accounts.google.com'];
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3010', 'https://wealthwars.games:3010', 'https://accounts.google.com',
+'https://wealthwars.games'];
 
 app.use(cors({
   origin: function(origin, callback){

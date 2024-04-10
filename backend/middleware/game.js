@@ -19,7 +19,7 @@ function createRoom(socket, user) {
   console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
 
 
-  socketEmit(socket, 'AccessCode', code);
+  socketEmit(socket, 'accessCode', code);
 
  console.log("EN CREATE: ");
  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
@@ -48,19 +48,19 @@ function joinRoom(socket, user, code) {
       sids.set(user.email, {code});
 
       console.log(`Player ${user.name} joined room woth code ${code}`);
-      socketEmit(socket, 'RoomAccess', code);
-      socketBroadcastToRoom(socket, 'PlayerJoined',code, code);
+      socketEmit(socket, 'roomAccess', code);
+      socketBroadcastToRoom(socket, 'playerJoined',code, code);
       
       // Notify players in the room
       const playersList = Array.from(playersInRoom);
-      socketBroadcastToRoom(socket, 'ConnectedPlayers', code, playersList);
+      socketBroadcastToRoom(socket, 'connectedPlayers', code, playersList);
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
-      socketEmit(socket, 'RoomJoinError', code);
+      socketEmit(socket, 'roomJoinError', code);
     }
   } else {
     console.log(`Room with code ${code} does not exist`);
-    socketEmit(socket, 'NonExistingRoom', code)
+    socketEmit(socket, 'nonExistingRoom', code)
   }
 }
 
@@ -95,7 +95,7 @@ function leaveRoom(socket, user) {
     rooms.get(Number(userEntry.code)).delete(user.email);
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${userEntry.code}`);
-    socketBroadcastToRoom(socket, 'PlayerLeftRoom', userEntry.code, user.name);
+    socketBroadcastToRoom(socket, 'playerLeftRoom', userEntry.code, user.name);
   }
 }
 
