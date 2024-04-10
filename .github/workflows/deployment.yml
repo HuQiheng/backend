@@ -41,4 +41,4 @@ jobs:
           mv /var/backend/temp/backend/* /var/www/backend
           echo "${{ secrets.ENV_VAR }}" > /var/www/backend/.env
           cd /var/www/backend
-          npm install --omit=dev
+          npm ci
