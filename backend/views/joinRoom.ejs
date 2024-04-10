@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Join Room</title>
+  <title>Chat Room</title>
   <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 </head>
 <body>
   <form id="joinRoomForm">
-    <input type="text" id="roomName" placeholder="Enter room name">
-    <input type="text" id="accessCode" placeholder="Enter access code">
+    <input type="text" id="roomCode" placeholder="Enter room code">
     <button type="submit">Join Room</button>
   </form>
 
@@ -17,17 +16,28 @@
 
     document.getElementById('joinRoomForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const roomName = document.getElementById('roomName').value;
-      const accessCode = document.getElementById('accessCode').value;
-      socket.emit('joinRoom', roomName, accessCode);
+      const roomCode = document.getElementById('roomCode').value;
+      socket.emit('joinRoom', roomCode);
     });
 
-    socket.on('Room access', (room, code) => {
-      console.log(`Joined room "${room}" with access code: ${code}`);
+    socket.on('RoomAccess', (code) => {
+      console.log(`You joined the room with code: ${code}`);
     });
-    
-    socket.on('Connected players', (room, code) => {
-      console.log(`Joined room "${room}" with access code: ${code}`);
+
+    socket.on('PlayerJoined', (code) => {
+      console.log(`A player joined the room with code: ${code}`);
+    });
+
+    socket.on('Connected players', (playersList) => {
+      console.log(`Connected players: ${playersList.join(', ')}`);
+    });
+
+    socket.on('RoomJoinError', (code) => {
+      console.log(`Could not join the room with code: ${code}`);
+    });
+
+    socket.on('NonExistingRoom', (code) => {
+      console.log(`Room with code ${code} does not exist`);
     });
   </script>
 </body>

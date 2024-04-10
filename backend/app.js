@@ -133,7 +133,6 @@ io.engine.use(onlyForHandshake(passport.session()));
 //IO error management
 io.engine.use(
   onlyForHandshake((req, res, next) => {
-    console.log(req)
     if (req.user) {
       next();
     } else {
@@ -173,20 +172,19 @@ io.on('connection', (socket) => {
   //The user
   const user = socket.request.user;
 
-
   //Create a new pair, the user is associated with that socket
   emailToSocket.set(user.email, socket);
   console.log("Socket ID: " + socket.id);
   console.log("User authenticated: " + JSON.stringify(user));
     
   // Create lobby
-  socket.on('createRoom', (room) => createRoom(socket, user, room));
+  socket.on('createRoom' ,() => createRoom(socket, user));
 
   // Join lobby
-  socket.on('joinRoom', (room, code) => joinRoom(socket, user, room, code));
+  socket.on('joinRoom', (code) => joinRoom(socket, user, code));
 
   //Start a game
-  socket.on('startGame', (room) => startGame(emailToSocket, room));
+  socket.on('startGame', (code) => startGame(emailToSocket, code, user, socket));
 
   // Leave a lobby
   socket.on('leaveRoom', () => leaveRoom(socket,user));
@@ -195,7 +193,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
-      leaveRoom(socket,user);
+     // leaveRoom(socket,user);
   });
   const fs = require('fs');
   // Move troops in a territory
