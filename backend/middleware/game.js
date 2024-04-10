@@ -112,7 +112,11 @@ function leaveRoom(emailToSocket, user) {
 
 // Send a message to all users in a room, note: doesnt send to itself
 function socketBroadcastToRoom(socket, event, room, data) {
-  socket.to(room).emit(event,data)
+  rooms.get(room).forEach((sid) => {
+    if (sid !== socket.id) {
+      socketEmit(socket, event, room);
+    }
+  });
 }
 
 // Send a message to a specific user
