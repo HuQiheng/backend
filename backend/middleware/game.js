@@ -53,7 +53,7 @@ function joinRoom(socket, user, code) {
       
       // Notify players in the room
       const playersList = Array.from(playersInRoom);
-      socketBroadcastToRoom(socket, 'Connected players', code, playersList);
+      socketBroadcastToRoom(socket, 'ConnectedPlayers', code, playersList);
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'RoomJoinError', code);
@@ -95,7 +95,7 @@ function leaveRoom(socket, user) {
     rooms.get(Number(userEntry.code)).delete(user.email);
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${userEntry.code}`);
-    socketBroadcastToRoom(socket, 'Player left room', userEntry.code, user.name);
+    socketBroadcastToRoom(socket, 'PlayerLeftRoom', userEntry.code, user.name);
   }
 }
 
