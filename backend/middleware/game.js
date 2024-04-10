@@ -79,7 +79,7 @@ function startGame(emailToSocket, code) {
   if (usersWithCode.length > 1) {
     usersWithCode.forEach((email) => {
       console.log("Emails: " + email);
-      sendingThroughEmail(emailToSocket, email, 'game starting',code);
+      sendingThroughEmail(emailToSocket, email, 'gameStarting',code);
     });
     console.log(`Game starting in room with code ${code}`);
   } else {
