@@ -142,13 +142,14 @@ io.on('connection', (socket) => {
   console.log("User authenticated: " + JSON.stringify(user));
     
   // Create lobby
-  socket.on('createRoom', (room) => createRoom(socket, user, room));
+  socket.on('createRoom' ,() => createRoom(socket, user));
 
   // Join lobby
-  socket.on('joinRoom', (room, code) => joinRoom(socket, user, room, code));
+  socket.on('joinRoom', (code) => joinRoom(socket, user, code));
 
   //Start a game
-  socket.on('startGame', (room) => startGame(emailToSocket, room));
+  socket.on('startGame', (code) => startGame(emailToSocket, code, user, socket));
+
   // Leave a lobby
   socket.on('leaveRoom', () => leaveRoom(socket,user));
 
@@ -156,8 +157,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
-      leaveRoom(socket,user);
+      // leaveRoom(socket,user);
   });
 });
-
-module.exports = io;

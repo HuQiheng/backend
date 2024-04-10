@@ -1,26 +1,25 @@
 // Game.js
-// Genero los conjuntos
+// Sets rooms set has all the rooms created, sids has in every room the users
+//that are in that room
 const sids = new Map();
 const rooms = new Map();
 
 // Creates a room and returns a unique code to join it
-function createRoom(socket, user, room) {
-  if (rooms.has(room)) {
-    return 'Error: La sala ya existe';
-  }
+function createRoom(socket, user) {
   //We create a new room
-  rooms.set(room, new Set());
-  rooms.get(room).add(user.email);
-
-  const code = 3;
   
+  let code;
+  do {
+    code = Math.floor(Math.random() * 10000); // generates a random number between 0 and 9999
+  } while (rooms.has(code)); // continues generating a new code until it's unique
+  rooms.set(code, new Set());
+  rooms.get(code).add(user.email);
   //A user can only connect to a room simultaneously
-  sids.set(user.email, { room, code });
-  console.log(`Jugador ${user.name} creó la sala ${room} con código de acceso ${code}`);
+  sids.set(user.email, {code});
+  console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
 
 
-  socketEmit(socket, 'Access code', code);
- // socketBroadcastToOthers(socketId, 'Sala creada', room, code);
+  socketEmit(socket, 'AccessCode', code);
 
  console.log("EN CREATE: ");
  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
@@ -28,13 +27,14 @@ function createRoom(socket, user, room) {
 }
 
 // Function to join an existing Room
-function joinRoom(socket, user, room, code) {
+function joinRoom(socket, user, code) {
   console.log("EN JOIN:");
   console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
   // Check if the room exists
-  const roomExists = rooms.has(room);
+  const roomExists = rooms.has(Number(code));
+  console.log("Existe? " + roomExists)
   if (roomExists) {
-    const playersInRoom = rooms.get(room);
+    const playersInRoom = rooms.get(Number(code));
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
     console.log("Jugador: " + firstPlayerDetails);
@@ -44,50 +44,58 @@ function joinRoom(socket, user, room, code) {
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected playeers for the game
       playersInRoom.add(user.email);
-      rooms.set(room, playersInRoom);
-      sids.set(user.email, { room, code });
+      rooms.set(code, playersInRoom);
+      sids.set(user.email, {code});
 
-      console.log(`Player ${user.name} joined room ${room}`);
-      socketEmit(socket, 'Room access', room);
-      socketBroadcastToRoom(socket, 'Player joined', room, code);
+      console.log(`Player ${user.name} joined room woth code ${code}`);
+      socketEmit(socket, 'RoomAccess', code);
+      socketBroadcastToRoom(socket, 'PlayerJoined',code, code);
       
       // Notify players in the room
       const playersList = Array.from(playersInRoom);
-      socketBroadcastToRoom(socket, 'Connected players', room, playersList);
+      socketBroadcastToRoom(socket, 'Connected players', code, playersList);
     } else {
-      console.log(`Player ${user.name} could not join room ${room}`);
-      socketEmit(socket, 'Room join error', room);
+      console.log(`Player ${user.name} could not join room with code ${code}`);
+      socketEmit(socket, 'RoomJoinError', code);
     }
   } else {
-    console.log(`Room ${room} does not exist`);
+    console.log(`Room with code ${code} does not exist`);
+    socketEmit(socket, 'NonExistingRoom', code)
   }
 }
 
 
 // Function that starts a game 
-function startGame(emailToSocket, room) {
-  const playersInRoom = rooms.get(room);
-  
-  if (playersInRoom) {
-    playersInRoom.forEach((email) => {
-      sendingThroughEmail(emailToSocket, email, 'game starting',room);
+function startGame(emailToSocket, code) {
+  console.log("EN START:");
+  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
+  console.log(sids);
+
+  let usersWithCode = getUsersWithCode(code);
+
+  //const playersInRoom = rooms.get(Number(code));
+  console.log("Length " + usersWithCode.length);
+  console.log(usersWithCode);
+  if (usersWithCode.length > 1) {
+    usersWithCode.forEach((email) => {
+      console.log("Emails: " + email);
+      sendingThroughEmail(emailToSocket, email, 'game starting',code);
     });
-    console.log(`Game starting in room ${room}`);
+    console.log(`Game starting in room with code ${code}`);
   } else {
-    console.log(`No players in room ${room}`);
+    console.log(`No players in room with code ${code}`);
   }
 }
 
 // Función para salir de una sala
 function leaveRoom(socket, user) {
   const userEntry = sids.get(user.email);
-
   //We check if user has a room asigned
   if (userEntry) {
-    rooms.get(userEntry.room).delete(user.email);
+    rooms.get(Number(userEntry.code)).delete(user.email);
     sids.delete(user.email);
-    console.log(`Jugador ${user.email} abandonó la sala ${userEntry.room}`);
-    socketBroadcastToRoom(socket, 'Player left room', userEntry.room, user.name);
+    console.log(`Jugador ${user.email} abandonó la sala ${userEntry.code}`);
+    socketBroadcastToRoom(socket, 'Player left room', userEntry.code, user.name);
   }
 }
 
@@ -117,13 +125,26 @@ function emit(io,socket, event, room, data, players) {
 
 
 // Given an email it emits an event to the corresponding socket
-function sendingThroughEmail(emailToSocket, user, event, data) {
-  const socket = emailToSocket.get(user);
+function sendingThroughEmail(emailToSocket, email, event, data) {
+  //console.log("El email to socket: ");
+  //console.log(emailToSocket);
+  const socket = emailToSocket.get(email);
   if (socket) {
     socket.emit(event, data);
   } else {
-    console.log(`No socket found for email ${user.email}`);
+    console.log(`No socket found for email ${email}`);
   }
+}
+
+function getUsersWithCode(code) {
+  let users = [];
+  code = Number(code); // ensure code is a number
+  for (let [email, userCode] of sids.entries()) {
+    if (Number(userCode.code) === code) { // ensure userCode.code is a number
+      users.push(email);
+    }
+  }
+  return users;
 }
 
 module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};
