@@ -48,4 +48,5 @@ router.delete('/delete/:email', checkAuthenticated, async (req, res) => {
   }
 });
 
+
 module.exports = router; // Export the router
