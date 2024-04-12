@@ -28,8 +28,6 @@ function createRoom(socket, user) {
 
 // Function to join an existing Room
 function joinRoom(socket, user, code) {
-  console.log("EN JOIN:");
-  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
   // Check if the room exists
   const roomExists = rooms.has(Number(code));
   console.log("Existe? " + roomExists)
@@ -40,14 +38,13 @@ function joinRoom(socket, user, code) {
     console.log("Jugador: " + firstPlayerDetails);
     console.log("Codigo   " + firstPlayerDetails.code);
     console.log("Codigo proprocinado " + code);
-    console.log("Jugadores " + playersInRoom.size);
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected playeers for the game
       playersInRoom.add(user.email);
       rooms.set(code, playersInRoom);
       sids.set(user.email, {code});
-
-      console.log(`Player ${user.name} joined room woth code ${code}`);
+      console.log(user.name);
+      console.log(`Player ${user.name} joined room with code ${code}`);
       socketEmit(socket, 'RoomAccess', code);
       socketBroadcastToRoom(socket, 'PlayerJoined',code, code);
       
@@ -58,10 +55,14 @@ function joinRoom(socket, user, code) {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'RoomJoinError', code);
     }
+    console.log("Jugadores " + playersInRoom.size);
   } else {
     console.log(`Room with code ${code} does not exist`);
     socketEmit(socket, 'NonExistingRoom', code)
   }
+  console.log("EN JOIN:");
+  const uniqueRooms = Object.fromEntries(rooms);
+  console.log(Object.entries(uniqueRooms).map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
 
