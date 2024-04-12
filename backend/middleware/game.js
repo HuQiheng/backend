@@ -28,8 +28,6 @@ function createRoom(socket, user) {
 
 // Function to join an existing Room
 function joinRoom(emailToSocket, socket, user, code) {
-  console.log("EN JOIN:");
-  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
   // Check if the room exists
   const roomExists = rooms.has(Number(code));
   console.log("Existe? " + roomExists)
@@ -40,7 +38,6 @@ function joinRoom(emailToSocket, socket, user, code) {
     console.log("Jugador: " + firstPlayerDetails);
     console.log("Codigo   " + firstPlayerDetails.code);
     console.log("Codigo proprocinado " + code);
-    console.log("Jugadores " + playersInRoom.size);
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected playeers for the game
       playersInRoom.add(user.email);
@@ -53,8 +50,8 @@ function joinRoom(emailToSocket, socket, user, code) {
       let usersWithCode = getUsersWithCode(code);
       usersWithCode.forEach((email) => {
         console.log("Emails: " + email);
-        sendingThroughEmail(emailToSocket, email, 'playerJoined',code);
-        sendingThroughEmail(emailToSocket, email, 'connectedPlayers',code);
+        sendingThroughEmail(emailToSocket, email, 'playerJoined', user.name);
+        sendingThroughEmail(emailToSocket, email, 'connectedPlayers', usersWithCode);
       });
       //socketBroadcastToRoom(socket, 'playerJoined',code, code);
       
@@ -64,10 +61,13 @@ function joinRoom(emailToSocket, socket, user, code) {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
     }
+    console.log("Jugadores " + playersInRoom.size);
   } else {
     console.log(`Room with code ${code} does not exist`);
     socketEmit(socket, 'nonExistingRoom', code)
   }
+  console.log("EN JOIN:");
+  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
 
