@@ -5,7 +5,7 @@ const checkAuthenticated = require('../middleware/authGoogle');
 const playerController = require('../controllers/PlayerController');
 
 //Method that gets the users info
-router.get('/get/:email', checkAuthenticated, async (req, res) => {
+router.get('/:email', checkAuthenticated, async (req, res) => {
   try {
     console.log('Email pedido ' + req.params.email);
     console.log('Especificado ' + req.user.email);
@@ -20,7 +20,7 @@ router.get('/get/:email', checkAuthenticated, async (req, res) => {
 });
 
 //Method that updates the user info, the username and password are required in the body of the json
-router.post('/update/:email', checkAuthenticated, async (req, res) => {
+router.put('/:email', checkAuthenticated, async (req, res) => {
   try {
     console.log('Info: \n');
     console.log('Email: ' + req.params.email + '\n');
@@ -36,7 +36,7 @@ router.post('/update/:email', checkAuthenticated, async (req, res) => {
 });
 
 //Method that deletes a user, this is NOT reversible
-router.delete('/delete/:email', checkAuthenticated, async (req, res) => {
+router.delete('/:email', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email) {
       await playerController.deletePlayer(req.params.email);

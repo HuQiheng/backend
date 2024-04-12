@@ -9,7 +9,7 @@ const passport = require('passport');
 
 
 
-const allowedOrigins = ['http://localhost:3000', 'https://wealthwars.games:3010', 'https://accounts.google.com'];
+const allowedOrigins = ['http://localhost:3010', 'http://localhost:3000', 'https://wealthwars.games:3010', 'https://accounts.google.com'];
 
 app.use(cors({
   origin: function(origin, callback){
