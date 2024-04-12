@@ -50,7 +50,6 @@ function moveTroops(state, from, to, t, player) {
     let playerIndex = state.players.indexOf(player);
     let map = state.map;
     troops = parseInt(t, 10);
-    console.log(from);
     if (state.turn === playerIndex) {
         if ((map[from].troops - troops) >= 1) {
             if (map[from].player === playerIndex && map[to].player === playerIndex) {
@@ -65,14 +64,16 @@ function moveTroops(state, from, to, t, player) {
     } else {
         console.log("Not your turn");
     }
+    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 
 // Player Attack territories
 function attackTerritories(state, from, to, troops, player) {
+    let playerIndex = state.players.indexOf(player);
     const map = state.map;
-    if (state.turn === state.players[player]) {
+    if (state.turn === playerIndex) {
         if ((map[from].troops - troops) >= 1) {
-            if (map[from].player === player && map[to].player !== player) {
+            if (map[from].player === playerIndex && map[to].player !== playerIndex) {
                 if (troops > map[to].troops) {
                     map[to].troops = troops - map[to].troops;
                     map[to].player = player;
@@ -89,14 +90,16 @@ function attackTerritories(state, from, to, troops, player) {
     } else {
         console.log("Not your turn");
     }
+    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 
 // Surrender
 function surrender(state, player) {
+    let playerIndex = state.players.indexOf(player);
     const map = state.map;
     for (const i in map) {
-        if (map[i].player === player) {
-            state.players = state.players.filter(p => p !== player);
+        if (map[i].player === playerIndex) {
+            state.players = state.players.filter(p => p !== playerIndex);
             // asign territory to another player
             let j = Math.floor(Math.random() * state.players.length);
             while (j === player) {
@@ -105,6 +108,8 @@ function surrender(state, player) {
             map[i].player = j;
         }
     }
+    console.log("Player surrendered");
+    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 
 // Shift management
@@ -121,10 +126,12 @@ function nextTurn(state) {
     }
     // Shift
     state.turn = (state.turn + 1) % state.players.length;
+    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
+    let playerIndex = state.players.indexOf(player);
     const map = state.map;
     if (type === 'factory') {
         var cost = 15;
@@ -138,7 +145,7 @@ function buyActives(state, player, type, territory, numActives) {
     else if (type === 'troop') {
         var cost = 2 * numActives;
     }
-    if (player.coins >= cost && map[territory].player === player) {
+    if (player.coins >= cost && map[territory].player === playerIndex) {
         if (type === 'factory' && map[territory].factories === 0) {
             player.coins -= cost;
             map[territory].factories += numActives;
@@ -151,6 +158,7 @@ function buyActives(state, player, type, territory, numActives) {
     } else {
         console.log("Not enough coins or territory is not owned by the player");
     }
+    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 /*
 const { joinRoom, createRoom, leaveRoom } = require('../middleware/game.js');

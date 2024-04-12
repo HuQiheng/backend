@@ -175,6 +175,7 @@ io.on('connection', (socket) => {
   //The user
   const user = socket.request.user;
 
+
   //Create a new pair, the user is associated with that socket
   emailToSocket.set(user.email, socket);
   console.log("Socket ID: " + socket.id);
@@ -202,44 +203,39 @@ io.on('connection', (socket) => {
   // Move troops in a territory
   socket.on('moveTroops', (from, to, troops) => {
     const room = sids.get(user.email);
-    let state = getTerritories(data, room.code);
+    const state = getTerritories(data, room.code);
     moveTroops(state, from, to, troops, user.email);
-    fs.writeFileSync('moverprueba.json', JSON.stringify(state, null, 4));
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Attack a territory
   socket.on('attack', (from, to, troops) => {
-    const mail = user.email;
-    const room = rooms.get(mail);
-    const state = getTerritories(data, room);
+    const room = sids.get(user.email);
+    const state = getTerritories(data, room.code);
     attackTerritories(state, from, to, troops, user.email);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Surrender
   socket.on('surrender', () => {
-    const mail = user.email;
-    const room = rooms.get(mail);
-    const state = getTerritories(data, room);
+    const room = sids.get(user.email);
+    const state = getTerritories(data, room.code);
     surrender(state, user.email);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Next turn
   socket.on('nextTurn', () => {
-    const mail = user.email;
-    const room = rooms.get(mail);
-    const state = getTerritories(data, room);
+    const room = sids.get(user.email);
+    const state = getTerritories(data, room.code);
     nextTurn(state);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
 
   // Buy actives
   socket.on('buyActives', (type, territory, numActives) => {
-    const mail = user.email;
-    const room = rooms.get(mail);
-    const state = getTerritories(data, room);
+    const room = sids.get(user.email);
+    const state = getTerritories(data, room.code);
     buyActives(state, user.email, type, territory, numActives);
     io.to(room).emit('update', JSON.stringify(state, null, 4));
   });
