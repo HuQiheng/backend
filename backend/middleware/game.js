@@ -47,6 +47,7 @@ function joinRoom(emailToSocket, socket, user, code) {
       socketEmit(socket, 'roomAccess', code);
 
       let usersWithCode = getUsersWithCode(code);
+      console.log("Usuarios con código: " + usersWithCode);
       usersWithCode.forEach((email) => {
         console.log("Emails: " + email);
         sendingThroughEmail(emailToSocket, email, 'playerJoined', user.name);

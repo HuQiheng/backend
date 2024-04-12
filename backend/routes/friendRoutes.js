@@ -3,7 +3,7 @@ const router = express.Router(); // Create a new router
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const playerController = require('../controllers/PlayerController');
-const friendsController = require('../controllers/FriendsController');
+const friendsController = require('../controllers/FriendController');
 
 //Method that gets the users friends info
 router.get('/get/:email/friends', checkAuthenticated, async (req, res) => {
