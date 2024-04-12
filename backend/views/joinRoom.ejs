@@ -24,19 +24,19 @@
       console.log(`You joined the room with code: ${code}`);
     });
 
-    socket.on('PlayerJoined', (code) => {
+    socket.on('playerJoined', (code) => {
       console.log(`A player joined the room with code: ${code}`);
     });
 
-    socket.on('Connected players', (playersList) => {
+    socket.on('connectedPlayers', (playersList) => {
       console.log(`Connected players: ${playersList.join(', ')}`);
     });
 
-    socket.on('RoomJoinError', (code) => {
+    socket.on('roomJoinError', (code) => {
       console.log(`Could not join the room with code: ${code}`);
     });
 
-    socket.on('NonExistingRoom', (code) => {
+    socket.on('nonExistingRoom', (code) => {
       console.log(`Room with code ${code} does not exist`);
     });
   </script>

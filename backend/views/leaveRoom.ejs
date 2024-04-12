@@ -20,7 +20,7 @@
       socket.emit('leaveRoom', roomName);
     });
 
-    socket.on('user left room', (room) => {
+    socket.on('playerLeftRoom', (room) => {
       console.log(`User left room "${room}"`);
     });
   </script>

@@ -20,11 +20,11 @@
       socket.emit('startGame', gameCode);
     });
 
-    socket.on('game starting', (room) => {
+    socket.on('gameStarting', (room) => {
       console.log(`Game starting in room: ${room}`);
     });
 
-    socket.on('No players', (code) => {
+    socket.on('noPlayers', (code) => {
       console.log(`No players in room with code: ${code}`);
     });
   </script>

@@ -20,7 +20,7 @@
       socket.emit('createRoom', roomName);
     });
 
-    socket.on('AccessCode', (code) => {
+    socket.on('accessCode', (code) => {
       console.log(`Your access code: ${code}`);
     });
 
