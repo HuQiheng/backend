@@ -45,12 +45,13 @@ function joinRoom(socket, user, code) {
       sids.set(user.email, {code});
       console.log(user.name);
       console.log(`Player ${user.name} joined room with code ${code}`);
-      socketEmit(socket, 'RoomAccess', code);
-      socketBroadcastToRoom(socket, 'PlayerJoined',code, code);
-      
-      // Notify players in the room
-      const playersList = Array.from(playersInRoom);
-      socketBroadcastToRoom(socket, 'Connected players', code, playersList);
+      let usersWithCode = getUsersWithCode(code);
+      console.log(usersWithCode);
+      usersWithCode.forEach((email) => {
+        console.log("Emails: " + email);
+        sendingThroughEmail(emailToSocket, email, 'playerJoined', user.name);
+        sendingThroughEmail(emailToSocket, email, 'connectedPlayers', usersWithCode);
+      });
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'RoomJoinError', code);
