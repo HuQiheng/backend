@@ -185,19 +185,19 @@ io.on('connection', (socket) => {
   socket.on('createRoom' ,() => createRoom(socket, user));
 
   // Join lobby
-  socket.on('joinRoom', (code) => joinRoom(socket, user, code));
+  socket.on('joinRoom', (code) => joinRoom(emailToSocket, socket, user, code));
 
   //Start a game
   socket.on('startGame', (code) => startGame(emailToSocket, code, user, socket));
 
   // Leave a lobby
-  socket.on('leaveRoom', () => leaveRoom(socket,user));
+  socket.on('leaveRoom', () => leaveRoom(emailToSocket,user));
 
   // Desconexion de un socket
   socket.on('disconnect', () => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
-     // leaveRoom(socket,user);
+      // leaveRoom(socket,user);
   });
   const fs = require('fs');
   // Move troops in a territory
