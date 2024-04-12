@@ -1,5 +1,8 @@
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
+
+const { selectPlayer } = require("../controllers/PlayerController");
+
 //that are in that room
 const sids = new Map();
 const rooms = new Map();
@@ -7,7 +10,6 @@ const rooms = new Map();
 // Creates a room and returns a unique code to join it
 function createRoom(socket, user) {
   //We create a new room
-  
   let code;
   do {
     code = Math.floor(Math.random() * 10000); // generates a random number between 0 and 9999
@@ -17,8 +19,6 @@ function createRoom(socket, user) {
   //A user can only connect to a room simultaneously
   sids.set(user.email, {code});
   console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
-
-
   socketEmit(socket, 'accessCode', code);
 
  console.log("EN CREATE: ");
@@ -40,18 +40,21 @@ function joinRoom(emailToSocket, socket, user, code) {
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected playeers for the game
       playersInRoom.add(user.email);
-      rooms.set(code, playersInRoom);
-      sids.set(user.email, {code});
+      rooms.set(Number(code), playersInRoom);
+      sids.set(user.email, {code: Number(code)});
 
       console.log(`Player ${user.name} joined room woth code ${code}`);
       socketEmit(socket, 'roomAccess', code);
 
       let usersWithCode = getUsersWithCode(code);
+    
       console.log("Usuarios con código: " + usersWithCode);
       usersWithCode.forEach((email) => {
         console.log("Emails: " + email);
+        let details = selectPlayer(email);
+        console.log("Detalles: " + details);
         sendingThroughEmail(emailToSocket, email, 'playerJoined', user.name);
-        sendingThroughEmail(emailToSocket, email, 'connectedPlayers', usersWithCode);
+        sendingThroughEmail(emailToSocket, email, 'connectedPlayers', details);
       });
       //socketBroadcastToRoom(socket, 'playerJoined',code, code);
       
