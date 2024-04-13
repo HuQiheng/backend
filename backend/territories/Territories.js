@@ -136,19 +136,18 @@ function surrender(state, player) {
 // Shift management
 function nextTurn(state) {
     //Check if the phase is the last one
-    const currentPlayer = state.players[state.turn];
-    // Asign coins to the current player
-    for (const j in state.map) {
-        if (state.map[j].player === state.turn) {
-            currentPlayer.coins += 1;
-            if (state.map[j].factories > 0) {
-                currentPlayer.coins += 4;
-            }
+    if (state.phase === 2){
+        //Cacluate the number of coins for every player
+        for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
+            let coins = countPlayerCoins(state, playerNumber);
+            state.players[playerNumber].coins += coins;
         }
+
+        // Next turn
+        state.turn = (state.turn + 1) % state.players.length;
+        state.phase = 0;
     }
-    // Shift
-    state.turn = (state.turn + 1) % state.players.length;
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+    return state;
 }
 
 // Given the data of a game it changes the phase we're a player is
@@ -190,6 +189,21 @@ function buyActives(state, player, type, territory, numActives) {
     }
     fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
+
+//Given a number of player it calculates the number of coins that this player have
+function countPlayerCoins(state,playerNumber) {
+    let count = 0;
+    for (let territory in state.map) {
+      if (state.map[territory].player === playerNumber) {
+        count++;
+        if(state.map[territory].factories === 1){
+            count = count + 4
+        }
+      }
+    }
+    return count;
+  }
+
 /*
 const { joinRoom, createRoom, leaveRoom } = require('../middleware/game.js');
 while(true) {

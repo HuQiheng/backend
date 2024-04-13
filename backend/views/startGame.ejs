@@ -16,6 +16,10 @@
     <button type="submit">Next Phase</button>
   </form>
 
+  <form id="nextTurnForm">
+    <button type="submit">Next Turn</button>
+  </form>
+
   <script>
     const socket = io('http://localhost:3010');
 
@@ -28,7 +32,12 @@
     document.getElementById('nextPhaseForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const phaseCode = document.getElementById('phaseCode').value;
-      socket.emit('nextPhase', phaseCode); // Emitting 'nextPhase' event here
+      socket.emit('nextPhase', phaseCode);
+    });
+
+    document.getElementById('nextTurnForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      socket.emit('nextTurn');
     });
 
     socket.on('gameStarting', (room) => {
@@ -39,7 +48,6 @@
       console.log(`No players in room with code: ${code}`);
     });
 
-    // New event listener for 'mapSended'
     socket.on('mapSended', (mapData) => {
       console.log(`Map data received: ${mapData}`);
     });
