@@ -1,19 +1,39 @@
 // Process territories.json for take information about territories
 const fs = require('fs');
 const data = require('./territories.json');
-const { rooms } = require('../middleware/game.js');
 
 // Assign territories
 function assignTerritories(players, data) {
-    const territoryAssignment = {};
+    const initialFactories = 0;
+    const initialTroops = 3;
+    const state = {
+        turn: 0,
+        phase: 0,
+        players: players.map((player, index) => ({
+            name: player.username,
+            email: player.email,
+            picture: player.picture,
+            coins: player.coins
+        })),
+        map: {}
+    };
+
     const shuffledTerritories = Object.keys(data).sort(() => Math.random() - 0.5); // Random
     const numPlayers = players.length;
+
     shuffledTerritories.forEach((i, j) => {
         const playerIndex = j % numPlayers; // module numPlayers
-        territoryAssignment[i] = playerIndex; 
+        state.map[i] = {
+            name: data[i].name,
+            player: playerIndex,
+            troops: initialTroops,
+            factories: initialFactories
+        };
     });
-    return territoryAssignment;
+
+    return state;
 }
+
 
 function getPlayers(room) {
     const p = rooms.get(room);
@@ -127,6 +147,11 @@ function nextTurn(state) {
     // Shift
     state.turn = (state.turn + 1) % state.players.length;
     fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+}
+
+// Given the data of a game it changes the phase we're a player is
+function nexPhase(data) {
+
 }
 
 // Buy actives

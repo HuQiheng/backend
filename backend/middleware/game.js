@@ -6,6 +6,12 @@
 const sids = new Map();
 const rooms = new Map();
 
+//A state of the map in a room
+const roomState = new Map();
+
+//Game functions needed 
+const { assignTerritories, getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('../territories/Territories');
+const data = require('../territories/territories.json');
 // Creates a room and returns a unique code to join it
 function createRoom(socket, user) {
   //We create a new room
@@ -57,15 +63,21 @@ function joinRoom(emailToSocket, socket, user, code) {
 }
 
 // Function that starts a game 
-function startGame(emailToSocket, code) {
+async function startGame(emailToSocket, code) {
   let usersWithCode = getUsersWithCode(code);
+  let usersInfo = await getUsersInfo(usersWithCode);
   if (usersWithCode.length > 1) {
     sendToAllWithCode(emailToSocket, code, 'gameStarting',code);
     console.log(`Game starting in room with code ${code}`);
+    //console.log(usersInfo)
+    const  assginment = assignTerritories(usersInfo, data);
+    roomState.set(code, assginment);
+    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment );
   } else {
     console.log(`No players in room with code ${code}`);
   }
 }
+
 
 // Function to leave a room
 function leaveRoom(emailToSocket, user) {
@@ -80,6 +92,25 @@ function leaveRoom(emailToSocket, user) {
   }
 }
 
+function nextPhase(socket, emailToSocket, user, code){
+  //Check if the user is in a room
+  //if is it in a room use auxiliar function what does this need? => The map
+  //it should return the new statement
+  //Error?
+
+  const usersWithCode = getUsersWithCode(code);
+
+  //Check if the user is in the room
+  if (usersWithCode.includes(user.email)){
+    //Next phase for the user
+    const  assginment = assignTerritories(usersInfo, data);
+    roomState.set(code, assginment);
+    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in the room ${code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', code);
+  }
+}
 
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
@@ -118,5 +149,26 @@ function getUsersWithCode(code) {
   }
   return users;
 }
+
+
+const playerController = require('../controllers/PlayerController');
+async function getUsersInfo(usersWithCode) {
+  try {
+    // Create an array of promises for each user
+    const promises = Array.from(usersWithCode.values()).map(email => playerController.selectPlayer(email));
+
+    // Use Promise.all to execute all promises in parallel
+    const queryResults = await Promise.all(promises);
+
+    // Extract only the user object from each query result
+    const usersInfo = queryResults.map(result => result.rows[0]);
+
+    return usersInfo;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 
 module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};
