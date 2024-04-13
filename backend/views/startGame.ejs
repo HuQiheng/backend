@@ -11,6 +11,11 @@
     <button type="submit">Start Game</button>
   </form>
 
+  <form id="nextPhaseForm">
+    <input type="text" id="phaseCode" placeholder="Enter phase code">
+    <button type="submit">Next Phase</button>
+  </form>
+
   <script>
     const socket = io('http://localhost:3010');
 
@@ -18,6 +23,12 @@
       e.preventDefault();
       const gameCode = document.getElementById('gameCode').value;
       socket.emit('startGame', gameCode);
+    });
+
+    document.getElementById('nextPhaseForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const phaseCode = document.getElementById('phaseCode').value;
+      socket.emit('nextPhase', phaseCode); // Emitting 'nextPhase' event here
     });
 
     socket.on('gameStarting', (room) => {
@@ -35,4 +46,3 @@
   </script>
 </body>
 </html>
-
