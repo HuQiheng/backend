@@ -150,9 +150,12 @@ function nextTurn(state) {
 }
 
 // Given the data of a game it changes the phase we're a player is
-function nexPhase(data) {
-
-}
+function nextPhase(state) {
+    if (state.phase === 0 || state.phase === 1) {
+      state.phase += 1;
+    }
+    return state;
+  }
 
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
@@ -253,4 +256,5 @@ module.exports = {
     surrender,
     buyActives,
     attackTerritories,
+    nextPhase
 };

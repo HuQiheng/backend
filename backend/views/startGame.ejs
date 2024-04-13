@@ -27,6 +27,12 @@
     socket.on('noPlayers', (code) => {
       console.log(`No players in room with code: ${code}`);
     });
+
+    // New event listener for 'mapSended'
+    socket.on('mapSended', (mapData) => {
+      console.log(`Map data received: ${mapData}`);
+    });
   </script>
 </body>
 </html>
+
