@@ -120,7 +120,7 @@ function nextTurnHandler(socket, emailToSocket, user){
     console.log(roomState);
 
     //Next stat for the user
-    const  assginment = nextPhase(roomState.get(String(userCode)));
+    const  assginment = nextTurn(roomState.get(String(userCode)));
     roomState.set(userCode, assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
   } else {

@@ -135,6 +135,7 @@ function surrender(state, player) {
 
 // Shift management
 function nextTurn(state) {
+    //Check if the phase is the last one
     const currentPlayer = state.players[state.turn];
     // Asign coins to the current player
     for (const j in state.map) {
