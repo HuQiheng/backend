@@ -162,8 +162,7 @@ else{
 }
 
 
-const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids, next} = require('./middleware/game');
-const { getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives, nextPhase } = require('./territories/Territories');
+const {createRoom, joinRoom, leaveRoom, startGame, moveTroopsHandler, rooms, sids, next, roomState} = require('./middleware/game');
 const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
@@ -199,17 +198,10 @@ io.on('connection', (socket) => {
       emailToSocket.delete(user.email);
       // leaveRoom(socket,user);
   });
-  const fs = require('fs');
+
   // Move troops in a territory
   socket.on('moveTroops', (from, to, troops) => {
-    if (user && user.email && sids.has(user.email)) { 
-      const room = sids.get(user.email);
-      const state = getTerritories(data, room.code);
-      moveTroops(state, from, to, troops, user.email);
-      io.to(room).emit('update', JSON.stringify(state, null, 4));
-    } else {
-      console.log("User not found");
-    }
+    moveTroopsHandler(socket, emailToSocket, user, from, to, troops);
   });
 
   // Attack a territory
