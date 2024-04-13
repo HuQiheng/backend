@@ -151,6 +151,22 @@ function moveTroopsHandler(socket, emailToSocket, user, from, to, troops){
   }
 }
 
+function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops) {
+  const room = sids.get(user.email);
+
+  //Check if the user is in the room
+  if (room && room.code){
+    //Next phase for the user
+    const assginment = attackTerritories(roomState.get(String(room.code)), from, to, troops, user.email);
+    console.log(assginment);
+    roomState.set(room.code, assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in the room ${room.code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', room.code);
+  }
+}
+
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con código ${data} a ${socket.id}`);
@@ -210,4 +226,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler};

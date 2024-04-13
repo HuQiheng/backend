@@ -69,7 +69,6 @@ function getTerritories(data, room) {
 // A Player Move troops
 function moveTroops(state, from, to, t, player) {
     let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
-
     let map = state.map;
     troops = parseInt(t, 10);
     if (state.turn === playerIndex) {
@@ -90,7 +89,7 @@ function moveTroops(state, from, to, t, player) {
 
 // Player Attack territories
 function attackTerritories(state, from, to, troops, player) {
-    let playerIndex = state.players.indexOf(player);
+    let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
     const map = state.map;
     if (state.turn === playerIndex) {
         if ((map[from].troops - troops) >= 1) {
@@ -116,7 +115,7 @@ function attackTerritories(state, from, to, troops, player) {
 
 // Surrender
 function surrender(state, player) {
-    let playerIndex = state.players.indexOf(player);
+    let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
     const map = state.map;
     for (const i in map) {
         if (map[i].player === playerIndex) {
@@ -161,7 +160,7 @@ function nextPhase(state) {
 
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
-    let playerIndex = state.players.indexOf(player);
+    let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
     const map = state.map;
     if (type === 'factory') {
         var cost = 15;
