@@ -93,8 +93,14 @@ function leaveRoom(emailToSocket, user) {
   }
 }
 
-//Function that handles next phase moments on a game
-function nextPhaseHandler(socket, emailToSocket, user){
+function nextPhase(socket, emailToSocket, user, code){
+  //Check if the user is in a room
+  //if is it in a room use auxiliar function what does this need? => The map
+  //it should return the new statement
+  //Error?
+
+  const usersWithCode = getUsersWithCode(code);
+
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
@@ -126,6 +132,23 @@ function nextTurnHandler(socket, emailToSocket, user){
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
+  }
+}
+
+function moveTroopsHandler(socket, emailToSocket, user, from, to, troops){
+  const room = sids.get(user.email);
+  console.log("Room: " + roomState.get(String(room.code)));
+
+  //Check if the user is in the room
+  if (room && room.code){
+    //Next phase for the user
+    const  assginment = moveTroops(roomState.get(room.code), from, to, troops, user.email);
+    console.log(assginment);
+    roomState.set(code, assginment);
+    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in the room ${code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', code);
   }
 }
 
@@ -188,4 +211,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhase};
