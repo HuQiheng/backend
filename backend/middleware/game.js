@@ -10,7 +10,7 @@ const rooms = new Map();
 const roomState = new Map();
 
 //Game functions needed 
-const { assignTerritories, getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('../territories/Territories');
+const { assignTerritories, nextPhase, getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives } = require('../territories/Territories');
 const data = require('../territories/territories.json');
 // Creates a room and returns a unique code to join it
 function createRoom(socket, user) {
@@ -103,7 +103,8 @@ function nextPhase(socket, emailToSocket, user, code){
   //Check if the user is in the room
   if (usersWithCode.includes(user.email)){
     //Next phase for the user
-    const  assginment = assignTerritories(usersInfo, data);
+    const  assginment = nextPhase(data);
+    console.log(assginment);
     roomState.set(code, assginment);
     sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
   } else {
@@ -171,4 +172,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhase};
