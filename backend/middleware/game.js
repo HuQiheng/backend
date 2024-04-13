@@ -131,18 +131,33 @@ function nextTurnHandler(socket, emailToSocket, user){
 
 function moveTroopsHandler(socket, emailToSocket, user, from, to, troops){
   const room = sids.get(user.email);
-  console.log("Room: " + roomState.get(String(room.code)));
 
   //Check if the user is in the room
   if (room && room.code){
     //Next phase for the user
-    const  assginment = moveTroops(roomState.get(room.code), from, to, troops, user.email);
+    const  assginment = moveTroops(roomState.get(String(room.code)), from, to, troops, user.email);
     console.log(assginment);
-    roomState.set(code, assginment);
-    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
+    roomState.set(room.code, assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
   } else {
-    console.log(`You are not in the room ${code} ` + user.email);
-    socketEmit(socket, 'notInTheRoom', code);
+    console.log(`You are not in the room ${room.code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', room.code);
+  }
+}
+
+function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops) {
+  const room = sids.get(user.email);
+
+  //Check if the user is in the room
+  if (room && room.code){
+    //Next phase for the user
+    const assginment = attackTerritories(roomState.get(String(room.code)), from, to, troops, user.email);
+    console.log(assginment);
+    roomState.set(room.code, assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in the room ${room.code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', room.code);
   }
 }
 
@@ -205,4 +220,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler};
