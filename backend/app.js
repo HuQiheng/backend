@@ -199,13 +199,17 @@ io.on('connection', (socket) => {
       emailToSocket.delete(user.email);
       // leaveRoom(socket,user);
   });
-  const fs = require('fs');
+
   // Move troops in a territory
   socket.on('moveTroops', (from, to, troops) => {
-    const room = sids.get(user.email);
-    const state = getTerritories(data, room.code);
-    moveTroops(state, from, to, troops, user.email);
-    io.to(room).emit('update', JSON.stringify(state, null, 4));
+    if (user && user.email && sids.has(user.email)) { 
+      const room = sids.get(user.email);
+      const state = getTerritories(data, room.code);
+      moveTroops(state, from, to, troops, user.email);
+      io.to(room).emit('update', JSON.stringify(state, null, 4));
+    } else {
+      console.log("User not found");
+    }
   });
 
   // Attack a territory
