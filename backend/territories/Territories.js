@@ -6,6 +6,7 @@ const data = require('./territories.json');
 function assignTerritories(players, data) {
     const initialFactories = 0;
     const initialTroops = 3;
+    const initialCoins = 0;
     const state = {
         turn: 0,
         phase: 0,
@@ -13,7 +14,7 @@ function assignTerritories(players, data) {
             name: player.username,
             email: player.email,
             picture: player.picture,
-            coins: player.coins
+            coins: initialCoins
         })),
         map: {}
     };

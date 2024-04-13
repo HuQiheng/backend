@@ -72,6 +72,7 @@ async function startGame(emailToSocket, code) {
     //console.log(usersInfo)
     const  assginment = assignTerritories(usersInfo, data);
     roomState.set(code, assginment);
+    console.log(roomState.get(code));
     sendToAllWithCode(emailToSocket, code, 'mapSended', assginment );
   } else {
     console.log(`No players in room with code ${code}`);
@@ -92,7 +93,7 @@ function leaveRoom(emailToSocket, user) {
   }
 }
 
-function nextPhaseHandler(socket, emailToSocket, user, code){
+function nextPhase(socket, emailToSocket, user, code){
   //Check if the user is in a room
   //if is it in a room use auxiliar function what does this need? => The map
   //it should return the new statement
@@ -101,15 +102,36 @@ function nextPhaseHandler(socket, emailToSocket, user, code){
   const usersWithCode = getUsersWithCode(code);
 
   //Check if the user is in the room
-  if (usersWithCode.includes(user.email)){
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+    console.log(roomState);
+  
     //Next phase for the user
-    const  assginment = nextPhase(data);
+    const  assginment = nextPhase(roomState.get(String(userCode)));
     console.log(assginment);
-    roomState.set(code, assginment);
-    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
+    roomState.set(userCode, assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
   } else {
-    console.log(`You are not in the room ${code} ` + user.email);
-    socketEmit(socket, 'notInTheRoom', code);
+    console.log(`You are not in a Room  ` + user.email);
+    socketEmit(socket, 'notInARoom', userCode);
+  }
+}
+
+function nextTurnHandler(socket, emailToSocket, user){
+  //Check if the user is in the room
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+    console.log(roomState);
+
+    //Next stat for the user
+    const  assginment = nextPhase(roomState.get(String(userCode)));
+    roomState.set(userCode, assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in a Room  ` + user.email);
+    socketEmit(socket, 'notInARoom', userCode);
   }
 }
 
@@ -189,4 +211,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhase, roomState, sids, moveTroopsHandler};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhase};
