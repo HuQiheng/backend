@@ -68,7 +68,8 @@ function getTerritories(data, room) {
 
 // A Player Move troops
 function moveTroops(state, from, to, t, player) {
-    let playerIndex = state.players.indexOf(player);
+    let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
+
     let map = state.map;
     troops = parseInt(t, 10);
     if (state.turn === playerIndex) {
@@ -85,7 +86,6 @@ function moveTroops(state, from, to, t, player) {
     } else {
         console.log("Not your turn");
     }
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
 }
 
 // Player Attack territories

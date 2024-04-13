@@ -162,8 +162,7 @@ else{
 }
 
 
-const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids, next} = require('./middleware/game');
-const { getTerritories, moveTroops, attackTerritories, surrender, nextTurn, buyActives, nextPhase } = require('./territories/Territories');
+const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids, next, moveTroopsHandler} = require('./middleware/game');
 const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
