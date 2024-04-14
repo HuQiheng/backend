@@ -1,10 +1,6 @@
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
 
-<<<<<<< HEAD
-
-=======
->>>>>>> ramaAuxiliar
 //that are in that room
 const sids = new Map();
 const rooms = new Map();
@@ -33,11 +29,7 @@ function createRoom(socket, user) {
   rooms.set(code, new Set());
   rooms.get(code).add(user.email);
   //A user can only connect to a room simultaneously
-<<<<<<< HEAD
-  sids.set(user.email, {code});
-=======
   sids.set(user.email, { code });
->>>>>>> ramaAuxiliar
   console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
   socketEmit(socket, 'accessCode', code);
 
@@ -56,11 +48,7 @@ function joinRoom(emailToSocket, socket, user, code) {
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
       rooms.set(Number(code), playersInRoom);
-<<<<<<< HEAD
-      sids.set(user.email, {code: Number(code)});
-=======
       sids.set(user.email, { code: Number(code) });
->>>>>>> ramaAuxiliar
 
       console.log(`Player ${user.name} joined room woth code ${code}`);
       socketEmit(socket, 'roomAccess', code);
@@ -72,12 +60,6 @@ function joinRoom(emailToSocket, socket, user, code) {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
     }
-<<<<<<< HEAD
-    console.log("Jugadores " + playersInRoom.size);
-  } else {
-    console.log(`Room with code ${code} does not exist`);
-    socketEmit(socket, 'nonExistingRoom', code)
-=======
     console.log('Jugadores ' + playersInRoom.size);
   } else {
     console.log(`Room with code ${code} does not exist`);
@@ -101,26 +83,11 @@ async function startGame(emailToSocket, code) {
     sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
   } else {
     console.log(`No players in room with code ${code}`);
->>>>>>> ramaAuxiliar
   }
   console.log("EN JOIN:");
   console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
-<<<<<<< HEAD
-// Function that starts a game 
-function startGame(emailToSocket, code) {
-  let usersWithCode = getUsersWithCode(code);
-  if (usersWithCode.length > 1) {
-    sendToAllWithCode(emailToSocket, code, 'gameStarting',code);
-    console.log(`Game starting in room with code ${code}`);
-  } else {
-    console.log(`No players in room with code ${code}`);
-  }
-}
-
-=======
->>>>>>> ramaAuxiliar
 // Function to leave a room
 function leaveRoom(emailToSocket, user) {
   const userEntry = sids.get(user.email);
