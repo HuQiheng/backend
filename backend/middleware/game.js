@@ -84,7 +84,7 @@ async function startGame(emailToSocket, code) {
   } else {
     console.log(`No players in room with code ${code}`);
   }
-  console.log("EN JOIN:");
+  console.log('EN JOIN:');
   console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 

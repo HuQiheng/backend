@@ -26,15 +26,15 @@ app.post('/auth', async (req, res) => {
       email: payload.email,
       image: payload.picture,
     };
-    if(PlayerDAO.select(userInfo.email) == null) {
-        PlayerDAO.insert(userInfo.email, userInfo.name, userInfo.id);
+    if (PlayerDAO.select(userInfo.email) == null) {
+      PlayerDAO.insert(userInfo.email, userInfo.name, userInfo.id);
     }
     req.session.userId = userInfo.id;
     req.session.save(() => {
       console.log(`User ${userInfo.name} authenticated`);
       res.send(userInfo);
     });
-    } catch (error) {
+  } catch (error) {
     console.error('Error verifying token', error);
     res.status(401).send('Invalid token');
   }

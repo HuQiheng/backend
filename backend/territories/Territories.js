@@ -1,4 +1,3 @@
-
 // Assign territories
 function assignTerritories(players, data) {
   const initialFactories = 0;
@@ -15,8 +14,6 @@ function assignTerritories(players, data) {
     })),
     map: {},
   };
-
-
 
   const shuffledTerritories = Object.keys(data).sort(() => Math.random() - 0.5); // Random
   const numPlayers = players.length;
@@ -43,7 +40,6 @@ function getPlayers(room) {
   const p = rooms.get(room);
   return Array.from(p);
 }
-
 
 // A Player Move troops
 function moveTroops(state, from, to, t, player) {
@@ -141,7 +137,7 @@ function nextPhase(state) {
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
-  console.log("Indice del jugador");
+  console.log('Indice del jugador');
   console.log(playerIndex);
   const map = state.map;
   console.log(state.players[playerIndex].coins);

@@ -6,11 +6,13 @@ const { sessionMiddleware, onlyForHandshake } = require('./middleware/serveMiddl
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
+//Enable cors comunication
 const allowedOrigins = [
-  'http://localhost:3010',
   'http://localhost:3000',
+  'http://localhost:3010',
   'https://wealthwars.games:3010',
   'https://accounts.google.com',
+  'https://wealthwars.games',
 ];
 
 app.use(
@@ -30,7 +32,6 @@ app.use(
     credentials: true,
   })
 );
-
 //Body parser for post and update petitions
 app.use(bodyParser.json());
 app.use(sessionMiddleware);
@@ -61,8 +62,6 @@ app.use((err, req, res, next) => {
   res.status(500).send('¡Algo salió mal!');
 });
 
-
-
 //Where using socket io, for game states
 const { Server } = require('socket.io');
 
@@ -86,7 +85,24 @@ if (process.env.MODE_ENV === 'development') {
 }
 
 //Use same session context as express and passport
-io = new Server(server, { cors: { origin: '*' } });
+io = new Server(server, {
+  cors: {
+    origin: function (origin, callback) {
+      console.log('Origen  ' + origin);
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.log('CORS not allowed');
+        var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      console.log('Allowed');
+      return callback(null, true);
+    },
+    credentials: true,
+  },
+});
+
 io.engine.use(onlyForHandshake(sessionMiddleware));
 io.engine.use(onlyForHandshake(passport.session()));
 
