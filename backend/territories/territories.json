@@ -1,171 +1,170 @@
 {
-    "A": { 
-      "name": "Alicante",
-      "adjacents": ["AB", "MU", "V"]
-    },
-    "AB": { 
-      "name": "Albacete",
-      "adjacents": ["A", "CR", "CU", "GR", "J", "MU", "V"]
-    },
-    "AL": { 
-      "name": "Alentejo - Algarve",
-      "adjacents": ["BA", "CC", "H", "PC"]
-    },
-    "AM": { 
-      "name": "Almería",
-      "adjacents": ["GR", "MU"]
-    },
-    "AS": { 
-      "name": "Ávila - Segovia",
-      "adjacents": ["BU", "CC", "GU", "M", "SA", "SO", "TO", "VP"]
-    },
-    "BA": { 
-      "name": "Badajoz",
-      "adjacents": ["AL", "CC", "CR", "CO", "H", "SE", "TO"]
-    },
-    "BG": { 
-      "name": "Barcelona - Gerona",
-      "adjacents": ["L", "T"]
-    },
-    "BU": { 
-      "name": "Burgos",
-      "adjacents": ["AS", "LN", "S", "SO", "PV", "VP"]
-    },
-    "C": { 
-      "name": "La Coruña",
-      "adjacents": ["LU", "PO"]
-    },
-    "CC": { 
-      "name": "Cáceres",
-      "adjacents": ["AL", "AS", "BA", "PC", "SA", "TO"]
-    },
-    "CO": { 
-      "name": "Córdoba",
-      "adjacents": ["BA", "CR", "GR", "J", "MC", "SE"]
-    },
-    "CR": { 
-      "name": "Ciudad Real",
-      "adjacents": ["AB", "BA", "CO", "CU", "J", "TO"]
-    },
-    "CS": { 
-      "name": "Castellón",
-      "adjacents": ["T", "TE", "V"]
-    },
-    "CU": { 
-      "name": "Cuenca",
-      "adjacents": ["AB", "CR", "GU", "M", "TE", "TO", "V"]
-    },
-    "GR": { 
-      "name": "Granada",
-      "adjacents": ["AB", "AM", "CO", "J", "MC", "MU"]
-    },
-    "GU": {
-      "name": "Guadalajara",
-      "adjacents": ["AS", "CU", "M", "SO", "TE", "Z"]
-    },
-    "H": {
-      "name": "Huelva",
-      "adjacents": ["AL", "BA", "MC", "SE"]
-    },
-    "HU": {
-      "name": "Huesca",
-      "adjacents": ["L", "LN", "Z"]
-    },
-    "J": {
-      "name": "Jaén",
-      "adjacents": ["AB", "CO", "CR", "GR"]
-    },
-    "L": {
-      "name": "Lérida",
-      "adjacents": ["BG", "HU", "T", "Z"]
-    },
-    "LE": {
-      "name": "León",
-      "adjacents": ["LU", "S", "PO", "O", "VP", "ZA"]
-    },
-    "LN": {
-      "name": "La Rioja - Navarra",
-      "adjacents": ["BU", "HU", "SO", "PV", "Z"]
-    },
-    "LU": {
-      "name": "Lugo",
-      "adjacents": ["C", "LE", "O", "PO"]
-    },
-    "M": { 
-      "name": "Madrid",
-      "adjacents": ["AS", "CU", "GU", "TO"]
-    },
-    "MC": { 
-      "name": "Málaga - Cádiz",
-      "adjacents": ["CO", "GR", "H", "SE"]
-    },
-    "MU": {
-      "name": "Murcia",
-      "adjacents": ["A", "AB", "AM", "GR"]
-    },
-    "O": {
-      "name": "Asturias",
-      "adjacents": ["LE", "LU", "S"]
-    },
-    "PC": {
-      "name": "Portugal Centro",
-      "adjacents": ["AL", "CC", "SA", "PN"]
-    },
-    "PN": {
-      "name": "Portugal Norte",
-      "adjacents": ["SA", "PC", "PO", "ZA"]
-    },
-    "PO": {
-      "name": "Pontevedra - Orense",
-      "adjacents": ["C", "LE", "LU", "PN", "ZA"]
-    },
-    "PV": {
-      "name": "País Vasco",
-      "adjacents": ["BU", "LN", "S"]
-    },
-    "S": {
-      "name": "Cantabria",
-      "adjacents": ["BU", "LE", "O", "PV", "VP"]
-    },
-    "SA": {
-      "name": "Salamanca",
-      "adjacents": ["AS", "CC", "PC", "PN", "VP", "ZA"]
-    },
-    "SE": {
-      "name": "Sevilla",
-      "adjacents": ["BA", "CO", "H", "MC"]
-  
-    },
-    "SO": {
-      "name": "Soria",
-      "adjacents": ["AS", "BU", "GU", "LN", "Z"]
-    },
-    "T": {
-      "name": "Tarragona",
-      "adjacents": ["BG", "CS", "L", "TE", "Z"]
-    },
-    "TE": {
-      "name": "Teruel",
-      "adjacents": ["CS", "CU", "GU", "T", "V", "Z"]
-    },
-    "TO": {
-      "name": "Toledo",
-      "adjacents": ["AS", "BA", "CC", "CR", "CU", "M"]
-    },
-    "V": {
-      "name": "Valencia",
-      "adjacents": ["A", "AB", "CS", "CU", "TE"]
-    },
-    "VP": {
-      "name": "Valladolid - Palencia",
-      "adjacents": ["AS", "BU", "LE", "S", "SA", "ZA"]
-    },
-    "Z": {
-      "name": "Zaragoza",
-      "adjacents": ["GU", "HU", "L", "LN", "SO", "T", "TE"]
-    },
-    "ZA": {
-      "name": "Zamora",
-      "adjacents": ["LE", "SA", "PN", "PO", "VP"]
-    }
+  "A": {
+    "name": "Alicante",
+    "adjacents": ["AB", "MU", "V"]
+  },
+  "AB": {
+    "name": "Albacete",
+    "adjacents": ["A", "CR", "CU", "GR", "J", "MU", "V"]
+  },
+  "AL": {
+    "name": "Alentejo - Algarve",
+    "adjacents": ["BA", "CC", "H", "PC"]
+  },
+  "AM": {
+    "name": "Almería",
+    "adjacents": ["GR", "MU"]
+  },
+  "AS": {
+    "name": "Ávila - Segovia",
+    "adjacents": ["BU", "CC", "GU", "M", "SA", "SO", "TO", "VP"]
+  },
+  "BA": {
+    "name": "Badajoz",
+    "adjacents": ["AL", "CC", "CR", "CO", "H", "SE", "TO"]
+  },
+  "BG": {
+    "name": "Barcelona - Gerona",
+    "adjacents": ["L", "T"]
+  },
+  "BU": {
+    "name": "Burgos",
+    "adjacents": ["AS", "LN", "S", "SO", "PV", "VP"]
+  },
+  "C": {
+    "name": "La Coruña",
+    "adjacents": ["LU", "PO"]
+  },
+  "CC": {
+    "name": "Cáceres",
+    "adjacents": ["AL", "AS", "BA", "PC", "SA", "TO"]
+  },
+  "CO": {
+    "name": "Córdoba",
+    "adjacents": ["BA", "CR", "GR", "J", "MC", "SE"]
+  },
+  "CR": {
+    "name": "Ciudad Real",
+    "adjacents": ["AB", "BA", "CO", "CU", "J", "TO"]
+  },
+  "CS": {
+    "name": "Castellón",
+    "adjacents": ["T", "TE", "V"]
+  },
+  "CU": {
+    "name": "Cuenca",
+    "adjacents": ["AB", "CR", "GU", "M", "TE", "TO", "V"]
+  },
+  "GR": {
+    "name": "Granada",
+    "adjacents": ["AB", "AM", "CO", "J", "MC", "MU"]
+  },
+  "GU": {
+    "name": "Guadalajara",
+    "adjacents": ["AS", "CU", "M", "SO", "TE", "Z"]
+  },
+  "H": {
+    "name": "Huelva",
+    "adjacents": ["AL", "BA", "MC", "SE"]
+  },
+  "HU": {
+    "name": "Huesca",
+    "adjacents": ["L", "LN", "Z"]
+  },
+  "J": {
+    "name": "Jaén",
+    "adjacents": ["AB", "CO", "CR", "GR"]
+  },
+  "L": {
+    "name": "Lérida",
+    "adjacents": ["BG", "HU", "T", "Z"]
+  },
+  "LE": {
+    "name": "León",
+    "adjacents": ["LU", "S", "PO", "O", "VP", "ZA"]
+  },
+  "LN": {
+    "name": "La Rioja - Navarra",
+    "adjacents": ["BU", "HU", "SO", "PV", "Z"]
+  },
+  "LU": {
+    "name": "Lugo",
+    "adjacents": ["C", "LE", "O", "PO"]
+  },
+  "M": {
+    "name": "Madrid",
+    "adjacents": ["AS", "CU", "GU", "TO"]
+  },
+  "MC": {
+    "name": "Málaga - Cádiz",
+    "adjacents": ["CO", "GR", "H", "SE"]
+  },
+  "MU": {
+    "name": "Murcia",
+    "adjacents": ["A", "AB", "AM", "GR"]
+  },
+  "O": {
+    "name": "Asturias",
+    "adjacents": ["LE", "LU", "S"]
+  },
+  "PC": {
+    "name": "Portugal Centro",
+    "adjacents": ["AL", "CC", "SA", "PN"]
+  },
+  "PN": {
+    "name": "Portugal Norte",
+    "adjacents": ["SA", "PC", "PO", "ZA"]
+  },
+  "PO": {
+    "name": "Pontevedra - Orense",
+    "adjacents": ["C", "LE", "LU", "PN", "ZA"]
+  },
+  "PV": {
+    "name": "País Vasco",
+    "adjacents": ["BU", "LN", "S"]
+  },
+  "S": {
+    "name": "Cantabria",
+    "adjacents": ["BU", "LE", "O", "PV", "VP"]
+  },
+  "SA": {
+    "name": "Salamanca",
+    "adjacents": ["AS", "CC", "PC", "PN", "VP", "ZA"]
+  },
+  "SE": {
+    "name": "Sevilla",
+    "adjacents": ["BA", "CO", "H", "MC"]
+  },
+  "SO": {
+    "name": "Soria",
+    "adjacents": ["AS", "BU", "GU", "LN", "Z"]
+  },
+  "T": {
+    "name": "Tarragona",
+    "adjacents": ["BG", "CS", "L", "TE", "Z"]
+  },
+  "TE": {
+    "name": "Teruel",
+    "adjacents": ["CS", "CU", "GU", "T", "V", "Z"]
+  },
+  "TO": {
+    "name": "Toledo",
+    "adjacents": ["AS", "BA", "CC", "CR", "CU", "M"]
+  },
+  "V": {
+    "name": "Valencia",
+    "adjacents": ["A", "AB", "CS", "CU", "TE"]
+  },
+  "VP": {
+    "name": "Valladolid - Palencia",
+    "adjacents": ["AS", "BU", "LE", "S", "SA", "ZA"]
+  },
+  "Z": {
+    "name": "Zaragoza",
+    "adjacents": ["GU", "HU", "L", "LN", "SO", "T", "TE"]
+  },
+  "ZA": {
+    "name": "Zamora",
+    "adjacents": ["LE", "SA", "PN", "PO", "VP"]
   }
+}

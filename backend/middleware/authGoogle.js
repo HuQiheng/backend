@@ -24,13 +24,15 @@ passport.use(
           name: account.name,
           email: email,
           password: account.sub,
+          picture: account.picture,
         };
         //We look if the user exists
         const query = await Player.selectPlayer(email);
         if (query.rows.length === 0) {
           //create user
-          await Player.insertPlayer(email, account.name, account.sub);
+          await Player.insertPlayer(email, account.name, account.sub, account.picture);
         }
+        await Player.updatePlayer(email, account.name, account.sub, account.picture);
         console.log('Retunred user ' + JSON.stringify(user));
         //If the user exists no action is needed just return the user
         done(null, user);

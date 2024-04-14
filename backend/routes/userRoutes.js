@@ -3,13 +3,14 @@ const router = express.Router(); // Create a new router
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const playerController = require('../controllers/PlayerController');
+const friendController = require('../controllers/FriendController');
 
 //Method that gets the users info
 router.get('/:email', checkAuthenticated, async (req, res) => {
   try {
     console.log('Email pedido ' + req.params.email);
     console.log('Especificado ' + req.user.email);
-    if (req.user.email === req.params.email) {
+    if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
       const userInfo = await playerController.selectPlayer(req.params.email);
       res.send(userInfo.rows[0]);
     }

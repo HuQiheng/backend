@@ -12,14 +12,21 @@ router.get(
   })
 );
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ramaAuxiliar
 //This callback redirects to the correct url depending if we are on web or mobile
 router.get(
   '/google/callback',
   passport.authenticate('google', { session: true, failureRedirect: '/auth/google' }),
   (req, res) => {
     const userAgent = req.headers['user-agent'];
+<<<<<<< HEAD
     console.log("Agent: " + userAgent);
+=======
+    console.log('Agent: ' + userAgent);
+>>>>>>> ramaAuxiliar
 
     let isMobile = false;
     //Searching if its a mobile
@@ -32,6 +39,7 @@ router.get(
 
     //Returning some needed data and redirecting
     const userData = encodeURIComponent(JSON.stringify(req.user));
+<<<<<<< HEAD
     if(isMobile){
       res.redirect('/?user=' + userData);
     }
@@ -47,6 +55,20 @@ router.get(
     }
     console.log('Devuelto ' + JSON.stringify(req.user));
     
+=======
+    if (isMobile) {
+      res.redirect('/?user=' + userData);
+    } else {
+      //We distinguish between development and production
+      if (process.env.MODE_ENV === 'development') {
+        res.redirect('http://localhost:3000/signin?user=' + userData);
+      } else {
+        res.redirect('https://wealthwars.games/signin?user=' + userData);
+      }
+    }
+    console.log('Devuelto ' + JSON.stringify(req.user));
+>>>>>>> ramaAuxiliar
   }
 );
+
 module.exports = router; // Export the router

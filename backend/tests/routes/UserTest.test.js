@@ -2,6 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const router = require('../../routes/userRoutes');
 const playerController = require('../../controllers/PlayerController');
+const friendController = require('../../controllers/FriendController');
 const { pool } = require('../../db/index');
 
 const app = express();
@@ -27,38 +28,41 @@ describe('Player Routes', () => {
 
   beforeEach(async () => {
     // Inserts a test player before each test
-    testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password');
+    testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password', 'testPicture');
+    testFriend = await friendController.insertFriend('friend@example.com', 'test@example.com');
   });
 
   afterEach(async () => {
     // Deletes the test player after each test
     await playerController.deletePlayer('test@example.com');
+    await friendController.removeFriend('test@example.com', 'friend@example.com');
   });
 
   it('should get user info', async () => {
-    const res = await request(app)
-      .get('/test/get/test@example.com')
-      .send();
+    const res = await request(app).get('/test/get/test@example.com').send();
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('email');
   });
 
   it('should update user info', async () => {
-    const res = await request(app)
-      .post('/test/update/test@example.com')
-      .send({
-        username: 'test',
-        password: 'password'
-      });
+    const res = await request(app).post('/test/update/test@example.com').send({
+      username: 'test',
+      password: 'password',
+      picture: 'testPicture2',
+    });
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('User updated test@example.com');
   });
 
   it('should delete a user', async () => {
-    const res = await request(app)
-      .delete('/test/delete/test@example.com')
-      .send();
+    const res = await request(app).delete('/test/delete/test@example.com').send();
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('User deleted');
+  });
+
+  it('should get friends info', async () => {
+    const res = await request(app).get('/test/get/friend@example.com').send();
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('email');
   });
 });
