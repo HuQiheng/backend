@@ -162,7 +162,7 @@ else{
 }
 
 
-const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids, next,nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler} = require('./middleware/game');
+const {createRoom, joinRoom, leaveRoom, startGame, rooms, sids, next,nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler, buyActivesHandler} = require('./middleware/game');
 const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
@@ -224,9 +224,6 @@ io.on('connection', (socket) => {
 
   // Buy actives
   socket.on('buyActives', (type, territory, numActives) => {
-    const room = sids.get(user.email);
-    const state = getTerritories(data, room.code);
-    buyActives(state, user.email, type, territory, numActives);
-    io.to(room).emit('update', JSON.stringify(state, null, 4));
+    buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
   });
 });
