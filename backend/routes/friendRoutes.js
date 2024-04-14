@@ -18,7 +18,7 @@ router.get('/get/:email/friends', checkAuthenticated, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-  
+
 //Method that adds a friend to the user friends list, the mail is required in the body of the json
 router.post('/add/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Email pedido ' + req.params.email);
@@ -34,8 +34,6 @@ router.post('/add/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
-
-
 //Method that deletes a friend from the user friends list, the mail is required in the body of the json
 router.delete('/delete/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Email pedido ' + req.params.email);
@@ -50,6 +48,5 @@ router.delete('/delete/:email/friends', checkAuthenticated, async (req, res) => 
     res.status(500).send('Internal Server Error');
   }
 });
-  
 
-module.exports = router; // Export the router  
+module.exports = router; // Export the router

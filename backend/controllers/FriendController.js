@@ -21,7 +21,7 @@ const selectAllFriends = async () => {
   }
 };
 
-const removeFriend = async (player_email1,player_email2) => { 
+const removeFriend = async (player_email1, player_email2) => {
   try {
     const query = `DELETE FROM friend WHERE Player_email1 = $1 AND Player_email2 = $2 OR Player_email1 = $2 AND Player_email2 = $1`;
     const result = await db.query(query, [player_email1, player_email2]);
@@ -46,7 +46,7 @@ const selectFriends = async (player_email) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 const areFriends = async (player_email1, player_email2) => {
   try {

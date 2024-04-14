@@ -18,7 +18,7 @@ router.get(
   passport.authenticate('google', { session: true, failureRedirect: '/auth/google' }),
   (req, res) => {
     const userAgent = req.headers['user-agent'];
-    console.log("Agent: " + userAgent);
+    console.log('Agent: ' + userAgent);
 
     let isMobile = false;
     //Searching if its a mobile
@@ -31,23 +31,18 @@ router.get(
 
     //Returning some needed data and redirecting
     const userData = encodeURIComponent(JSON.stringify(req.user));
-    if(isMobile){
+    if (isMobile) {
       res.redirect('/?user=' + userData);
-    }
-    else{
+    } else {
       //We distinguish between development and production
-      if(process.env.MODE_ENV === 'development'){
+      if (process.env.MODE_ENV === 'development') {
         res.redirect('http://localhost:3000/signin?user=' + userData);
-      }
-      else{
+      } else {
         res.redirect('https://wealthwars.games/signin?user=' + userData);
       }
-      
     }
     console.log('Devuelto ' + JSON.stringify(req.user));
-    
   }
 );
-
 
 module.exports = router; // Export the router

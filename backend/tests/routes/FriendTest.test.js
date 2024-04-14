@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   req.isAuthenticated = () => true;
   next();
 });
-  
+
 app.use('/test', router);
 
 afterAll(() => {
@@ -42,29 +42,23 @@ describe('Friend Routes', () => {
   });
 
   it('should get friends info', async () => {
-    const res = await request(app)
-      .get('/test/get/test@example.com/friends')
-      .send();
+    const res = await request(app).get('/test/get/test@example.com/friends').send();
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('email');
   });
 
   it('should add friend', async () => {
-    const res = await request(app)
-      .post('/test/add/test@example.com/friends')
-      .send({
-        friend: 'test4@example.com'
-      });  
+    const res = await request(app).post('/test/add/test@example.com/friends').send({
+      friend: 'test4@example.com',
+    });
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('Friend added');
   });
 
   it('should remove a friend', async () => {
-    const res = await request(app)
-      .delete('/test/delete/test@example.com/friends')
-      .send({
-        friend: 'test4@example.com'
-      });
+    const res = await request(app).delete('/test/delete/test@example.com/friends').send({
+      friend: 'test4@example.com',
+    });
     expect(res.statusCode).toEqual(200);
     expect(res.text).toEqual('Friend deleted');
   });
