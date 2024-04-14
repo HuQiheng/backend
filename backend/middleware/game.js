@@ -112,11 +112,11 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     const assginment = nextPhase(roomState.get(String(userCode)));
     console.log(assginment);
     roomState.set(userCode, assginment);
-    socketEmit(socket, 'nextPhase', user.email);
+    socketEmit(socket, 'nextPhaseResponse', user.email);
     //sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
   } else {
     console.log(`You are not in a Room  ` + user.email);
-    socketEmit(socket, 'notInARoom', userCode);
+    socketEmit(socket, 'notInARoom', ' ');
   }
 }
 
@@ -135,7 +135,7 @@ function nextTurnHandler(socket, emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
-    socketEmit(socket, 'notInARoom', userCode);
+    socketEmit(socket, 'notInARoom', ' ');
   }
 }
 
@@ -167,7 +167,7 @@ function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops)
     sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
-    socketEmit(socket, 'notInTheRoom', room.code);
+    socketEmit(socket, 'notInARoom', room.code);
   }
 }
 
