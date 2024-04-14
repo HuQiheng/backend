@@ -85,6 +85,7 @@ function moveTroops(state, from, to, t, player) {
     } else {
         console.log("Not your turn");
     }
+    return state;
 }
 
 // Player Attack territories
@@ -96,7 +97,7 @@ function attackTerritories(state, from, to, troops, player) {
             if (map[from].player === playerIndex && map[to].player !== playerIndex) {
                 if (troops > map[to].troops) {
                     map[to].troops = troops - map[to].troops;
-                    map[to].player = player;
+                    map[to].player = playerIndex;
                 } else {
                     map[to].troops -= troops;
                 }
@@ -110,7 +111,7 @@ function attackTerritories(state, from, to, troops, player) {
     } else {
         console.log("Not your turn");
     }
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+    return state;
 }
 
 // Surrender
@@ -162,6 +163,7 @@ function nextPhase(state) {
 function buyActives(state, player, type, territory, numActives) {
     let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
     const map = state.map;
+    console.log(state.players[playerIndex].coins);
     if (type === 'factory') {
         var cost = 15;
     }
@@ -174,20 +176,20 @@ function buyActives(state, player, type, territory, numActives) {
     else if (type === 'troop') {
         var cost = 2 * numActives;
     }
-    if (player.coins >= cost && map[territory].player === playerIndex) {
+    if (state.player[playerIndex].coins >= cost && map[territory].player === playerIndex) {
         if (type === 'factory' && map[territory].factories === 0) {
-            player.coins -= cost;
+            state.player[playerIndex].coins -= cost;
             map[territory].factories += numActives;
         } else if (type === 'factory' && map[territory].factories > 0) {
             console.log("Territory already has a factory");
         } else if (type === 'troop') {
-            player.coins -= cost;
+            state.player[playerIndex].coins -= cost;
             map[territory].troops += numActives;
         }
     } else {
         console.log("Not enough coins or territory is not owned by the player");
     }
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+    return state;
 }
 
 //Given a number of player it calculates the number of coins that this player have

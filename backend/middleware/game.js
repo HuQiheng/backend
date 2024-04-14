@@ -164,24 +164,39 @@ function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops)
 }
 
 function surrenderHandler(socket, emailToSocket, user){
-    //Check if the user is in the room
-    if (sids.has(user.email)) {
-      let userCode = sids.get(user.email).code;
-      console.log(userCode);
+  //Check if the user is in the room
+if (sids.has(user.email)) {
+  let userCode = sids.get(user.email).code;
+  console.log(userCode);
 
-      const assginment = surrender(roomState.get(String(userCode)), user.email);
-      console.log(assginment);
+  const assginment = surrender(roomState.get(String(userCode)), user.email);
+  console.log(assginment);
 
-      //A user that surrenders leaves the room
-      leaveRoom(emailToSocket, user);
+  //A user that surrenders leaves the room
+  leaveRoom(emailToSocket, user);
 
-      sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
-      sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
-      socketEmit(socket, 'youSurrendered', userCode);
-    } else {
-      console.log(`You are not in a Room  ` + user.email);
-      socketEmit(socket, 'notInARoom', ' ');
-    }
+  sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+  sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
+  socketEmit(socket, 'youSurrendered', userCode);
+} else {
+  console.log(`You are not in a Room  ` + user.email);
+  socketEmit(socket, 'notInARoom', ' ');
+}
+
+function buyActivesHandler(socket, emailToSocket, user, type, territory, numActives) {
+  const room = sids.get(user.email);
+
+  //Check if the user is in the room
+  if (room && room.code){
+    //Next phase for the user
+    const assginment = buyActives(roomState.get(String(room.code)), user.email, type, territory, numActives);
+    console.log(assginment);
+    roomState.set(room.code, assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+  } else {
+    console.log(`You are not in the room ${room.code} ` + user.email);
+    socketEmit(socket, 'notInTheRoom', room.code);
+  }
 }
 
 // Send a message to a specific user
@@ -243,5 +258,4 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { 
-  createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler, surrenderHandler};
+module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler,surrenderHandler, buyActivesHandler};
