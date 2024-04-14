@@ -116,20 +116,21 @@ function attackTerritories(state, from, to, troops, player) {
 // Surrender
 function surrender(state, player) {
     let playerIndex = state.players.findIndex(p => p.email.trim() === player.trim());
+    console.log("index of the player that surrendered" );
+    console.log(playerIndex);
     const map = state.map;
     for (const i in map) {
         if (map[i].player === playerIndex) {
-            state.players = state.players.filter(p => p !== playerIndex);
             // asign territory to another player
             let j = Math.floor(Math.random() * state.players.length);
-            while (j === player) {
+            while (j === playerIndex) {
                 j = Math.floor(Math.random() * state.players.length);
             }
             map[i].player = j;
         }
     }
     console.log("Player surrendered");
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+    return state;
 }
 
 // Shift management
@@ -202,67 +203,6 @@ function countPlayerCoins(state,playerNumber) {
     }
     return count;
   }
-
-/*
-const { joinRoom, createRoom, leaveRoom } = require('../middleware/game.js');
-while(true) {
-    //test
-    const state = getTerritories(data, mockRoom);
-    console.log('Turn: ', state.turn);
-    console.log('Players: ', state.players);
-    for (let i=0;i<state.players.length;i++) {
-        console.log('Player: ', state.players[i]);
-        for (const j in state.map) {
-            if (state.map[j].player === i) {
-                console.log(j, state.map[j]);
-            }
-        }
-    };
-    let command = prompt(`Enter your command: `);
-    let args = command.split(' ');
-    let cmd = args.shift();
-    switch(cmd) {
-        case 'move':
-            moveTroops(state, args[0], args[1], parseInt(args[2]), state.turn);
-            break;
-        case 'attack':
-            attackTerritories(state, args[0], args[1], parseInt(args[2]), state.turn);
-            break;
-        case 'surrender':
-            surrender(state, state.turn);
-            break;
-        case 'next':
-            nextTurn(state);
-            break;
-        case 'buy':
-            buyActives(state, state.players[state.turn], args[0], args[1], parseInt(args[2]));
-            break;
-        default:
-            console.log('Invalid command');
-    }
-};
-
-// Play game
-function playGame(state) {
-    // While there are more than one player playing
-    while(state.players.length > 1){
-        // En cualquier false se puede rendir
-        for (let phase = 1; phase <= 3; phase++) {
-            if (phase === 1) {
-                // Move troops
-                moveTroops(state, from, to, troops, player);
-            } else if (phase === 2) {
-                // Attack territories
-                attackTerritories(state, from, to, troops, player);
-            } else if (phase === 3) {
-                // Buy actives
-                buyActives(state, player, type, territory, numActives);
-            }
-        }
-        nextTurn(state);
-    }
-}
-*/
 module.exports = {
     assignTerritories,
     getTerritories, 

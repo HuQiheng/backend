@@ -104,7 +104,8 @@ function nextPhaseHandler(socket, emailToSocket, user){
     const  assginment = nextPhase(roomState.get(String(userCode)));
     console.log(assginment);
     roomState.set(userCode, assginment);
-    sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+    socketEmit(socket, 'nextPhase', user.email);
+    //sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
@@ -123,6 +124,7 @@ function nextTurnHandler(socket, emailToSocket, user){
 
     console.log(assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
@@ -159,6 +161,27 @@ function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops)
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
   }
+}
+
+function surrenderHandler(socket, emailToSocket, user){
+    //Check if the user is in the room
+    if (sids.has(user.email)) {
+      let userCode = sids.get(user.email).code;
+      console.log(userCode);
+
+      const assginment = surrender(roomState.get(String(userCode)), user.email);
+      console.log(assginment);
+
+      //A user that surrenders leaves the room
+      leaveRoom(emailToSocket, user);
+
+      sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+      sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
+      socketEmit(socket, 'youSurrendered', userCode);
+    } else {
+      console.log(`You are not in a Room  ` + user.email);
+      socketEmit(socket, 'notInARoom', ' ');
+    }
 }
 
 // Send a message to a specific user
@@ -220,4 +243,5 @@ async function getUsersInfo(usersWithCode) {
 
 
 
-module.exports = { createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler};
+module.exports = { 
+  createRoom, joinRoom, leaveRoom, startGame, rooms, nextPhaseHandler, nextTurnHandler, moveTroopsHandler, attackTerritoriesHandler, surrenderHandler};

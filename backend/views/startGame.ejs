@@ -20,6 +20,11 @@
     <button type="submit">Next Turn</button>
   </form>
 
+  <!-- Add the surrender form here -->
+  <form id="surrenderForm">
+    <button type="submit">Surrender</button>
+  </form>
+
   <script>
     const socket = io('http://localhost:3010');
 
@@ -38,6 +43,12 @@
     document.getElementById('nextTurnForm').addEventListener('submit', (e) => {
       e.preventDefault();
       socket.emit('nextTurn');
+    });
+
+    // Add the surrender event listener here
+    document.getElementById('surrenderForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      socket.emit('surrender');
     });
 
     socket.on('gameStarting', (room) => {
