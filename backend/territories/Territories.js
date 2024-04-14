@@ -85,6 +85,7 @@ function moveTroops(state, from, to, t, player) {
     } else {
         console.log("Not your turn");
     }
+    return state;
 }
 
 // Player Attack territories
@@ -96,7 +97,7 @@ function attackTerritories(state, from, to, troops, player) {
             if (map[from].player === playerIndex && map[to].player !== playerIndex) {
                 if (troops > map[to].troops) {
                     map[to].troops = troops - map[to].troops;
-                    map[to].player = player;
+                    map[to].player = playerIndex;
                 } else {
                     map[to].troops -= troops;
                 }
@@ -110,7 +111,7 @@ function attackTerritories(state, from, to, troops, player) {
     } else {
         console.log("Not your turn");
     }
-    fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
+    return state;
 }
 
 // Surrender

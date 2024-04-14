@@ -207,7 +207,7 @@ io.on('connection', (socket) => {
   });
 
   // Attack a territory
-  socket.on('attack', (from, to, troops) => {
+  socket.on('attackTerritories', (from, to, troops) => {
     attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops);
   });
 
