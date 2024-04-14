@@ -86,7 +86,24 @@ if (process.env.MODE_ENV === 'development') {
 }
 
 //Use same session context as express and passport
-io = new Server(server, { cors: { origin: '*' } });
+//Use same session context as express and passport
+io = new Server(server, {
+  cors: {
+    origin: function (origin, callback) {
+      console.log('Origen  ' + origin);
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.log('CORS not allowed');
+        var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      console.log('Allowed');
+      return callback(null, true);
+    },
+    credentials: true,
+  },
+});
 io.engine.use(onlyForHandshake(sessionMiddleware));
 io.engine.use(onlyForHandshake(passport.session()));
 
