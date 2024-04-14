@@ -12,7 +12,6 @@ const roomState = new Map();
 const {
   assignTerritories,
   nextPhase,
-  getTerritories,
   moveTroops,
   attackTerritories,
   surrender,
@@ -197,7 +196,7 @@ function buyActivesHandler(socket, emailToSocket, user, type, territory, numActi
   //Check if the user is in the room
   if (room && room.code) {
     //Next phase for the user
-    const assginment = buyActives(roomState.get(String(room.code)), user.email, type, territory, numActives);
+    const assginment = buyActives(roomState.get(String(room.code)), user.email, type, territory, Number(numActives));
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);

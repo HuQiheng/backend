@@ -1,6 +1,3 @@
-// Process territories.json for take information about territories
-const fs = require('fs');
-const data = require('./territories.json');
 
 // Assign territories
 function assignTerritories(players, data) {
@@ -19,6 +16,8 @@ function assignTerritories(players, data) {
     map: {},
   };
 
+
+
   const shuffledTerritories = Object.keys(data).sort(() => Math.random() - 0.5); // Random
   const numPlayers = players.length;
 
@@ -32,6 +31,11 @@ function assignTerritories(players, data) {
     };
   });
 
+  for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
+    let coins = countPlayerCoins(state, playerNumber);
+    state.players[playerNumber].coins += coins;
+  }
+
   return state;
 }
 
@@ -40,30 +44,6 @@ function getPlayers(room) {
   return Array.from(p);
 }
 
-// Map territories
-function getTerritories(data, room) {
-  const map = {};
-  players = getPlayers(room);
-  const territoryAssignment = assignTerritories(players, data);
-  for (const i in data) {
-    const territory = data[i];
-    map[i] = {
-      name: territory.name,
-      player: territoryAssignment[i],
-      troops: 3, // Initial troops
-      factories: 0,
-    };
-  }
-  // Game state
-  const state = {
-    turn: 0,
-    players: players,
-    map: map,
-  };
-  // Store the game state in an external file
-  fs.writeFileSync('gameState.json', JSON.stringify(state, null, 4));
-  return state;
-}
 
 // A Player Move troops
 function moveTroops(state, from, to, t, player) {
@@ -161,6 +141,8 @@ function nextPhase(state) {
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
+  console.log("Indice del jugador");
+  console.log(playerIndex);
   const map = state.map;
   console.log(state.players[playerIndex].coins);
   if (type === 'factory') {
@@ -172,14 +154,14 @@ function buyActives(state, player, type, territory, numActives) {
   } else if (type === 'troop') {
     var cost = 2 * numActives;
   }
-  if (state.player[playerIndex].coins >= cost && map[territory].player === playerIndex) {
+  if (state.players[playerIndex].coins >= cost && map[territory].player === playerIndex) {
     if (type === 'factory' && map[territory].factories === 0) {
-      state.player[playerIndex].coins -= cost;
+      state.players[playerIndex].coins -= cost;
       map[territory].factories += numActives;
     } else if (type === 'factory' && map[territory].factories > 0) {
       console.log('Territory already has a factory');
     } else if (type === 'troop') {
-      state.player[playerIndex].coins -= cost;
+      state.players[playerIndex].coins -= cost;
       map[territory].troops += numActives;
     }
   } else {
@@ -203,7 +185,6 @@ function countPlayerCoins(state, playerNumber) {
 }
 module.exports = {
   assignTerritories,
-  getTerritories,
   moveTroops,
   nextTurn,
   surrender,

@@ -20,10 +20,18 @@
     <button type="submit">Next Turn</button>
   </form>
 
-  <!-- Add the surrender form here -->
   <form id="surrenderForm">
     <button type="submit">Surrender</button>
   </form>
+
+  <form id="BuyActivesForm">
+    <input type="text" id="active" placeholder="Enter active">
+    <input type="text" id="territory" placeholder="Enter territory">
+    <input type="number" id="troops" placeholder="Enter number">
+    <button type="submit">Buy Actives</button>
+  </form>
+
+  <ul id="messages"></ul>
 
   <script>
     const socket = io('http://localhost:3010');
@@ -45,10 +53,18 @@
       socket.emit('nextTurn');
     });
 
-    // Add the surrender event listener here
     document.getElementById('surrenderForm').addEventListener('submit', (e) => {
       e.preventDefault();
       socket.emit('surrender');
+    });
+
+    document.getElementById('BuyActivesForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const active = document.getElementById('active').value;
+      const troops = document.getElementById('troops').value;
+      const territory = document.getElementById('territory').value;
+
+      socket.emit('buyActives', active, territory, troops );
     });
 
     socket.on('gameStarting', (room) => {
@@ -61,6 +77,10 @@
 
     socket.on('mapSended', (mapData) => {
       console.log(`Map data received: ${mapData}`);
+    });
+
+    socket.on('actives Purchased', (data) => {
+      console.log(`Bought ${data.troops} troops of ${data.active} in ${data.territory}`)
     });
   </script>
 </body>
