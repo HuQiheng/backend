@@ -87,10 +87,7 @@ if (process.env.MODE_ENV === 'development') {
 }
 
 //Use same session context as express and passport
-<<<<<<< HEAD
-=======
 //Use same session context as express and passport
->>>>>>> ramaAuxiliar
 io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
@@ -108,10 +105,6 @@ io = new Server(server, {
     credentials: true,
   },
 });
-<<<<<<< HEAD
-
-=======
->>>>>>> ramaAuxiliar
 io.engine.use(onlyForHandshake(sessionMiddleware));
 io.engine.use(onlyForHandshake(passport.session()));
 
