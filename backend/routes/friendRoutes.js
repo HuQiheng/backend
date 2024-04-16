@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
-const playerController = require('../controllers/PlayerController');
 const friendsController = require('../controllers/FriendController');
 
 // Get the information of all the friends of a user
-router.get('/get/:email/friends', checkAuthenticated, async (req, res) => {
+router.get('/:email/friends', checkAuthenticated, async (req, res) => {
   try {
+    console.log("Solicitado " + req.params.email);
+    console.log("Pedido con " + req.user.email);
     if (req.user.email === req.params.email) {
       const userInfo = await friendsController.selectAllFriends(req.params.email);
       res.send(userInfo.rows);
@@ -21,13 +22,18 @@ router.get('/get/:email/friends', checkAuthenticated, async (req, res) => {
 });
 
 // Add a friend to the user's friend list
-router.post('/add/:email/friends', checkAuthenticated, async (req, res) => {
+router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
   console.log('Friend to add: ' + req.body.friend);
   try {
     if (req.user.email === req.params.email) {
-      await playerController.insertFriend(req.params.email, req.body.friend);
-      res.json({ message: 'Friend added' });
+      const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.friend);
+      if (areAlreadyFriends) {
+        res.status(400).send('Users are already friends');
+      } else {
+        await friendsController.insertFriend(req.params.email, req.body.friend);
+        res.json({ message: 'Friend added' });
+      }
     } else {
       res.status(403).send('Access denied');
     }
@@ -38,12 +44,12 @@ router.post('/add/:email/friends', checkAuthenticated, async (req, res) => {
 });
 
 // Delete a friend from the user's friend list
-router.delete('/delete/:email/friends', checkAuthenticated, async (req, res) => {
+router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
   console.log('Friend to delete: ' + req.body.friend);
   try {
     if (req.user.email === req.params.email) {
-      await playerController.removeFriend(req.params.email, req.body.friend);
+      await friendsController.removeFriend(req.params.email, req.body.friend);
       res.json({ message: 'Friend deleted' });
     } else {
       res.status(403).send('Access denied');
