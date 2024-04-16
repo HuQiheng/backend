@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Chat Room</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="BuyActivesForm">
+    <input type="text" name="active" placeholder="Enter active">
+    <input type="text" id="territory" placeholder="Enter territory">
+    <input type="number" id="troops" placeholder="Enter number">
+    <button type="submit">Buy Actives</button>
+  </form>
+  <ul id="messages"></ul>
+  <script>
+    const socket = io('http://localhost:3010');
+
+    document.getElementById('BuyActivesForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const active = document.getElementById('active').value;
+      const troops = document.getElementById('troops').value;
+      const territory = document.getElementById('territory').value;
+
+      socket.emit('buyActives', active, territory, troops );
+    });
+
+    socket.on('actives Purchased', (data) => {
+      console.log(`Bought ${data.troops} troops of ${data.active} in ${data.territory}`)
+    });
+    </script>
+</body>
+</html>
