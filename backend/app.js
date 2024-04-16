@@ -45,6 +45,45 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
+//To remove only tries for the socket io !!!!
+app.set('view engine', 'ejs');
+
+app.get('/create', (req, res) => {
+  res.render('createRoom');
+});
+
+app.get('/join', (req, res) => {
+  res.render('joinRoom');
+});
+
+app.get('/start', (req, res) => {
+  res.render('startGame');
+});
+
+app.get('/leave', (req, res) => {
+  res.render('leaveRoom');
+});
+
+app.get('/move', (req, res) => {
+  res.render('moveTroops');
+});
+
+app.get('/attack', (req, res) => {
+  res.render('attackTerritories');
+});
+
+app.get('/surrender', (req, res) => {
+  res.render('surrender');
+});
+
+app.get('/next', (req, res) => {
+  res.render('nextTurn');
+});
+
+app.get('/buy', (req, res) => {
+  res.render('buyActives');
+});
+
 //Used routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
@@ -147,6 +186,7 @@ const {
   attackTerritoriesHandler,
   buyActivesHandler,
   surrenderHandler,
+  getMap,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -205,4 +245,7 @@ io.on('connection', (socket) => {
   socket.on('buyActives', (type, territory, numActives) => {
     buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
   });
+
+  //Send the map
+  socket.on('sendMap', () => getMap(socket, user));
 });

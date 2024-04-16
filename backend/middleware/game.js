@@ -80,7 +80,7 @@ async function startGame(emailToSocket, code) {
     const assginment = assignTerritories(usersInfo, data);
     roomState.set(code, assginment);
     console.log(roomState.get(code));
-    sendToAllWithCode(emailToSocket, code, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, code, 'mapSent', assginment);
   } else {
     console.log(`No players in room with code ${code}`);
   }
@@ -111,7 +111,7 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     console.log(assginment);
     roomState.set(userCode, assginment);
     socketEmit(socket, 'nextPhase', user.email);
-    //sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+    //sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
@@ -129,7 +129,7 @@ function nextTurnHandler(socket, emailToSocket, user) {
     roomState.set(userCode, assginment);
 
     console.log(assginment);
-    sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -146,7 +146,7 @@ function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
     const assginment = moveTroops(roomState.get(String(room.code)), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
@@ -162,7 +162,7 @@ function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops)
     const assginment = attackTerritories(roomState.get(String(room.code)), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
@@ -181,7 +181,7 @@ function surrenderHandler(socket, emailToSocket, user) {
     //A user that surrenders leaves the room
     leaveRoom(emailToSocket, user);
 
-    sendToAllWithCode(emailToSocket, userCode, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
     sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
     socketEmit(socket, 'youSurrendered', userCode);
   } else {
@@ -199,16 +199,28 @@ function buyActivesHandler(socket, emailToSocket, user, type, territory, numActi
     const assginment = buyActives(roomState.get(String(room.code)), user.email, type, territory, Number(numActives));
     console.log(assginment);
     roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSended', assginment);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
   }
 }
 
+//Given a user it sends the map to the user of the party that he is in
+function getMap(socket, user) {
+  //Check if the user is in the room
+  if(sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+
+    const assginment = roomState.get(String(userCode));
+
+    socketEmit(socket, 'mapSent', assginment);
+  }
+}
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
-  console.log(`Emitiendo evento ${event} con código ${data} a ${socket.id}`);
+  console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
   socket.emit(event, data);
 }
 
@@ -274,4 +286,5 @@ module.exports = {
   attackTerritoriesHandler,
   surrenderHandler,
   buyActivesHandler,
+  getMap,
 };
