@@ -107,7 +107,7 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     console.log(roomState);
 
     //Next phase for the user
-    const assginment = nextPhase(roomState.get(String(userCode)));
+    const assginment = nextPhase(roomState.get(userCode));
     console.log(assginment);
     roomState.set(userCode, assginment);
     socketEmit(socket, 'nextPhase', user.email);
@@ -125,7 +125,7 @@ function nextTurnHandler(socket, emailToSocket, user) {
     console.log(userCode);
 
     //Next stat for the user
-    const assginment = nextTurn(roomState.get(String(userCode)));
+    const assginment = nextTurn(roomState.get(userCode));
     roomState.set(userCode, assginment);
 
     console.log(assginment);
@@ -143,7 +143,7 @@ function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
   //Check if the user is in the room
   if (room && room.code) {
     //Next phase for the user
-    const assginment = moveTroops(roomState.get(String(room.code)), from, to, troops, user.email);
+    const assginment = moveTroops(roomState.get(room.code), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
@@ -158,8 +158,9 @@ function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops)
 
   //Check if the user is in the room
   if (room && room.code) {
+    
     //Next phase for the user
-    const assginment = attackTerritories(roomState.get(String(room.code)), from, to, troops, user.email);
+    const assginment = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
@@ -175,7 +176,7 @@ function surrenderHandler(socket, emailToSocket, user) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
 
-    const assginment = surrender(roomState.get(String(userCode)), user.email);
+    const assginment = surrender(roomState.get(userCode), user.email);
     console.log(assginment);
 
     //A user that surrenders leaves the room
@@ -191,18 +192,21 @@ function surrenderHandler(socket, emailToSocket, user) {
 }
 
 function buyActivesHandler(socket, emailToSocket, user, type, territory, numActives) {
-  const room = sids.get(user.email);
 
   //Check if the user is in the room
-  if (room && room.code) {
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+
+    console.log("Codigo en buy actives");
+    console.log(userCode);
     //Next phase for the user
-    const assginment = buyActives(roomState.get(String(room.code)), user.email, type, territory, Number(numActives));
+    const assginment = buyActives(roomState.get(userCode), user.email, type, territory, Number(numActives));
     console.log(assginment);
-    roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
+    roomState.set(userCode, assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
   } else {
-    console.log(`You are not in the room ${room.code} ` + user.email);
-    socketEmit(socket, 'notInTheRoom', room.code);
+    console.log(`You are not in a room ` + user.email);
+    socketEmit(socket, 'notInARoom', user.email);
   }
 }
 
@@ -213,7 +217,7 @@ function getMap(socket, user) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
 
-    const assginment = roomState.get(String(userCode));
+    const assginment = roomState.get(userCode);
 
     socketEmit(socket, 'mapSent', assginment);
   }
