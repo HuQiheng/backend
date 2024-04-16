@@ -46,6 +46,8 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
+
+
 //Used routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
@@ -85,6 +87,10 @@ if (process.env.MODE_ENV === 'development') {
 }
 
 //Use same session context as express and passport
+<<<<<<< HEAD
+=======
+//Use same session context as express and passport
+>>>>>>> ramaAuxiliar
 io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
@@ -102,7 +108,10 @@ io = new Server(server, {
     credentials: true,
   },
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> ramaAuxiliar
 io.engine.use(onlyForHandshake(sessionMiddleware));
 io.engine.use(onlyForHandshake(passport.session()));
 
@@ -146,6 +155,7 @@ const {
   attackTerritoriesHandler,
   buyActivesHandler,
   surrenderHandler,
+  getMap,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -204,4 +214,7 @@ io.on('connection', (socket) => {
   socket.on('buyActives', (type, territory, numActives) => {
     buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
   });
+
+  //Send the map
+  socket.on('sendMap', () => getMap(socket, user));
 });
