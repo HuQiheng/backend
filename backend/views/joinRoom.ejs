@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <title>Chat Room</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="JoinRoomForm">
+    <input type="text" id="roomName" placeholder="Room Name">
+    <button type="submit">Join Room</button>
+  </form>
+  <ul id="messages"></ul>
+  <script>
+    const socket = io('http://localhost:3010');
+    document.getElementById('JoinRoomForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const roomName = document.getElementById('roomName').value;
+      socket.emit('joinRoom', roomName);
+    });
+    socket.on('roomJoined', () => {
+      console.log(`Room joined`)
+    });
+    </script>
+</body>
+</html>
