@@ -238,6 +238,18 @@ function chat(socket, emailToSocket, user, message) {
   }
 }
 
+// Invite a friend to a game 
+function inviteFriend(socket, emailToSocket, user, friendEmail) {
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+    sendingThroughEmail(emailToSocket, friendEmail, 'invitation', user.email);
+  } else {
+    console.log(`You are not in a Room  ` + user.email);
+    socketEmit(socket, 'notInARoom', userCode);
+  }
+}
+
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
@@ -308,4 +320,5 @@ module.exports = {
   buyActivesHandler,
   getMap,
   chat,
+  inviteFriend,
 };
