@@ -278,6 +278,20 @@ async function getUsersInfo(usersWithCode) {
   }
 }
 
+//Function distributed chat
+function chat(socket, emailToSocket, user, message) {
+  //Check if the user is in the room
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+
+    sendToAllWithCode(emailToSocket, userCode, 'chat', message);
+  } else {
+    console.log(`You are not in a Room  ` + user.email);
+    socketEmit(socket, 'notInARoom', userCode);
+  }
+}
+
 module.exports = {
   createRoom,
   joinRoom,
@@ -291,4 +305,5 @@ module.exports = {
   surrenderHandler,
   buyActivesHandler,
   getMap,
+  chat,
 };

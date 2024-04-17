@@ -150,6 +150,7 @@ const {
   buyActivesHandler,
   surrenderHandler,
   getMap,
+  chat,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -214,7 +215,6 @@ io.on('connection', (socket) => {
 
   // Distributed chat
   socket.on('chat', (msg) => {
-    console.log('Mensaje recibido: ' + msg);
-    io.to(sids.get(user.email).code).emit('chat', { email: user.email, msg });
+    chat(socket, emailToSocket, user, msg);
   });
 });
