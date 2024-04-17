@@ -238,18 +238,6 @@ function chat(socket, emailToSocket, user, message) {
   }
 }
 
-// Invite a user to a room
-function inviteUser(socket, emailToSocket, user, email) {
-  // Check if the invited user is connected and in a room
-  if (sids.has(email)) {
-    let sid = sids.get(email);
-    joinRoom(socket, emailToSocket, sid, user.code);
-    socketEmit(socket, 'inviteSent', email);
-  } else {
-    socketEmit(socket, 'notConnected', email);
-  }
-}
-
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
