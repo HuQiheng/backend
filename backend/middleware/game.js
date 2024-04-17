@@ -37,7 +37,7 @@ function createRoom(socket, user) {
 }
 
 //Joins a room, returns events in diferent situations
-function joinRoom(emailToSocket, socket, user, code) {
+async function joinRoom(emailToSocket, socket, user, code) {
   // Check if the room exists
   const roomExists = rooms.has(Number(code));
   if (roomExists) {
@@ -54,8 +54,9 @@ function joinRoom(emailToSocket, socket, user, code) {
       socketEmit(socket, 'roomAccess', code);
 
       let players = getUsersWithCode(code);
+      let usersInfo = await getUsersInfo(players);
       sendToAllWithCode(emailToSocket, code, 'playerJoined', user.name);
-      sendToAllWithCode(emailToSocket, code, 'connectedPlayers', players);
+      sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
@@ -222,6 +223,33 @@ function getMap(socket, user) {
     socketEmit(socket, 'mapSent', assginment);
   }
 }
+
+//Function distributed chat
+function chat(socket, emailToSocket, user, message) {
+  //Check if the user is in the room
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    console.log(userCode);
+
+    sendToAllWithCode(emailToSocket, userCode, 'chat', message);
+  } else {
+    console.log(`You are not in a Room  ` + user.email);
+    socketEmit(socket, 'notInARoom', userCode);
+  }
+}
+
+// Invite a user to a room
+function inviteUser(socket, emailToSocket, user, email) {
+  // Check if the invited user is connected and in a room
+  if (sids.has(email)) {
+    let sid = sids.get(email);
+    joinRoom(socket, emailToSocket, sid, user.code);
+    socketEmit(socket, 'inviteSent', email);
+  } else {
+    socketEmit(socket, 'notConnected', email);
+  }
+}
+
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
@@ -275,20 +303,6 @@ async function getUsersInfo(usersWithCode) {
     return usersInfo;
   } catch (error) {
     throw error;
-  }
-}
-
-//Function distributed chat
-function chat(socket, emailToSocket, user, message) {
-  //Check if the user is in the room
-  if (sids.has(user.email)) {
-    let userCode = sids.get(user.email).code;
-    console.log(userCode);
-
-    sendToAllWithCode(emailToSocket, userCode, 'chat', message);
-  } else {
-    console.log(`You are not in a Room  ` + user.email);
-    socketEmit(socket, 'notInARoom', userCode);
   }
 }
 
