@@ -211,4 +211,10 @@ io.on('connection', (socket) => {
 
   //Send the map
   socket.on('sendMap', () => getMap(socket, user));
+
+  // Distributed chat
+  socket.on('chat', (msg) => {
+    console.log('Mensaje recibido: ' + msg);
+    io.to(sids.get(user.email).code).emit('chat', { email: user.email, msg });
+  });
 });
