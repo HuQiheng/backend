@@ -97,6 +97,9 @@ function leaveRoom(emailToSocket, user) {
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
+    let players = getUsersWithCode(code);
+    let usersInfo = getUsersInfo(players);
+    sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
   }
 }
 
