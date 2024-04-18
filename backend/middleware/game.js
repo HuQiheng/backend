@@ -57,6 +57,7 @@ async function joinRoom(emailToSocket, socket, user, code) {
       let usersInfo = await getUsersInfo(players);
       sendToAllWithCode(emailToSocket, code, 'playerJoined', user.name);
       sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
+      console.log(usersInfo);
     } else {
       console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
@@ -79,8 +80,8 @@ async function startGame(emailToSocket, code) {
     console.log(`Game starting in room with code ${code}`);
     //console.log(usersInfo)
     const assginment = assignTerritories(usersInfo, data);
-    roomState.set(code, assginment);
-    console.log(roomState.get(code));
+    roomState.set(Number(code), assginment);
+    console.log(roomState.get(Number(code)));
     sendToAllWithCode(emailToSocket, code, 'mapSent', assginment);
   } else {
     console.log(`No players in room with code ${code}`);
@@ -90,17 +91,18 @@ async function startGame(emailToSocket, code) {
 }
 
 // Function to leave a room
-function leaveRoom(emailToSocket, user) {
+async function leaveRoom(emailToSocket, user) {
   const userEntry = sids.get(user.email);
   //We check if user has a room asigned
   if (userEntry) {
     let code = Number(userEntry.code);
+    
     rooms.get(code).delete(user.email);
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
     let players = getUsersWithCode(code);
-    let usersInfo = getUsersInfo(players);
+    let usersInfo = await getUsersInfo(players);
     sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
   }
 }
@@ -234,12 +236,13 @@ function chat(socket, emailToSocket, user, message) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
+    console.log("message to be sent");
+    console.log(message)
 
-    sendToAllWithCode(emailToSocket, userCode, 'chat', message);
+    sendToAllWithCode(emailToSocket, userCode, 'messageReceived', message);
   } else {
     console.log(`You are not in a Room  ` + user.email);
-    socketEmit(socket, 'notInARoom', userCode);
+    socketEmit(socket, 'notInARoom', user.email);
   }
 }
 
