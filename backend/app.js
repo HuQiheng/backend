@@ -92,7 +92,10 @@ if (process.env.MODE_ENV === 'development') {
 io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
-      console.log('Origen  ' + origin);
+      if(origin){
+        console.log('Origen  ' + origin);
+      }
+
       // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
@@ -115,7 +118,6 @@ io.engine.use(
     if (req.user) {
       next();
     } else {
-      console.log('Unauthorized user');
       res.writeHead(401);
       res.end();
     }
@@ -158,63 +160,145 @@ const data = require('./territories/territories.json');
 const emailToSocket = new Map();
 // Conexion de un socket
 io.on('connection', (socket) => {
-  //The session
-  const session = socket.request.session;
-  //The user
-  const user = socket.request.user;
+  try {
+    //The session
+    const session = socket.request.session;
+    //The user
+    const user = socket.request.user;
 
-  //Create a new pair, the user is associated with that socket
-  emailToSocket.set(user.email, socket);
-  console.log('Socket ID: ' + socket.id);
-  console.log('User authenticated: ' + JSON.stringify(user));
+    //Create a new pair, the user is associated with that socket
+    emailToSocket.set(user.email, socket);
+    console.log('Socket ID: ' + socket.id);
+    console.log('User authenticated: ' + JSON.stringify(user));
 
-  // Create lobby
-  socket.on('createRoom', () => createRoom(socket, user));
+    // Create lobby
+    socket.on('createRoom', () => {
+      try {
+        createRoom(socket, user);
+      } catch (error) {
+        console.log('Error creating room: ' + error.message);
+        socket.emit('error', 'Error creating room: ' + error.message);
+      }
+    });
 
-  // Join lobby
-  socket.on('joinRoom', (code) => joinRoom(emailToSocket, socket, user, code));
+    // Join lobby
+    socket.on('joinRoom', (code) => {
+      try {
+        joinRoom(emailToSocket, socket, user, code);
+      } catch (error) {
+        console.log('Error joining room: ' + error.message);
+        socket.emit('error', 'Error joining room: ' + error.message);
+      }
+    });
 
-  //Start a game
-  socket.on('startGame', (code) => startGame(emailToSocket, code, user, socket));
+    //Start a game
+    socket.on('startGame', (code) => {
+      try {
+        startGame(emailToSocket, code, user, socket);
+      } catch (error) {
+        console.log('Error starting game: ' + error.message);
+        socket.emit('error', 'Error starting game: ' + error.message);
+      }
+    });
 
-  // Leave a lobby
-  socket.on('leaveRoom', () => leaveRoom(emailToSocket, user));
+    // Leave a lobby
+    socket.on('leaveRoom', () => {
+      try {
+        leaveRoom(emailToSocket, user);
+      } catch (error) {
+        console.log('Error leaving room: ' + error.message);
+        socket.emit('error', 'Error leaving room: ' + error.message);
+      }
+    });
 
-  // Socket disconnection
-  socket.on('disconnect', () => {
-    console.log(`Jugador ${user.email} desconectado`);
-    emailToSocket.delete(user.email);
-    // leaveRoom(socket,user);
-  });
+    // Socket disconnection
+    socket.on('disconnect', () => {
+      console.log(`Jugador ${user.email} desconectado`);
+      emailToSocket.delete(user.email);
+      // leaveRoom(socket,user);
+    });
 
-  socket.on('nextPhase', () => nextPhaseHandler(socket, emailToSocket, user));
+    // Next phase
+    socket.on('nextPhase', () => {
+      try {
+        nextPhaseHandler(socket, emailToSocket, user);
+      } catch (error) {
+        console.log('Error in next phase: ' + error.message);
+        socket.emit('error', 'Error in next phase: ' + error.message);
+      }
+    });
 
-  // Move troops in a territory
-  socket.on('moveTroops', (from, to, troops) => {
-    moveTroopsHandler(socket, emailToSocket, user, from, to, troops);
-  });
+    // Move troops in a territory
+    socket.on('moveTroops', (from, to, troops) => {
+      try {
+        moveTroopsHandler(socket, emailToSocket, user, from, to, troops);
+      } catch (error) {
+        console.log('Error moving troops: ' + error.message);
+        socket.emit('error', 'Error moving troops: ' + error.message);
+      }
+    });
 
-  // Attack a territory
-  socket.on('attackTerritories', (from, to, troops) => {
-    attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops);
-  });
+    // Attack a territory
+    socket.on('attackTerritories', (from, to, troops) => {
+      try {
+        attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops);
+      } catch (error) {
+        console.log('Error attacking territories: ' + error.message);
+        socket.emit('error', 'Error attacking territories: ' + error.message);
+      }
+    });
 
-  // Surrender
-  socket.on('surrender', () => surrenderHandler(socket, emailToSocket, user));
+    // Surrender
+    socket.on('surrender', () => {
+      try {
+        surrenderHandler(socket, emailToSocket, user);
+      } catch (error) {
+        console.log('Error in surrender: ' + error.message);
+        socket.emit('error', 'Error in surrender: ' + error.message);
+      }
+    });
 
-  // Next turn
-  socket.on('nextTurn', () => nextTurnHandler(socket, emailToSocket, user));
+    // Next turn
+    socket.on('nextTurn', () => {
+      try {
+        nextTurnHandler(socket, emailToSocket, user);
+      } catch (error) {
+        console.log('Error in next turn: ' + error.message);
+        socket.emit('error', 'Error in next turn: ' + error.message);
+      }
+    });
 
-  // Buy actives
-  socket.on('buyActives', (type, territory, numActives) => {
-    buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
-  });
+    // Buy actives
+    socket.on('buyActives', (type, territory, numActives) => {
+      try {
+        buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
+      } catch (error) {
+        console.log('Error buying actives: ' + error.message);
+        socket.emit('error', 'Error buying actives: ' + error.message);
+      }
+    });
 
-  //Send the map
-  socket.on('sendMap', () => getMap(socket, user));
+    //Send the map
+    socket.on('sendMap', () => {
+      try {
+        getMap(socket, user);
+      } catch (error) {
+        console.log('Error sending map: ' + error.message);
+        socket.emit('error', 'Error sending map: ' + error.message);
+      }
+    });
 
-  // Distributed chat
-  socket.on('chat', (msg) => {
-    chat(socket, emailToSocket, user, msg);
-  });
+    // Distributed chat
+    socket.on('sendMessage', (msg) => {
+      try {
+        chat(socket, emailToSocket, user, msg);
+      } catch (error) {
+        console.log('Error in chat: ' + error.message);
+        socket.emit('error', 'Error in chat: ' + error.message);
+      }
+    });
+  } catch (error) {
+    console.log('Error in connection event: ' + error.message);
+  }
 });
+
