@@ -239,7 +239,7 @@ function chat(socket, emailToSocket, user, message) {
     console.log("message to be sent");
     console.log(message)
 
-    sendToAllWithCode(emailToSocket, userCode, 'messageReceived', message);
+    sendToAllWithCode(emailToSocket, userCode, 'messageReceived', { message, user: user.email });
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
