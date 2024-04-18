@@ -149,6 +149,7 @@ const {
   buyActivesHandler,
   surrenderHandler,
   getMap,
+  chat,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -210,4 +211,9 @@ io.on('connection', (socket) => {
 
   //Send the map
   socket.on('sendMap', () => getMap(socket, user));
+
+  // Distributed chat
+  socket.on('chat', (msg) => {
+    chat(socket, emailToSocket, user, msg);
+  });
 });
