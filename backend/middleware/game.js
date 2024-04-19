@@ -237,8 +237,7 @@ function chat(socket, emailToSocket, user, message) {
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
     console.log("message to be sent");
-    console.log(message)
-
+    console.log(message);
     sendToAllWithCode(emailToSocket, userCode, 'messageReceived', { message, user: user.email });
   } else {
     console.log(`You are not in a Room  ` + user.email);
