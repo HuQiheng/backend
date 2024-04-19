@@ -52,3 +52,24 @@ CREATE TABLE Friend
    FOREIGN KEY (Player_email1) REFERENCES Player(email),
    FOREIGN KEY (Player_email2) REFERENCES Player(email)
 );
+
+-- Friend request table
+CREATE TABLE Friend_request
+(
+   Player_from VARCHAR(50),
+   Player_to VARCHAR(50),
+   PRIMARY KEY (Player_from, Player_to),
+   FOREIGN KEY (Player_from) REFERENCES Player(email),
+   FOREIGN KEY (Player_to) REFERENCES Player(email)
+);
+
+CREATE OR REPLACE FUNCTION check_friend_request() RETURNS TRIGGER AS $$
+BEGIN
+   IF EXISTS (SELECT 1 FROM Friend WHERE (Player_email1 = NEW.Player_from AND Player_email2 = NEW.Player_to) OR (Player_email2 = NEW.Player_from AND Player_email1 = NEW.Player_to)) THEN
+      RAISE EXCEPTION 'Already friends, cannot send friend request.';
+   END IF;
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER friend_request_trigger BEFORE INSERT ON Friend_request FOR EACH ROW EXECUTE PROCEDURE check_friend_request();
