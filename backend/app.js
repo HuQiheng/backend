@@ -152,6 +152,7 @@ const {
   surrenderHandler,
   getMap,
   chat,
+  invite,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -294,6 +295,16 @@ io.on('connection', (socket) => {
       } catch (error) {
         console.log('Error in chat: ' + error.message);
         socket.emit('error', 'Error in chat: ' + error.message);
+      }
+    });
+
+    //Invite someone to lobby
+    socket.on('invite', (email) =>{
+      try{
+        invite(socket, emailToSocket, user, email);
+      } catch (error) {
+        console.log('Error sending map: ' + error.message);
+        socket.emit('error', 'Error sending map: ' + error.message);
       }
     });
   } catch (error) {

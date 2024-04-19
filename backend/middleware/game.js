@@ -245,15 +245,20 @@ function chat(socket, emailToSocket, user, message) {
   }
 }
 
-// Invite a friend to a game 
-function inviteFriend(socket, emailToSocket, user, friendEmail) {
+// Invite someone to a game 
+function invite(socket, emailToSocket, user, friendEmail) {
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
-    sendingThroughEmail(emailToSocket, friendEmail, 'invitation', user.email);
+    console.log(friendEmail);
+
+    const userInfo = {email: user.email, name: user.name, picture: user.picture}
+    console.log(user);
+    console.log(userInfo);
+    sendingThroughEmail(emailToSocket, friendEmail, 'invitationRecevied', {userCode, userInfo});
   } else {
     console.log(`You are not in a Room  ` + user.email);
-    socketEmit(socket, 'notInARoom', userCode);
+    socketEmit(socket, 'notInARoom', user.email);
   }
 }
 
@@ -296,6 +301,7 @@ function getUsersWithCode(code) {
 }
 
 const playerController = require('../controllers/PlayerController');
+const { use } = require('passport');
 async function getUsersInfo(usersWithCode) {
   try {
     // Create an array of promises for each user
@@ -327,5 +333,5 @@ module.exports = {
   buyActivesHandler,
   getMap,
   chat,
-  inviteFriend,
+  invite,
 };
