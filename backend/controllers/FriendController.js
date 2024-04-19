@@ -41,7 +41,7 @@ const selectFriends = async (player_email) => {
                     INNER JOIN Player ON friend.Player_email1 = Player.email
                     WHERE Player_email2 = $1`;
     const values = [player_email, player_email];
-    const result = await pool.query(query, values);
+    const result = await db.query(query, values);
     return result;
   } catch (error) {
     throw error;

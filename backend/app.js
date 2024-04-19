@@ -57,6 +57,9 @@ app.use('/users', userRoutes);
 const friendsRoutes = require('./routes/friendRoutes');
 app.use('/users', friendsRoutes);
 
+const friendsRequestRoutes = require('./routes/friend_requestRoutes');
+app.use('/users', friendsRequestRoutes);
+
 // General error management
 app.use((err, req, res, next) => {
   console.error(err.stack);
