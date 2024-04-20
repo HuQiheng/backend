@@ -116,8 +116,9 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     const assginment = nextPhase(roomState.get(userCode));
     console.log(assginment);
     roomState.set(userCode, assginment);
-    socketEmit(socket, 'nextPhase', user.email);
+    //socketEmit(socket, 'nextPhase', user.email);
     //sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'nextPhase', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
