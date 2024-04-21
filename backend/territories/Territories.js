@@ -47,15 +47,20 @@ function moveTroops(state, from, to, t, player) {
   let map = state.map;
   troops = parseInt(t, 10);
   if (state.turn === playerIndex) {
-    if (map[from].troops - troops >= 1) {
-      if (map[from].player === playerIndex && map[to].player === playerIndex) {
-        map[to].troops += troops;
-        map[from].troops -= troops;
+    if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+      if (map[from].troops - troops >= 1) {
+        if (map[from].player === playerIndex && map[to].player === playerIndex) {
+          map[to].troops += troops;
+          map[from].troops -= troops;
+        } else {
+          console.log('Territories are owned by different players');
+        }
       } else {
-        console.log('Territories are owned by different players');
+        console.log('No troops available');
       }
-    } else {
-      console.log('No troops available');
+    }
+    else {
+      console.log('Invalid number of troops');
     }
   } else {
     console.log('Not your turn');
