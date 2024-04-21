@@ -183,20 +183,24 @@ function buyActives(state, player, type, territory, numActives) {
   } else if (type === 'troop') {
     var cost = 2 * numActives;
   }
-  if (state.players[playerIndex].coins >= cost  && map[territory].player === playerIndex) {
-    if (type === 'factory' && map[territory].factories === 0) {
-      state.players[playerIndex].coins -= cost;
-      map[territory].factories += numActives;
-    } else if (type === 'factory' && map[territory].factories > 0) {
-      console.log('Territory already has a factory');
-    } else if (type === 'troop') {
-      state.players[playerIndex].coins -= cost;
-      map[territory].troops += numActives;
+  if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+    if (state.players[playerIndex].coins >= cost  && map[territory].player === playerIndex) {
+      if (type === 'factory' && map[territory].factories === 0) {
+        state.players[playerIndex].coins -= cost;
+        map[territory].factories += numActives;
+      } else if (type === 'factory' && map[territory].factories > 0) {
+        console.log('Territory already has a factory');
+      } else if (type === 'troop') {
+        state.players[playerIndex].coins -= cost;
+        map[territory].troops += numActives;
+      } else {
+        console.log("El tipo de tropa no es admisible");
+      }
     } else {
-      console.log("El tipo de tropa no es admisible");
+      console.log('Not enough coins or territory is not owned by the player');
     }
   } else {
-    console.log('Not enough coins or territory is not owned by the player');
+    console.log('Invalid number of troops');
   }
   return state;
 }
