@@ -282,6 +282,16 @@ io.on('connection', (socket) => {
       }
     });
 
+    // Victory
+    socket.on('victory', () => {
+      try {
+        victoryHandler(emailToSocket, user);
+      } catch (error) {
+        console.log('Error in victory: ' + error.message);
+        socket.emit('error', 'Error in victory: ' + error.message);
+      }
+    });
+    
     //Send the map
     socket.on('sendMap', () => {
       try {

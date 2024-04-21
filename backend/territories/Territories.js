@@ -64,7 +64,7 @@ function moveTroops(state, from, to, t, player) {
 }
 
 // Player Attack territories
-function attackTerritories(state, from, to, troops, player) {
+function attackTerritories(state, from, to, troops, player, emailToSocket) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   console.log("Estado del ataque");
   console.log("Numero de tropas usadas");
@@ -78,7 +78,8 @@ function attackTerritories(state, from, to, troops, player) {
           map[to].player = playerIndex;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
-            console.log('Player conquered all territories');
+            console.log(`${player} has conquered all territories`);
+            victoryHandler(emailToSocket, state.players[playerIndex], state.code);
           }
         } else {
           map[to].troops -= troops;
