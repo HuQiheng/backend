@@ -47,7 +47,7 @@ function moveTroops(state, from, to, t, player) {
   let map = state.map;
   troops = parseInt(t, 10);
   if (state.turn === playerIndex) {
-    if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+    if (troops > 0) {
       if (map[from].troops - troops >= 1) {
         if (map[from].player === playerIndex && map[to].player === playerIndex) {
           map[to].troops += troops;
@@ -76,7 +76,7 @@ function attackTerritories(state, from, to, troops, player) {
   console.log(troops);
   const map = state.map;
   if (state.turn === playerIndex) {
-    if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+    if (troops > 0) {
       if (map[from].troops - troops >= 1) {
         if (map[from].player === playerIndex && map[to].player !== playerIndex) {
           if (troops > map[to].troops) {
@@ -183,7 +183,7 @@ function buyActives(state, player, type, territory, numActives) {
   } else if (type === 'troop') {
     var cost = 2 * numActives;
   }
-  if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+  if (troops > 0) {
     if (state.players[playerIndex].coins >= cost  && map[territory].player === playerIndex) {
       if (type === 'factory' && map[territory].factories === 0) {
         state.players[playerIndex].coins -= cost;
