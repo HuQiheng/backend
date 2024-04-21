@@ -71,24 +71,28 @@ function attackTerritories(state, from, to, troops, player) {
   console.log(troops);
   const map = state.map;
   if (state.turn === playerIndex) {
-    if (map[from].troops - troops >= 1) {
-      if (map[from].player === playerIndex && map[to].player !== playerIndex) {
-        if (troops > map[to].troops) {
-          map[to].troops = troops - map[to].troops;
-          map[to].player = playerIndex;
-          // Check if the player conquered all territories and win the game
-          if(checkVictory(state, player)) {
-            console.log('Player conquered all territories');
+    if (troops === null || troops === undefined || troops === '' || troops <= 0) {
+      if (map[from].troops - troops >= 1) {
+        if (map[from].player === playerIndex && map[to].player !== playerIndex) {
+          if (troops > map[to].troops) {
+            map[to].troops = troops - map[to].troops;
+            map[to].player = playerIndex;
+            // Check if the player conquered all territories and win the game
+            if(checkVictory(state, player)) {
+              console.log('Player conquered all territories');
+            }
+          } else {
+            map[to].troops -= troops;
           }
+          map[from].troops -= troops;
         } else {
-          map[to].troops -= troops;
+          console.log('Territories are owned by the same player');
         }
-        map[from].troops -= troops;
       } else {
-        console.log('Territories are owned by the same player');
+        console.log('No troops available');
       }
     } else {
-      console.log('No troops available');
+      console.log('Invalid number of troops');
     }
   } else {
     console.log('Not your turn');
