@@ -208,13 +208,17 @@ function buyActives(state, player, type, territory, numActives) {
 //Given a number of player it calculates the number of coins that this player have
 function countPlayerCoins(state, playerNumber) {
   let count = 0;
-  for (let territory in state.map) {
-    if (state.map[territory].player === playerNumber) {
-      count++;
-      if (state.map[territory].factories === 1) {
-        count = count + 4;
+  if (state.turn === playerNumber) {
+    for (let territory in state.map) {
+      if (state.map[territory].player === playerNumber) {
+        count++;
+        if (state.map[territory].factories === 1) {
+          count = count + 4;
+        }
       }
     }
+  } else {
+    console.log('Not your turn');
   }
   return count;
 }
