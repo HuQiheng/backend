@@ -1,17 +1,23 @@
--- Drop Player table
-DROP TABLE Player;
+-- Drop trigger
+DROP TRIGGER friend_request_trigger;
 
--- Drop Game table
-DROP TABLE Game;
-
--- Drop Achievement table
-DROP TABLE Achievement;
-
--- Drop Obtains table
-DROP TABLE Obtains;
+-- Drop function
+DROP FUNCTION check_friend_request;
+-- Drop Friend table
+DROP TABLE Friend;
 
 -- Drop Compound table
 DROP TABLE Compound;
 
--- Drop Friend table
-DROP TABLE Friend;
+-- Drop Obtains table
+DROP TABLE Obtains;
+
+
+-- Drop Achievement table
+DROP TABLE Achievement;
+
+-- Drop Game table
+DROP TABLE Game;
+
+-- Drop Player table
+DROP TABLE Player;

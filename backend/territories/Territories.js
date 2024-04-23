@@ -69,7 +69,7 @@ function moveTroops(state, from, to, t, player) {
 }
 
 // Player Attack territories
-function attackTerritories(state, from, to, troops, player) {
+function attackTerritories(state, from, to, troops, player, emailToSocket) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   console.log("Estado del ataque");
   console.log("Numero de tropas usadas");
