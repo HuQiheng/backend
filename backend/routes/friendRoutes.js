@@ -10,7 +10,7 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
     console.log("Solicitado " + req.params.email);
     console.log("Pedido con " + req.user.email);
     if (req.user.email === req.params.email) {
-      const userInfo = await friendsController.selectAllFriends(req.params.email);
+      const userInfo = await friendsController.selectFriends(req.params.email);
       res.send(userInfo.rows);
     } else {
       res.status(403).send('Access denied');
