@@ -40,7 +40,7 @@ const selectFriends = async (player_email) => {
                     SELECT Player_email1 AS friend_email, username, picture FROM friend 
                     INNER JOIN Player ON friend.Player_email1 = Player.email
                     WHERE Player_email2 = $1`;
-    const values = [player_email, player_email];
+    const values = [player_email];
     const result = await db.query(query, values);
     return result;
   } catch (error) {
