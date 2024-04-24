@@ -59,7 +59,7 @@ router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Friend to delete: ' + req.body.friend);
   try {
     if (req.user.email === req.params.email) {
-      await friendsController.removeFriend(req.params.email, req.body.friend);
+      await friendsController.removeFriend(req.params.email, req.body.email);
       res.json({ message: 'Friend deleted' });
     } else {
       res.status(403).send('Access denied');
