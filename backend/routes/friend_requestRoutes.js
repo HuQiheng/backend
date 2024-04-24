@@ -6,7 +6,7 @@ const friendsController = require('../controllers/FriendController');
 const friends_reqController = require('../controllers/Friend_requestController');
 
 // Get the information of all the peding requests to the user
-router.get('/:email/friendRequests', checkAuthenticated, async (req, res) => {
+router.get('/:email/friendsRequests', checkAuthenticated, async (req, res) => {
     try {
       console.log("Solicitado " + req.params.email);
       console.log("Pedido con " + req.user.email);
@@ -23,7 +23,7 @@ router.get('/:email/friendRequests', checkAuthenticated, async (req, res) => {
 });
 
 // Get the information of all the peding requests made by the user
-router.get('/:email/myFriendRequests', checkAuthenticated, async (req, res) => {
+router.get('/:email/myFriendsRequests', checkAuthenticated, async (req, res) => {
     try {
       console.log("Solicitado " + req.params.email);
       console.log("Pedido con " + req.user.email);
