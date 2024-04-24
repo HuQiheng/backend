@@ -36,10 +36,6 @@ function assignTerritories(players, data) {
   return state;
 }
 
-function getPlayers(room) {
-  const p = rooms.get(room);
-  return Array.from(p);
-}
 
 // A Player Move troops
 function moveTroops(state, from, to, t, player) {

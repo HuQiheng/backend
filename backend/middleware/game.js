@@ -217,38 +217,16 @@ function buyActivesHandler(socket, emailToSocket, user, type, territory, numActi
   }
 }
 
-function victoryHandler(emailToSocket, user, userCode, gameActions) {
-  // Check for achievements
-  let achievements = checkAchievements(gameActions[user.email]);
+function victoryHandler(emailToSocket, user, userCode) {
 
   // Emit victory event to the winning player
-  sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! You earned the following achievements: ${achievements.join(', ')}`);
+  sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
 
-  // Emit victory event to the other players in the room
-  let usersWithCode = getUsersWithCode(Number(userCode));
-  usersWithCode.forEach((email) => {
-    if (email !== user.email) {
-      sendingThroughEmail(emailToSocket, email, 'victory', `Game over, ${user.name} has won the game!`);
-    }
-  });
+
+  // Emit game over to all the rest of users
+  sendToAllWithCode(emailToSocket, userCode, `Game over, ${user.name} has won the game!`, assginment);
 }
 
-// De momento miramos aquí los logros que tengamos, quizás deberíamos hacerlo en otro archivo o de otra manera
-function checkAchievements(actions) {
-  let achievements = [];
-
-  if (actions.conqueredTerritories >= 10) {
-    achievements.push('Conqueror');
-  }
-
-  if (actions.defeatedPlayers >= 5) {
-    achievements.push('Vanquisher');
-  }
-
-  // Add more checks for achievements here...
-
-  return achievements;
-}
 
 //Given a user it sends the map to the user of the party that he is in
 function getMap(socket, user) {
