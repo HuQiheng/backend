@@ -34,11 +34,11 @@ const removeFriend = async (player_email1, player_email2) => {
 
 const selectFriends = async (player_email) => {
   try {
-    const query = `SELECT Player_email2 AS friend_email, username, picture FROM Friend 
+    const query = `SELECT Player_email2 AS email, user, picture FROM Friend 
                     INNER JOIN Player ON Friend.Player_email2 = Player.email
                     WHERE Player_email1 = $1
                   UNION
-                    SELECT Player_email1 AS friend_email, username, picture FROM Friend 
+                    SELECT Player_email1 AS email, user, picture FROM Friend 
                     INNER JOIN Player ON Friend.Player_email1 = Player.email
                     WHERE Player_email2 = $1`;
     const values = [player_email];
