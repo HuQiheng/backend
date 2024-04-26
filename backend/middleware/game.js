@@ -329,6 +329,46 @@ async function getUsersInfo(usersWithCode) {
   }
 }
 
+// Function to fetch achievements from the database
+async function fetchAchievementsFromDatabase() {
+  try {
+    const achievements = new Map();
+    const query = 'SELECT * FROM Achievements';
+    const queryResult = await pool.query(query);
+    queryResult.rows.forEach((row) => {
+      achievements.set(`${row.title}`, row);
+    });
+    return achievements;
+  } catch (error) {
+    console.error('Error fetching achievements from database:', error);
+    throw error;
+  }
+}
+
+// Verify if the player has unlocked an achievement
+async function checkAchievementUnlocked(playerEmail, achievementTitle) {
+  try {
+    const query = 'SELECT obtained FROM Obtains WHERE Players_email = $1 AND Achievements_title = $2';
+    const result = await pool.query(query, [playerEmail, achievementTitle]);
+    return result.rows.length > 0 && result.rows[0].obtained;
+  } catch (error) {
+    console.error('Error checking achievement unlocked:', error);
+    throw error;
+  }
+}
+
+// Actualiza la base de datos para reflejar los logros desbloqueados por el jugador
+async function updateAchievement(playerEmail, achievementTitle, obtained) {
+  try {
+    const query = 'UPDATE Obtains SET obtained = $1 WHERE Players_email = $2 AND Achievements_title = $3';
+    await pool.query(query, [obtained, playerEmail, achievementTitle]);
+    console.log(`Achievement '${achievementTitle}' updated for player '${playerEmail}'`);
+  } catch (error) {
+    console.error('Error updating achievement:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   createRoom,
   joinRoom,
