@@ -66,14 +66,18 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
   console.log("Numero de tropas usadas");
   console.log(troops);
   const map = state.map;
+  conquered = false;
+  winner = false;
   if (state.turn === playerIndex) {
     if (map[from].troops - troops >= 1) {
       if (map[from].player === playerIndex && map[to].player !== playerIndex) {
         if (troops > map[to].troops) {
           map[to].troops = troops - map[to].troops;
           map[to].player = playerIndex;
+          conquered = true;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
+            winner = true;
             console.log(`${player} has conquered all territories`);
             victoryHandler(emailToSocket, state.players[playerIndex], state.code);
           }
@@ -90,7 +94,7 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
   } else {
     console.log('Not your turn');
   }
-  return state;
+  return {state, conquered};
 }
 
 // Check if the player conquered all territories

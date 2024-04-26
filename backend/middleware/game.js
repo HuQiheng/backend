@@ -83,6 +83,16 @@ async function startGame(emailToSocket, code) {
     roomState.set(Number(code), assginment);
     console.log(roomState.get(Number(code)));
     sendToAllWithCode(emailToSocket, code, 'mapSent', assginment);
+
+    // Si es su primera partida, desbloquea el logro de jugar una partida
+    for (let user of usersInfo) {
+      const achievementTitle = 'First game';
+      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      if (!achievementUnlocked) {
+        await updateAchievement(user.email, achievementTitle, true);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
   } else {
     console.log(`No players in room with code ${code}`);
   }
@@ -144,7 +154,7 @@ function nextTurnHandler(socket, emailToSocket, user) {
   }
 }
 
-function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
+async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
   const room = sids.get(user.email);
 
   //Check if the user is in the room
@@ -154,23 +164,50 @@ function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
+    // Si tiene 99 tropas en un territorio, desbloquea el logro de tener 99 tropas
+    if (assginment.map[to].troops === 99) {
+      const achievementTitle = '99 troops';
+      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      if (!achievementUnlocked) {
+        await updateAchievement(user.email, achievementTitle, true);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
   }
 }
 
-function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops) {
+async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops) {
   const room = sids.get(user.email);
 
   //Check if the user is in the room
   if (room && room.code) {
     
     //Next phase for the user
-    const assginment = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    const {assginment ,conquered, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
+    
+    if (conquered) {
+      const achievementTitle = 'Conquer a territory';
+      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      if (!achievementUnlocked) {
+        await updateAchievement(user.email, achievementTitle, true);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
+    if (winner) {
+      //desbloquea el logro de primera victoria
+      const achievementTitle = 'First victory';
+      const firstVictoryUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      if (!firstVictoryUnlocked) {
+        await updateAchievement(user.email, achievementTitle, true);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
