@@ -38,7 +38,9 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         if (isRequestPending) {
           await friendReqController.removeFriend_Request(req.params.email, req.body.friend);
           await friendsController.insertFriend(req.params.email, req.body.friend);
-          res.json({ message: 'Friend added' });
+
+          
+          res.json({ message: 'Friend added' });  
         } else {
           res.status(400).send('No friend request found ');
         }
