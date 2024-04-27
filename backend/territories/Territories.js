@@ -1,3 +1,4 @@
+
 // Assign territories
 function assignTerritories(players, data) {
   const initialFactories = 0;
@@ -67,7 +68,7 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
   console.log(troops);
   const map = state.map;
   conquered = false;
-  winner = false;
+  let winner = false;
   if (state.turn === playerIndex) {
     if (map[from].troops - troops >= 1) {
       if (map[from].player === playerIndex && map[to].player !== playerIndex) {
@@ -78,8 +79,6 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
             winner = true;
-            console.log(`${player} has conquered all territories`);
-            victoryHandler(emailToSocket, state.players[playerIndex], state.code);
           }
         } else {
           map[to].troops -= troops;
@@ -94,10 +93,10 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
   } else {
     console.log('Not your turn');
   }
-  return {state, conquered};
+  return {state, conquered, winner, player};
 }
 
-// Check if the player conquered all territories
+// Check if the player named player conquered all territories
 function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
@@ -114,9 +113,23 @@ function checkVictory(state, player) {
   }
 }
 
+//Check if any of the players has conquered al the territories
+function checkWinner(gameState) {
+  let players = new Set();
+  for (let territory in gameState.map) {
+    players.add(gameState.map[territory].player);
+  }
+  if (players.size === 1) {
+    return Array.from(players)[0]; // Return the player number if there is a winner
+  } else {
+    return -1; // Return -1 if there is no winner
+  }
+}
+
 // Surrender
 function surrender(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
+  let winner = false;
   console.log('index of the player that surrendered');
   console.log(playerIndex);
   const map = state.map;
@@ -130,8 +143,16 @@ function surrender(state, player) {
       map[i].player = j;
     }
   }
+  state.map = map;
+  const indexWinner = checkWinner(state);
+  //There is a winner
+  let playerWinner;
+  if(indexWinner !== -1){
+    winner = true;
+    playerWinner = state.players[indexWinner];
+  }
   console.log('Player surrendered');
-  return state;
+  return {state, winner, playerWinner};
 }
 
 // Shift management
@@ -139,13 +160,10 @@ function nextTurn(state) {
   //Check if the phase is the last one
   if (state.phase === 2) {
     //Cacluate the number of coins for every player
-    for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
-      let coins = countPlayerCoins(state, playerNumber);
-      state.players[playerNumber].coins += coins;
-    }
-
     // Next turn
     state.turn = (state.turn + 1) % state.players.length;
+    let coins = countPlayerCoins(state, state.turn);
+    state.players[state.turn].coins += coins;
     state.phase = 0;
   }
   return state;
@@ -161,6 +179,7 @@ function nextPhase(state) {
 
 // Buy actives
 function buyActives(state, player, type, territory, numActives) {
+  //Obtain the index in the state object
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   console.log('Indice del jugador');
   console.log(playerIndex);
@@ -190,6 +209,7 @@ function buyActives(state, player, type, territory, numActives) {
   } else {
     console.log('Not enough coins or territory is not owned by the player');
   }
+  state.map = map;
   return state;
 }
 

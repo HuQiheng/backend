@@ -1,6 +1,6 @@
+const AchievementController = require('../controllers/ObtainsController')
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
-
 //that are in that room
 const sids = new Map();
 const rooms = new Map();
@@ -84,12 +84,12 @@ async function startGame(emailToSocket, code) {
     console.log(roomState.get(Number(code)));
     sendToAllWithCode(emailToSocket, code, 'mapSent', assginment);
 
-    // Si es su primera partida, desbloquea el logro de jugar una partida
+    // First game? -> unlocks an achievement
     for (let user of usersInfo) {
-      const achievementTitle = 'First game';
-      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      const achievementTitle = 'Bienvenido a WealthWars';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
-        await updateAchievement(user.email, achievementTitle, true);
+        await AchievementController.insert(achievementTitle, user.email)
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     }
@@ -164,12 +164,13 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
-    // Si tiene 99 tropas en un territorio, desbloquea el logro de tener 99 tropas
+    
+    //99 troops in a territory unlocks you an achievement
     if (assginment.map[to].troops === 99) {
       const achievementTitle = '99 troops';
-      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
-        await updateAchievement(user.email, achievementTitle, true);
+        await AchievementController.insert(achievementTitle, user.email);
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     }
@@ -186,7 +187,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   if (room && room.code) {
     
     //Next phase for the user
-    const {assginment ,conquered, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    const {assginment ,conquered,win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
@@ -199,8 +200,11 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     }
-    if (winner) {
-      //desbloquea el logro de primera victoria
+    if (win) {
+      //User won send event to all
+      victoryHandler(emailToSocket, winner);
+
+      //See if user unlocked first victory achievement
       const achievementTitle = 'First victory';
       const firstVictoryUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
       if (!firstVictoryUnlocked) {
@@ -220,22 +224,28 @@ function surrenderHandler(socket, emailToSocket, user) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
 
-    const assginment = surrender(roomState.get(userCode), user.email);
-    console.log(assginment);
+    const {state, winner, playerWinner} = surrender(roomState.get(userCode), user.email);
+    console.log(state);
 
     //A user that surrenders leaves the room
     leaveRoom(emailToSocket, user);
 
-    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
     socketEmit(socket, 'youSurrendered', userCode);
+
+    console.log("HAY GANADOR ");
+    console.log(winner);
+    if(winner) {
+      victoryHandler(emailToSocket, playerWinner);
+    }
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', ' ');
   }
 }
 
-function buyActivesHandler(socket, emailToSocket, user, type, territory, numActives) {
+async function buyActivesHandler(socket, emailToSocket, user, type, territory, numActives) {
 
   //Check if the user is in the room
   if (sids.has(user.email)) {
@@ -248,20 +258,40 @@ function buyActivesHandler(socket, emailToSocket, user, type, territory, numActi
     console.log(assginment);
     roomState.set(userCode, assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+
+    //99 troops in a territory unlocks you an achievement
+    if (assginment.map[territory].troops === 99) {
+      const achievementTitle = '99 troops';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+      if (!achievementUnlocked) {
+        await AchievementController.insert(achievementTitle, user.email);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
   } else {
     console.log(`You are not in a room ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
   }
 }
 
-function victoryHandler(emailToSocket, user, userCode) {
+async function victoryHandler(emailToSocket, user) {
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    // Emit victory event to the winning player
+    sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
+    // Emit game over to all the rest of users
+    sendToAllWithCode(emailToSocket, userCode, 'gameOver', `Game over, ${user.name} has won the game!`);
 
-  // Emit victory event to the winning player
-  sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
-
-
-  // Emit game over to all the rest of users
-  sendToAllWithCode(emailToSocket, userCode, `Game over, ${user.name} has won the game!`, assginment);
+    const achievementTitle = 'Comandante principiante';
+    const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+    if (!achievementUnlocked) {
+      await AchievementController.insert(achievementTitle, user.email);
+      sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+    }
+  } else {
+    console.log(`You are not in a room ` + user.email);
+  }
+  
 }
 
 
@@ -348,7 +378,6 @@ function getUsersWithCode(code) {
 }
 
 const playerController = require('../controllers/PlayerController');
-const { use } = require('passport');
 async function getUsersInfo(usersWithCode) {
   try {
     // Create an array of promises for each user
@@ -382,29 +411,7 @@ async function fetchAchievementsFromDatabase() {
   }
 }
 
-// Verify if the player has unlocked an achievement
-async function checkAchievementUnlocked(playerEmail, achievementTitle) {
-  try {
-    const query = 'SELECT obtained FROM Obtains WHERE Players_email = $1 AND Achievements_title = $2';
-    const result = await pool.query(query, [playerEmail, achievementTitle]);
-    return result.rows.length > 0 && result.rows[0].obtained;
-  } catch (error) {
-    console.error('Error checking achievement unlocked:', error);
-    throw error;
-  }
-}
 
-// Actualiza la base de datos para reflejar los logros desbloqueados por el jugador
-async function updateAchievement(playerEmail, achievementTitle, obtained) {
-  try {
-    const query = 'UPDATE Obtains SET obtained = $1 WHERE Players_email = $2 AND Achievements_title = $3';
-    await pool.query(query, [obtained, playerEmail, achievementTitle]);
-    console.log(`Achievement '${achievementTitle}' updated for player '${playerEmail}'`);
-  } catch (error) {
-    console.error('Error updating achievement:', error);
-    throw error;
-  }
-}
 
 module.exports = {
   createRoom,

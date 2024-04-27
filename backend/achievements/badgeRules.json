@@ -1,8 +1,0 @@
-{
-    "id": "b01",
-    "description": "Playing your first game",
-    "active": true,
-    "max": 1,
-    "updatePeriod": "GLOBAL",
-    "condition": "gameCount == 1"
-}
