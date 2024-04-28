@@ -34,16 +34,19 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         res.status(400).send('Users are already friends');
       } else {
         //We check if this user sent a friend request to the req.body.friend
-        const friendRequests = await friendReqController.selectFriends_Requests(req.params.email);
-        const isRequestPending = friendRequests.rows.some(request => request.email === friendEmail);
-        if (isRequestPending) {
-          await friendReqController.removeFriend_Request(req.params.email, friendEmail);
-          await friendsController.insertFriend(req.params.email, friendEmail);
-
-          
-          res.json({ message: 'Friend added' });  
+        const friendReq = await friendReqController.selectFriendReq(req.params.email);
+        let isSent = false;
+        for (let i = 0; i < friendReq.rows.length; i++) {
+          if (friendReq.rows[i].email === friendEmail) {
+            isSent = true;
+          }
+        }
+        if (!isSent) {
+          res.status(400).send('Friend request not sent');
         } else {
-          res.status(400).send('No friend request found ');
+          await friendsController.insertFriend(req.params.email, friendEmail);
+          await friendReqController.removeFriendReq(req.params.email, friendEmail);
+          res.json({ message: 'Friend added' });
         }
       }
     } else {
