@@ -4,6 +4,7 @@ function assignTerritories(players, data) {
   const initialFactories = 0;
   const initialTroops = 3;
   const initialCoins = 0;
+  const initialPoints = 0;
   const state = {
     turn: 0,
     phase: 0,
@@ -12,6 +13,7 @@ function assignTerritories(players, data) {
       email: player.email,
       picture: player.picture,
       coins: initialCoins,
+      points: initialPoints,
     })),
     map: {},
   };
@@ -62,6 +64,8 @@ function moveTroops(state, from, to, t, player) {
 
 // Player Attack territories
 function attackTerritories(state, from, to, troops, player, emailToSocket) {
+  //Points that a user gain for a succesful attack
+  const conquerPoints = 1;
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   console.log("Estado del ataque");
   console.log("Numero de tropas usadas");
@@ -75,6 +79,7 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
         if (troops > map[to].troops) {
           map[to].troops = troops - map[to].troops;
           map[to].player = playerIndex;
+          state.players[playerIndex].points += conquerPoints;
           conquered = true;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
@@ -229,8 +234,14 @@ function countPlayerCoins(state, playerNumber) {
 
 // Function that makes the ranking
 function updateRanking(gameState) {
-  const ranking = [];
-  const eliminatedPlayers = new Set();
+  // Copy the players array from the gameState
+  const ranking = [...gameState.players];
+  
+  // Sort players array based on points in descending order
+  ranking.sort((a, b) => b.points - a.points);
+    
+  
+  /*const eliminatedPlayers = new Set();
   for (let player of gameState.players) {
     if (checkVictory(gameState, player.email)) {
       ranking.unshift(player);
@@ -247,7 +258,7 @@ function updateRanking(gameState) {
     if (!ranking.some((p) => p.email === player.email)) {
       ranking.push(player);
     }
-  }
+  }*/
   return ranking;
 }
 

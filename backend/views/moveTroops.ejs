@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Chat Room</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="moveTroopsForm">
+    <input type="number" id="troops" placeholder="Enter number of troops">
+    <input type="text" id="origin" placeholder="Enter origin">
+    <input type="text" id="destination" placeholder="Enter destination">
+    <button type="submit">Move Troops</button>
+  </form>
+  <ul id="messages"></ul>
+  <script>
+    const socket = io('http://localhost:3010');
+
+    document.getElementById('moveTroopsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const troops = document.getElementById('troops').value;
+      const origin = document.getElementById('origin').value;
+      const destination = document.getElementById('destination').value;
+      socket.emit('moveTroops', origin, destination, troops );
+    });
+
+    socket.on('troops moved', (data) => {
+      console.log(`Moved ${data.troops} troops from ${data.origin} to ${data.destination}`)
+    });
+  </script>
+</body>
+</html>

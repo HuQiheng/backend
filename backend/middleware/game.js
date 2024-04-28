@@ -195,9 +195,9 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     
     if (conquered) {
       const achievementTitle = 'Conquistador';
-      const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
-        await updateAchievement(user.email, achievementTitle, true);
+        await AchievementController.insert(achievementTitle, user.email);
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     }
@@ -207,9 +207,9 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
 
       //See if user unlocked first victory achievement
       const achievementTitle = 'First victory';
-      const firstVictoryUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
+      const firstVictoryUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!firstVictoryUnlocked) {
-        await updateAchievement(user.email, achievementTitle, true);
+        await AchievementController.insert(achievementTitle, user.email);
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     }
@@ -407,21 +407,6 @@ async function getUsersInfo(usersWithCode) {
   }
 }
 
-// Function to fetch achievements from the database
-async function fetchAchievementsFromDatabase() {
-  try {
-    const achievements = new Map();
-    const query = 'SELECT * FROM Achievements';
-    const queryResult = await pool.query(query);
-    queryResult.rows.forEach((row) => {
-      achievements.set(`${row.title}`, row);
-    });
-    return achievements;
-  } catch (error) {
-    console.error('Error fetching achievements from database:', error);
-    throw error;
-  }
-}
 
 
 
