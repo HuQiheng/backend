@@ -3,7 +3,7 @@ const router = express.Router();
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
-const friendReqController = require('../controllers/Friend_requestController');
+const friendReqController = require('../controllers/FriendReqController');
 
 // Get the information of all the friends of a user
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
@@ -25,19 +25,20 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
 // Add a friend to the user's friend list
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
-  console.log('Friend to add: ' + req.body.friend);
+  console.log('Friend to add: ' + req.body.email);
+  const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
-      const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.friend);
+      const areAlreadyFriends = await friendsController.areFriends(req.params.email, friendEmail);
       if (areAlreadyFriends) {
         res.status(400).send('Users are already friends');
       } else {
         //We check if this user sent a friend request to the req.body.friend
         const friendRequests = await friendReqController.selectFriends_Requests(req.params.email);
-        const isRequestPending = friendRequests.rows.some(request => request.email === req.body.friend);
+        const isRequestPending = friendRequests.rows.some(request => request.email === friendEmail);
         if (isRequestPending) {
-          await friendReqController.removeFriend_Request(req.params.email, req.body.friend);
-          await friendsController.insertFriend(req.params.email, req.body.friend);
+          await friendReqController.removeFriend_Request(req.params.email, friendEmail);
+          await friendsController.insertFriend(req.params.email, friendEmail);
 
           
           res.json({ message: 'Friend added' });  
@@ -58,7 +59,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
 // Delete a friend from the user's friend list
 router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
-  console.log('Friend to delete: ' + req.body.friend);
+  console.log('Friend to delete: ' + req.body.email);
   try {
     if (req.user.email === req.params.email) {
       await friendsController.removeFriend(req.params.email, req.body.email);
