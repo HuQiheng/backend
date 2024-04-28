@@ -339,26 +339,16 @@ async function victoryHandler(emailToSocket, user) {
 
     // Añadir game a la base de datos
 
-    // Achievement titles
-    const achievementTitles = ['Comandante principiante', 'Comandante experimentado', 'Comandante veterano'];
-    // Achievement victories
-    const achievementVictories = [1, 10, 100];
-
-    // Get user victories
-    const userVictories = await GameController.getUserVictories(user.email);
-
-    for (let i = 0; i < achievementVictories.length; i++) {
-      if (userVictories === achievementVictories[i]) {
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitles[i], user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitles[i], user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitles[i]);
-        }
-      }
+    const achievementTitle = 'Comandante principiante';
+    const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+    if (!achievementUnlocked) {
+      await AchievementController.insert(achievementTitle, user.email);
+      sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
     }
   } else {
     console.log(`You are not in a room ` + user.email);
   }
+  
 }
 
 
