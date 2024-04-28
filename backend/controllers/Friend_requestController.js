@@ -67,10 +67,22 @@ const selectFriends_Requests_Made = async (player_email) => {
     }
 };
 
+const friendRequestExist = async (player_email1, player_email2) => {
+  try {
+    const query = `SELECT * FROM Friend_request WHERE Player_from = $1 AND Player_to = $2 OR Player_from = $2 AND Player_to = $1`;
+    const values = [player_email1, player_email2];
+    const result = await db.query(query, values);
+    return result.rows.length > 0;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
     insertFriend_Request,
     selectAllFriends_requests,
     removeFriend_Request,
     selectFriends_Requests,
     selectFriends_Requests_Made,
+    friendRequestExist,
 }

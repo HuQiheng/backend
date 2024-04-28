@@ -75,4 +75,20 @@ router.delete('/:email/friendRequests', checkAuthenticated, async (req, res) => 
     }
 });
 
+router.get('/:email1/:email2/friendRequest/existence', checkAuthenticated, async (req, res) => {
+  try {
+    if (req.user.email === req.params.email1 || req.user.email === req.params.email2){
+      const user1 = req.params.email1;
+      const user2 = req.params.email2;
+      const hasFriendReq = await friends_reqController.friendRequestExist(user1, user2);
+      res.json({ hasFriendReq: hasFriendReq });
+    } else {
+      res.status(403).send('Access denied');
+    }
+  } catch (error) {
+    console.error('Error checking friendship status', error);
+    res.status(500).send('Internal Server Error: ' + error.message);
+  }
+});
+
 module.exports = router;
