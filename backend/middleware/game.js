@@ -194,7 +194,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
     
     if (conquered) {
-      const achievementTitle = 'Conquer a territory';
+      const achievementTitle = 'Conquistador';
       const achievementUnlocked = await checkAchievementUnlocked(user.email, achievementTitle);
       if (!achievementUnlocked) {
         await updateAchievement(user.email, achievementTitle, true);
@@ -259,6 +259,16 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     console.log(assginment);
     roomState.set(userCode, assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+
+    // If you buy your first factory, you unlock an achievement
+    if(type === 'factory' && assginment.map[territory].factory === 1) {
+      const achievementTitle = 'Industrializador';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+      if(!achievementUnlocked){
+        await AchievementController.insert(achievementTitle, user.email);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
 
     //99 troops in a territory unlocks you an achievement
     if (assginment.map[territory].troops === 99) {
