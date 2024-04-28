@@ -136,7 +136,7 @@ function nextPhaseHandler(socket, emailToSocket, user) {
   }
 }
 
-function nextTurnHandler(socket, emailToSocket, user) {
+async function nextTurnHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
@@ -149,6 +149,16 @@ function nextTurnHandler(socket, emailToSocket, user) {
     console.log(assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
+    const playerIndex = roomState.get(userCode).players.findIndex((p) => p.email.trim() === user.email.trim());
+    // Si llega a las 1000 monedas, desbloquea un logro
+    if(assginment.players[playerIndex].coins >= 1000) {
+      const achievementTitle = 'Mileurista';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+      if (!achievementUnlocked) {
+        await AchievementController.insert(achievementTitle, user.email);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+      }
+    }
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', userCode);
@@ -188,11 +198,26 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   if (room && room.code) {
     
     //Next phase for the user
-    const {assginment ,conquered,win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    const {assginment ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
     console.log(assginment);
     roomState.set(room.code, assginment);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
-    
+    const playerIndex = roomState.get(room.code).players.findIndex((p) => p.email.trim() === user.email.trim());
+    let factories = 0;
+    for(let i=0;i<assginment.map.length;i++){
+      if(assginment.map[i].factory === 1 && assginment.map[i].player === playerIndex){
+        factories++;
+      }
+      if(factories === 15) {
+        const achievementTitle = 'Revolución industrial';
+        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+        if (!achievementUnlocked) {
+          await AchievementController.insert(achievementTitle, user.email);
+          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+        }
+        break;
+      }
+    }
     if (conquered) {
       const achievementTitle = 'Conquistador';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
@@ -259,14 +284,32 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     console.log(assginment);
     roomState.set(userCode, assginment);
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+    const playerIndex = assginment.players.findIndex((p) => p.email.trim() === user.email.trim());
 
     // If you buy your first factory, you unlock an achievement
-    if(type === 'factory' && assginment.map[territory].factory === 1) {
-      const achievementTitle = 'Industrializador';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if(!achievementUnlocked){
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+    if(type === 'factory') {
+      if(assginment.map[territory].factory === 1) {
+        const achievementTitle = 'Industrializador';
+        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+        if(!achievementUnlocked){
+          await AchievementController.insert(achievementTitle, user.email);
+          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+        }
+      }
+      let factories = 0;
+      for(let i=0;i<assginment.map.length;i++){
+        if(assginment.map[i].factory === 1 && assginment.map[i].player === playerIndex){
+          factories++;
+        }
+        if(factories === 15) {
+          const achievementTitle = 'Revolución industrial';
+          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+          if (!achievementUnlocked) {
+            await AchievementController.insert(achievementTitle, user.email);
+            sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
+          }
+          break;
+        }
       }
     }
 
