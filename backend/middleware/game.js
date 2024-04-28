@@ -17,6 +17,7 @@ const {
   surrender,
   nextTurn,
   buyActives,
+  updateRanking,
 } = require('../territories/Territories');
 const data = require('../territories/territories.json');
 // Creates a room and returns a unique code to join it
@@ -277,10 +278,11 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
 async function victoryHandler(emailToSocket, user) {
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
+    let rank = updateRanking(roomState.get(userCode));
     // Emit victory event to the winning player
     sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
     // Emit game over to all the rest of users
-    sendToAllWithCode(emailToSocket, userCode, 'gameOver', `Game over, ${user.name} has won the game!`);
+    sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
 
     const achievementTitle = 'Comandante principiante';
     const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
