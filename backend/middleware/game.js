@@ -178,7 +178,7 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
     
     //99 troops in a territory unlocks you an achievement
     if (assginment.map[to].troops === 99) {
-      const achievementTitle = '99 troops';
+      const achievementTitle = 'La Armada Invencible';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
         await AchievementController.insert(achievementTitle, user.email);
@@ -230,8 +230,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       //User won send event to all
       victoryHandler(emailToSocket, winner);
 
-      //See if user unlocked first victory achievement
-      const achievementTitle = 'First victory';
+      //See if user unlocked Comandante principiante achievement
+      const achievementTitle = 'Comandante principiante';
       const firstVictoryUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!firstVictoryUnlocked) {
         await AchievementController.insert(achievementTitle, user.email);
@@ -315,7 +315,7 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
 
     //99 troops in a territory unlocks you an achievement
     if (assginment.map[territory].troops === 99) {
-      const achievementTitle = '99 troops';
+      const achievementTitle = 'La Armada Invencible';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
         await AchievementController.insert(achievementTitle, user.email);
@@ -336,6 +336,8 @@ async function victoryHandler(emailToSocket, user) {
     sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
     // Emit game over to all the rest of users
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
+
+    // Añadir game a la base de datos
 
     const achievementTitle = 'Comandante principiante';
     const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);

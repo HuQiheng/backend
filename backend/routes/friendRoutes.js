@@ -4,6 +4,7 @@ require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
 const friendReqController = require('../controllers/FriendReqController');
+const AchievementController = require('../controllers/AchievementController');
 
 // Get the information of all the friends of a user
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
@@ -45,6 +46,15 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
           res.status(400).send('Friend request not sent');
         } else {
           await friendsController.insertFriend(req.params.email, friendEmail);
+          // Check achievement 
+          const achievementTitle = 'First Friend';
+          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, req.user.email);
+          if (!achievementUnlocked) {
+            await AchievementController.unlockAchievement(achievementTitle, req.user.email);
+          }
+          // sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle); 
+          // Cómo deberíamos notificarlo?
+
           await friendReqController.removeFriendReq(req.params.email, friendEmail);
           res.json({ message: 'Friend added' });
         }
