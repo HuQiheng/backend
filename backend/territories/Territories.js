@@ -34,6 +34,7 @@ function assignTerritories(players, data) {
   for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
     let coins = countPlayerCoins(state, playerNumber);
     state.players[playerNumber].coins += coins;
+    state.players[playerNumber].points += coins;
   }
 
   return state;
@@ -64,8 +65,6 @@ function moveTroops(state, from, to, t, player) {
 
 // Player Attack territories
 function attackTerritories(state, from, to, troops, player, emailToSocket) {
-  //Points that a user gain for a succesful attack
-  const conquerPoints = 1;
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   console.log("Estado del ataque");
   console.log("Numero de tropas usadas");
@@ -79,7 +78,6 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
         if (troops > map[to].troops) {
           map[to].troops = troops - map[to].troops;
           map[to].player = playerIndex;
-          state.players[playerIndex].points += conquerPoints;
           conquered = true;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
@@ -169,6 +167,7 @@ function nextTurn(state) {
     state.turn = (state.turn + 1) % state.players.length;
     let coins = countPlayerCoins(state, state.turn);
     state.players[state.turn].coins += coins;
+    state.players[state.turn].points += coins;
     state.phase = 0;
   }
   return state;
