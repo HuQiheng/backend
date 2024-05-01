@@ -62,17 +62,6 @@ const selectAllPlayers = async () => {
   }
 };
 
-const addVictory = async (email) => {
-  try {
-    const query = `UPDATE Player SET victories = victories + 1 WHERE email = $1`;
-    const result = await db.query(query, [email]);
-    return result;
-  }
-  catch (error) {
-    throw error;
-  }
-};
-
 const verificarCredenciales = async (email, password) => {
   const query = 'SELECT * FROM Player WHERE email = $1 AND password = $2';
   const values = [email, password];
@@ -85,13 +74,34 @@ const verificarCredenciales = async (email, password) => {
   }
 };
 
+const getWins = async (email) => {
+  try {
+    const query = `SELECT victories FROM Player WHERE email = $1`;
+    const result = await db.query(query, [email]);
+    return result.rows[0].victories;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateWins = async (email) => {
+  try {
+    const query = `UPDATE Player SET victories = victories + 1 WHERE email = $1`;
+    const result = await db.query(query, [email]);
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   insertPlayer,
   updatePlayer,
   deletePlayer,
   selectPlayer,
   selectAllPlayers,
-  addVictory,
   verificarCredenciales,
   selectPlayerByname,
+  getWins,
+  updateWins,
 };
