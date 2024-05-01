@@ -4,7 +4,8 @@ CREATE TABLE Player
    email VARCHAR(50) PRIMARY KEY,
    username VARCHAR(20) NOT NULL,
    picture VARCHAR(255) NOT NULL,
-   password VARCHAR(30) NOT NULL
+   password VARCHAR(30) NOT NULL,
+   victories INTEGER NOT NULL
 );
 
 -- Game table creation
