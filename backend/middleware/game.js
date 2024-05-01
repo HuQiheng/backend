@@ -239,8 +239,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
         await AchievementController.insert(achievementTitle, user.email);
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       } else {
-        const numWins = await AchievementController.getWins(user.email);
-        await AchievementController.updateWins(user.email);
+        const numWins = await playerController.getWins(user.email);
+        await playerController.updateWins(user.email);
       }
     }
   } else {
