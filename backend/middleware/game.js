@@ -6,6 +6,8 @@ const PlayerController = require('../controllers/PlayerController');
 const sids = new Map();
 const rooms = new Map();
 
+//A state of the map in a room
+const roomState = new Map();
 //Game functions needed
 const {
   assignTerritories,
@@ -79,10 +81,10 @@ async function startGame(emailToSocket, code) {
     sendToAllWithCode(emailToSocket, code, 'gameStarting', code);
     console.log(`Game starting in room with code ${code}`);
     //console.log(usersInfo)
-    const assginment = assignTerritories(usersInfo, data);
-    roomState.set(Number(code), assginment);
+    const state = assignTerritories(usersInfo, data);
+    roomState.set(Number(code), state);
     console.log(roomState.get(Number(code)));
-    sendToAllWithCode(emailToSocket, code, 'mapSent', assginment);
+    sendToAllWithCode(emailToSocket, code, 'mapSent', state);
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
@@ -123,11 +125,11 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     console.log(roomState);
 
     //Next phase for the user
-    const assginment = nextPhase(roomState.get(userCode));
-    console.log(assginment);
-    roomState.set(userCode, assginment);
+    const state = nextPhase(roomState.get(userCode));
+    console.log(state);
+    roomState.set(userCode, state);
     //socketEmit(socket, 'nextPhase', user.email);
-    //sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+    //sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'nextPhase', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -142,15 +144,15 @@ async function nextTurnHandler(socket, emailToSocket, user) {
     console.log(userCode);
 
     //Next stat for the user
-    const assginment = nextTurn(roomState.get(userCode));
-    roomState.set(userCode, assginment);
+    const state = nextTurn(roomState.get(userCode));
+    roomState.set(userCode, state);
 
-    console.log(assginment);
-    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
+    console.log(state);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
-    const playerIndex = roomState.get(userCode).players.findIndex((p) => p.email.trim() === user.email.trim());
+    const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     // Si llega a las 1000 monedas, desbloquea un logro
-    if(assginment.players[playerIndex].coins >= 1000) {
+    if(state.players[playerIndex].coins >= 1000) {
       const achievementTitle = 'Mileurista';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
@@ -170,13 +172,13 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
   //Check if the user is in the room
   if (room && room.code) {
     //Next phase for the user
-    const assginment = moveTroops(roomState.get(room.code), from, to, troops, user.email);
-    console.log(assginment);
-    roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
+    const state = moveTroops(roomState.get(room.code), from, to, troops, user.email);
+    console.log(state);
+    roomState.set(room.code, state);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
     
     //99 troops in a territory unlocks you an achievement
-    if (assginment.map[to].troops === 99) {
+    if (state.map[to].troops === 99) {
       const achievementTitle = 'La Armada Invencible';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
@@ -197,14 +199,15 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   if (room && room.code) {
     
     //Next phase for the user
-    const {assginment ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
-    console.log(assginment);
-    roomState.set(room.code, assginment);
-    sendToAllWithCode(emailToSocket, room.code, 'mapSent', assginment);
-    const playerIndex = roomState.get(room.code).players.findIndex((p) => p.email.trim() === user.email.trim());
+    const {state ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    console.log(state);
+    roomState.set(room.code, state);
+    sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
+
+    const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     let factories = 0;
-    for(let i=0;i<assginment.map.length;i++){
-      if(assginment.map[i].factories === 1 && assginment.map[i].player === playerIndex){
+    for(let i=0;i<state.map.length;i++){
+      if(state.map[i].factories === 1 && state.map[i].player === playerIndex){
         factories++;
       }
       if(factories === 15) {
@@ -297,15 +300,15 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     console.log("Codigo en buy actives");
     console.log(userCode);
     //Next phase for the user
-    const assginment = buyActives(roomState.get(userCode), user.email, type, territory, Number(numActives));
-    console.log(assginment);
-    roomState.set(userCode, assginment);
-    sendToAllWithCode(emailToSocket, userCode, 'mapSent', assginment);
-    const playerIndex = assginment.players.findIndex((p) => p.email.trim() === user.email.trim());
+    const state = buyActives(roomState.get(userCode), user.email, type, territory, Number(numActives));
+    console.log(state);
+    roomState.set(userCode, state);
+    sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
+    const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
 
     // If you buy your first factory, you unlock an achievement
     if(type === 'factory') {
-      if(assginment.map[territory].factories === 1) {
+      if(state.map[territory].factories === 1) {
         const achievementTitle = 'Industrializador';
         const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
         if(!achievementUnlocked){
@@ -314,8 +317,8 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
         }
       }
       let factories = 0;
-      for(let i=0;i<assginment.map.length;i++){
-        if(assginment.map[i].factories === 1 && assginment.map[i].player === playerIndex){
+      for(let i=0;i<state.map.length;i++){
+        if(state.map[i].factories === 1 && state.map[i].player === playerIndex){
           factories++;
         }
         if(factories === 15) {
@@ -331,7 +334,7 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     }
 
     //99 troops in a territory unlocks you an achievement
-    if (assginment.map[territory].troops === 99) {
+    if (state.map[territory].troops === 99) {
       const achievementTitle = 'La Armada Invencible';
       const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
       if (!achievementUnlocked) {
@@ -392,9 +395,9 @@ function getMap(socket, user) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
 
-    const assginment = roomState.get(userCode);
+    const state = roomState.get(userCode);
 
-    socketEmit(socket, 'mapSent', assginment);
+    socketEmit(socket, 'mapSent', state);
   }
 }
 
