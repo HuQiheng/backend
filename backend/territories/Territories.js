@@ -4,6 +4,7 @@ function assignTerritories(players, data) {
   const initialFactories = 0;
   const initialTroops = 3;
   const initialCoins = 0;
+  const initialPoints = 0;
   const state = {
     turn: 0,
     phase: 0,
@@ -12,6 +13,7 @@ function assignTerritories(players, data) {
       email: player.email,
       picture: player.picture,
       coins: initialCoins,
+      points: initialPoints,
     })),
     map: {},
   };
@@ -32,6 +34,7 @@ function assignTerritories(players, data) {
   for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
     let coins = countPlayerCoins(state, playerNumber);
     state.players[playerNumber].coins += coins;
+    state.players[playerNumber].points += coins;
   }
 
   return state;
@@ -169,6 +172,7 @@ function nextTurn(state) {
     state.turn = (state.turn + 1) % state.players.length;
     let coins = countPlayerCoins(state, state.turn);
     state.players[state.turn].coins += coins;
+    state.players[state.turn].points += coins;
     state.phase = 0;
   }
   return state;
@@ -239,6 +243,37 @@ function countPlayerCoins(state, playerNumber) {
   }
   return count;
 }
+
+// Function that makes the ranking
+function updateRanking(gameState) {
+  // Copy the players array from the gameState
+  const ranking = [...gameState.players];
+  
+  // Sort players array based on points in descending order
+  ranking.sort((a, b) => b.points - a.points);
+    
+  
+  /*const eliminatedPlayers = new Set();
+  for (let player of gameState.players) {
+    if (checkVictory(gameState, player.email)) {
+      ranking.unshift(player);
+    }
+  }
+  for (let player of gameState.players) {
+    if (!eliminatedPlayers.has(player.email)) {
+      if (player.email !== ranking[0]?.email) {
+        ranking.push(player);
+      }
+    }
+  }
+  for (let player of gameState.players) {
+    if (!ranking.some((p) => p.email === player.email)) {
+      ranking.push(player);
+    }
+  }*/
+  return ranking;
+}
+
 module.exports = {
   assignTerritories,
   moveTroops,
@@ -247,4 +282,5 @@ module.exports = {
   buyActives,
   attackTerritories,
   nextPhase,
+  updateRanking,
 };

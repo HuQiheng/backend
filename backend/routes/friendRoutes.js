@@ -3,7 +3,8 @@ const router = express.Router();
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
-const friendReqController = require('../controllers/Friend_requestController');
+const friendReqController = require('../controllers/FriendReqController');
+const AchievementController = require('../controllers/AchievementController');
 
 // Get the information of all the friends of a user
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
@@ -25,24 +26,37 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
 // Add a friend to the user's friend list
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
-  console.log('Friend to add: ' + req.body.friend);
+  console.log('Friend to add: ' + req.body.email);
+  const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
-      const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.friend);
+      const areAlreadyFriends = await friendsController.areFriends(req.params.email, friendEmail);
       if (areAlreadyFriends) {
         res.status(400).send('Users are already friends');
       } else {
         //We check if this user sent a friend request to the req.body.friend
-        const friendRequests = await friendReqController.selectFriends_Requests(req.params.email);
-        const isRequestPending = friendRequests.rows.some(request => request.email === req.body.friend);
-        if (isRequestPending) {
-          await friendReqController.removeFriend_Request(req.params.email, req.body.friend);
-          await friendsController.insertFriend(req.params.email, req.body.friend);
-
-          
-          res.json({ message: 'Friend added' });  
+        const friendReq = await friendReqController.selectFriendReq(req.params.email);
+        let isSent = false;
+        for (let i = 0; i < friendReq.rows.length; i++) {
+          if (friendReq.rows[i].email === friendEmail) {
+            isSent = true;
+          }
+        }
+        if (!isSent) {
+          res.status(400).send('Friend request not sent');
         } else {
-          res.status(400).send('No friend request found ');
+          await friendsController.insertFriend(req.params.email, friendEmail);
+          // Check achievement 
+          const achievementTitle = 'First Friend';
+          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, req.user.email);
+          if (!achievementUnlocked) {
+            await AchievementController.unlockAchievement(achievementTitle, req.user.email);
+          }
+          // sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle); 
+          // Cómo deberíamos notificarlo?
+
+          await friendReqController.removeFriendReq(req.params.email, friendEmail);
+          res.json({ message: 'Friend added' });
         }
       }
     } else {
@@ -58,7 +72,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
 // Delete a friend from the user's friend list
 router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
-  console.log('Friend to delete: ' + req.body.friend);
+  console.log('Friend to delete: ' + req.body.email);
   try {
     if (req.user.email === req.params.email) {
       await friendsController.removeFriend(req.params.email, req.body.email);

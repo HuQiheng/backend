@@ -3,7 +3,7 @@ const router = express.Router();
 require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
-const friends_reqController = require('../controllers/Friend_requestController');
+const friendsReqController = require('../controllers/FriendReqController');
 
 // Get the information of all the peding requests to the user
 router.get('/:email/friendsRequests', checkAuthenticated, async (req, res) => {
@@ -11,7 +11,7 @@ router.get('/:email/friendsRequests', checkAuthenticated, async (req, res) => {
       console.log("Solicitado " + req.params.email);
       console.log("Pedido con " + req.user.email);
       if (req.user.email === req.params.email) {
-        const userInfo = await friends_reqController.selectFriends_Requests(req.params.email);
+        const userInfo = await friendsReqController.selectFriendReq(req.params.email);
         res.send(userInfo.rows);
       } else {
         res.status(403).send('Access denied');
@@ -28,7 +28,7 @@ router.get('/:email/myFriendsRequests', checkAuthenticated, async (req, res) => 
       console.log("Solicitado " + req.params.email);
       console.log("Pedido con " + req.user.email);
       if (req.user.email === req.params.email) {
-        const userInfo = await friends_reqController.selectFriends_Requests_Made(req.params.email);
+        const userInfo = await friendsReqController.selectFriendReqMade(req.params.email);
         res.send(userInfo.rows);
       } else {
         res.status(403).send('Access denied');
@@ -49,7 +49,7 @@ router.put('/:email/friendRequests', checkAuthenticated, async (req, res) => {
         if (areAlreadyFriends) {
             res.status(400).send('Users are already friends');
         } else {
-            await friends_reqController.insertFriend_Request(req.params.email, req.body.to);
+            await friendsReqController.insertFriendReq(req.params.email, req.body.to);
             res.json({ message: 'Friend request sent' });
         }
     } catch (error) {
@@ -64,7 +64,7 @@ router.delete('/:email/friendRequests', checkAuthenticated, async (req, res) => 
     console.log('Friend to delete: ' + req.body.to);
     try {
       if (req.user.email === req.params.email) {
-        await friends_reqController.removeFriend_Request(req.params.email, req.body.to);
+        await friendsReqController.removeFriendReq(req.params.email, req.body.to);
         res.json({ message: 'Request deleted' });
       } else {
         res.status(403).send('Access denied');
@@ -73,6 +73,22 @@ router.delete('/:email/friendRequests', checkAuthenticated, async (req, res) => 
       console.error('Error deleting friend', error);
       res.status(500).send('Internal Server Error: ' + error.message);
     }
+});
+
+router.get('/:email1/:email2/friendRequest/existence', checkAuthenticated, async (req, res) => {
+  try {
+    if (req.user.email === req.params.email1 || req.user.email === req.params.email2){
+      const user1 = req.params.email1;
+      const user2 = req.params.email2;
+      const hasFriendReq = await friendsReqController.friendRequestExist(user1, user2);
+      res.json({ hasFriendReq: hasFriendReq });
+    } else {
+      res.status(403).send('Access denied');
+    }
+  } catch (error) {
+    console.error('Error checking friendship status', error);
+    res.status(500).send('Internal Server Error: ' + error.message);
+  }
 });
 
 module.exports = router;

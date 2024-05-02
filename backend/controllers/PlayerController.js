@@ -2,8 +2,8 @@ const db = require('../db/index.js');
 
 const insertPlayer = async (email, username, password, picture) => {
   try {
-    const query = `INSERT INTO Player (email, username, password, picture) VALUES ($1, $2, $3, $4)`;
-    const values = [email, username, password, picture];
+    const query = `INSERT INTO Player (email, username, password, picture, victories) VALUES ($1, $2, $3, $4, $5)`;
+    const values = [email, username, password, picture, 0];
     const result = await db.query(query, values);
     return result;
   } catch (error) {
@@ -74,6 +74,26 @@ const verificarCredenciales = async (email, password) => {
   }
 };
 
+const getWins = async (email) => {
+  try {
+    const query = `SELECT victories FROM Player WHERE email = $1`;
+    const result = await db.query(query, [email]);
+    return result.rows[0].victories;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateWins = async (email) => {
+  try {
+    const query = `UPDATE Player SET victories = victories + 1 WHERE email = $1`;
+    const result = await db.query(query, [email]);
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   insertPlayer,
   updatePlayer,
@@ -82,4 +102,6 @@ module.exports = {
   selectAllPlayers,
   verificarCredenciales,
   selectPlayerByname,
+  getWins,
+  updateWins,
 };
