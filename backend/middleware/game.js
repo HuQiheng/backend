@@ -239,23 +239,22 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       if (!firstVictoryUnlocked) {
         await AchievementController.insert(achievementTitle, user.email);
         sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      } else {
-        const numWins = await playerController.getWins(user.email);
-        if (numWins === 10) {
-          const achievementTitle = 'Comandante experimentado';
-          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-          if (!achievementUnlocked) {
-            await AchievementController.insert(achievementTitle, user.email);
-            sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-          }
+      } 
+      const numWins = await playerController.getWins(user.email);
+      if (numWins === 10) {
+        const achievementTitle = 'Comandante experimentado';
+        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+        if (!achievementUnlocked) {
+          await AchievementController.insert(achievementTitle, user.email);
+          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
         }
-        if (numWins === 100) {
-          const achievementTitle = 'Comandante veterano';
-          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-          if (!achievementUnlocked) {
-            await AchievementController.insert(achievementTitle, user.email);
-            sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-          }
+      }
+      else if (numWins === 100) {
+        const achievementTitle = 'Comandante veterano';
+        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+        if (!achievementUnlocked) {
+          await AchievementController.insert(achievementTitle, user.email);
+          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
         }
       }
     }
@@ -366,23 +365,22 @@ async function victoryHandler(emailToSocket, user) {
     if (!achievementUnlocked) {
       await AchievementController.insert(achievementTitle, user.email);
       sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-    } else {
-      const numWins = await AchievementController.getWins(user.email);
-      if (numWins === 10) {
-        const achievementTitle = 'Comandante experimentado';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+    }
+    const numWins = await playerController.getWins(user.email);
+    if (numWins === 10) {
+      const achievementTitle = 'Comandante experimentado';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+      if (!achievementUnlocked) {
+        await AchievementController.insert(achievementTitle, user.email);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
-      if (numWins === 100) {
-        const achievementTitle = 'Comandante veterano';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+    }
+    else if (numWins === 100) {
+      const achievementTitle = 'Comandante veterano';
+      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+      if (!achievementUnlocked) {
+        await AchievementController.insert(achievementTitle, user.email);
+        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
       }
     } 
   } else {
