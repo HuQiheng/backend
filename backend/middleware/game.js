@@ -19,9 +19,6 @@ const {
 } = require('../territories/Territories');
 const data = require('../territories/territories.json');
 
-// Number of victories for each player
-const victories = new Map();
-
 // Creates a room and returns a unique code to join it
 function createRoom(socket, user) {
   //We create a new room
