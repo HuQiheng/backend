@@ -1,5 +1,6 @@
-const ObtainsController = require('../controllers/ObtainsController')
+const ObtainsController = require('../controllers/ObtainsController');
 const PlayerController = require('../controllers/PlayerController');
+
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
 //that are in that room
@@ -357,7 +358,7 @@ function invite(socket, emailToSocket, user, friendEmail) {
     const userInfo = {email: user.email, name: user.name, picture: user.picture}
     console.log(user);
     console.log(userInfo);
-    sendingThroughEmail(emailToSocket, friendEmail, 'invitationRecevied', {userCode, userInfo});
+    sendingThroughEmail(emailToSocket, friendEmail, 'invitationReceived', {userCode, userInfo});
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
@@ -450,4 +451,5 @@ module.exports = {
   getMap,
   chat,
   invite,
+  giveAchievement,
 };
