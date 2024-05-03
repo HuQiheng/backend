@@ -1,4 +1,4 @@
-const AchievementController = require('../controllers/ObtainsController')
+const ObtainsController = require('../controllers/ObtainsController')
 const PlayerController = require('../controllers/PlayerController');
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
@@ -304,7 +304,7 @@ async function victoryHandler(emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
 
     // Update wins and achievements
-    await AchievementController.updateWins(user.email);
+    await ObtainsController.updateWins(user.email);
     const numWins = await playerController.getWins(user.email);
     if (numWins === 1) {
       await giveAchievement('Comandante principiante', user.email);
@@ -423,9 +423,9 @@ async function getUsersInfo(usersWithCode) {
 // Function for search if the user have the achievement
 async function giveAchievement(achievementTitle, email) {
   try {
-    const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
+    const achievementUnlocked = await ObtainsController.hasAchievement(achievementTitle, user.email);
     if (!achievementUnlocked) {
-      await AchievementController.insert(achievementTitle, user.email);
+      await ObtainsController.insert(achievementTitle, user.email);
       sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
     }
   } catch (error) {
