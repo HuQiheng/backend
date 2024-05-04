@@ -33,7 +33,9 @@ function assignTerritories(players, data) {
 
   for (let playerNumber = 0; playerNumber < state.players.length; playerNumber++) {
     let coins = countPlayerCoins(state, playerNumber);
-    state.players[playerNumber].coins += coins;
+    if (playerNumber === 0) {
+      state.players[playerNumber].coins += coins;
+    }
     state.players[playerNumber].points += coins;
   }
 
