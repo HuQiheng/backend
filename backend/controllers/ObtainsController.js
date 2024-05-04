@@ -57,6 +57,9 @@ const hasAchievement = async (achievements_title, players_email) => {
   
 }
 
+const updateWins = async (email) => {
+  
+}
 module.exports = {
   insert,
   selectAll,

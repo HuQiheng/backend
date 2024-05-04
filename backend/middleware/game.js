@@ -89,6 +89,7 @@ async function startGame(emailToSocket, code) {
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
+      console.log("Usario al que darle el logro " + user.email);
       await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
   } else {
