@@ -28,6 +28,7 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
   console.log('Friend to add: ' + req.body.email);
+  console.log('Requested from: ' + req.user.email);
   const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
@@ -48,14 +49,15 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         } else {
           await friendsController.insertFriend(req.params.email, friendEmail);
           // Check achievement 
-          await giveAchievement('First Friend', user.email);
+          await giveAchievement(null,'Tu primer compañero', req.params.email);
+          await giveAchievement(null,'Tu primer compañero', req.body.email);
 
           await friendReqController.removeFriendReq(req.params.email, friendEmail);
           res.json({ message: 'Friend added' });
         }
       }
     } else {
-      res.status(403).send('Access denied');
+      res.status(403).send({message:'Access denied'});
     }
   } catch (error) {
     console.error('Error adding friend', error);
