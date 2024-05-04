@@ -208,8 +208,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     if (win) {
       //User won send event to all
       victoryHandler(emailToSocket, winner);
-      await playerController.updateWins(user.email);
-      const numWins = await playerController.getWins(user.email);
+      await PlayerController.updateWins(user.email);
+      const numWins = await PlayerController.getWins(user.email);
       // Check the achievements
       if (numWins === 1) {
         await giveAchievement(emailToSocket,'Comandante principiante', user.email);
@@ -306,8 +306,8 @@ async function victoryHandler(emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
 
     // Update wins and achievements
-    await ObtainsController.updateWins(user.email);
-    const numWins = await playerController.getWins(user.email);
+    await PlayerController.updateWins(user.email);
+    const numWins = await PlayerController.getWins(user.email);
     if (numWins === 1) {
       await giveAchievement(emailToSocket,'Comandante principiante', user.email);
     }

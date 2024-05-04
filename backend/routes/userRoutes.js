@@ -16,7 +16,7 @@ router.get('/:email', checkAuthenticated, async (req, res) => {
     }
   } catch (error) {
     console.error('Error getting user info', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send({ message: 'Internal Server Error' });
   }
 });
 
@@ -32,7 +32,7 @@ router.put('/:email', checkAuthenticated, async (req, res) => {
     }
   } catch (error) {
     console.error('Error updating user info', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send({ message: 'Internal Server Error' });
   }
 });
 
@@ -45,7 +45,7 @@ router.delete('/:email', checkAuthenticated, async (req, res) => {
     }
   } catch (error) {
     console.error('Error deleting user', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send({ message: 'Internal Server Error' });
   }
 });
 

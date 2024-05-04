@@ -16,11 +16,11 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
       const userInfo = await friendsController.selectFriends(req.params.email);
       res.send(userInfo.rows);
     } else {
-      res.status(403).send('Access denied');
+      res.status(403).send({ message: 'Access denied' });
     }
   } catch (error) {
     console.error('Error getting friends information', error);
-    res.status(500).send('Internal Server Error: ' + error.message);
+    res.status(500).send({ message: 'Internal Server Error: ' + error.message });
   }
 });
 
@@ -34,7 +34,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
     if (req.user.email === req.params.email) {
       const areAlreadyFriends = await friendsController.areFriends(req.params.email, friendEmail);
       if (areAlreadyFriends) {
-        res.status(400).send('Users are already friends');
+        res.status(400).send({ message: 'Users are already friends' });
       } else {
         //We check if this user sent a friend request to the req.body.friend
         const friendReq = await friendReqController.selectFriendReq(req.params.email);
@@ -45,7 +45,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
           }
         }
         if (!isSent) {
-          res.status(400).send('Friend request not sent');
+          res.status(400).send({ message: 'Friend request not sent' });
         } else {
           await friendsController.insertFriend(req.params.email, friendEmail);
           // Check achievement 
@@ -57,11 +57,11 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         }
       }
     } else {
-      res.status(403).send({message:'Access denied'});
+      res.status(403).send({ message:'Access denied' });
     }
   } catch (error) {
     console.error('Error adding friend', error);
-    res.status(500).send('Internal Server Error: ' + error.message);
+    res.status(500).send({ message: 'Internal Server Error: ' + error.message });
   }
 });
 
@@ -75,11 +75,11 @@ router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
       await friendsController.removeFriend(req.params.email, req.body.email);
       res.json({ message: 'Friend deleted' });
     } else {
-      res.status(403).send('Access denied');
+      res.status(403).send({ message: 'Access denied' });
     }
   } catch (error) {
     console.error('Error deleting friend', error);
-    res.status(500).send('Internal Server Error: ' + error.message);
+    res.status(500).send({ message: 'Internal Server Error: ' + error.message });
   }
 });
 
@@ -91,11 +91,11 @@ router.get('/:email1/:email2/friendship', checkAuthenticated, async (req, res) =
       const areFriends = await friendsController.areFriends(user1, user2);
       res.json({ areFriends: areFriends });
     } else {
-      res.status(403).send('Access denied');
+      res.status(403).send({ message: 'Access denied' });
     }
   } catch (error) {
     console.error('Error checking friendship status', error);
-    res.status(500).send('Internal Server Error: ' + error.message);
+    res.status(500).send({ message: 'Internal Server Error: ' + error.message });
   }
 });
 
