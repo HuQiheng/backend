@@ -241,25 +241,6 @@ function updateRanking(gameState) {
   // Sort players array based on points in descending order
   ranking.sort((a, b) => b.points - a.points);
     
-  
-  /*const eliminatedPlayers = new Set();
-  for (let player of gameState.players) {
-    if (checkVictory(gameState, player.email)) {
-      ranking.unshift(player);
-    }
-  }
-  for (let player of gameState.players) {
-    if (!eliminatedPlayers.has(player.email)) {
-      if (player.email !== ranking[0]?.email) {
-        ranking.push(player);
-      }
-    }
-  }
-  for (let player of gameState.players) {
-    if (!ranking.some((p) => p.email === player.email)) {
-      ranking.push(player);
-    }
-  }*/
   return ranking;
 }
 
