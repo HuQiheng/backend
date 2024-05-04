@@ -4,7 +4,8 @@ require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
 const friendReqController = require('../controllers/FriendReqController');
-const AchievementController = require('../controllers/AchievementController');
+const ObtainsController = require('../controllers/ObtainsController');
+const { giveAchievement } = require('../middleware/game')
 
 // Get the information of all the friends of a user
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
@@ -27,6 +28,7 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   console.log('Requested email ' + req.params.email);
   console.log('Friend to add: ' + req.body.email);
+  console.log('Requested from: ' + req.user.email);
   const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
@@ -47,20 +49,15 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         } else {
           await friendsController.insertFriend(req.params.email, friendEmail);
           // Check achievement 
-          const achievementTitle = 'First Friend';
-          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, req.user.email);
-          if (!achievementUnlocked) {
-            await AchievementController.unlockAchievement(achievementTitle, req.user.email);
-          }
-          // sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle); 
-          // Cómo deberíamos notificarlo?
+          await giveAchievement(null,'Tu primer compañero', req.params.email);
+          await giveAchievement(null,'Tu primer compañero', req.body.email);
 
           await friendReqController.removeFriendReq(req.params.email, friendEmail);
           res.json({ message: 'Friend added' });
         }
       }
     } else {
-      res.status(403).send('Access denied');
+      res.status(403).send({message:'Access denied'});
     }
   } catch (error) {
     console.error('Error adding friend', error);

@@ -46,6 +46,7 @@ router.put('/:email/friendRequests', checkAuthenticated, async (req, res) => {
     try {
     
         const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.to);
+        console.log(areAlreadyFriends);
         if (areAlreadyFriends) {
             res.status(400).send('Users are already friends');
         } else {

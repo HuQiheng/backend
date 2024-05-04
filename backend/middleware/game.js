@@ -1,5 +1,6 @@
-const AchievementController = require('../controllers/ObtainsController')
+const ObtainsController = require('../controllers/ObtainsController');
 const PlayerController = require('../controllers/PlayerController');
+
 // Game.js
 // Sets rooms set has all the rooms created, sids has in every room the users
 //that are in that room
@@ -88,12 +89,7 @@ async function startGame(emailToSocket, code) {
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
-      const achievementTitle = 'Bienvenido a WealthWars';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email)
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
   } else {
     console.log(`No players in room with code ${code}`);
@@ -153,14 +149,9 @@ async function nextTurnHandler(socket, emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
-    // Si llega a las 1000 monedas, desbloquea un logro
+    // If reach 1000 coins, unlock an achievement
     if(state.players[playerIndex].coins >= 1000) {
-      const achievementTitle = 'Mileurista';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'Mileurista', user.email)
     }
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -181,12 +172,7 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
     
     //99 troops in a territory unlocks you an achievement
     if (state.map[to].troops === 99) {
-      const achievementTitle = 'La Armada Invencible';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'La Armada Invencible', user.email);
     }
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
@@ -213,51 +199,27 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
         factories++;
       }
       if(factories === 15) {
-        const achievementTitle = 'Revolución industrial';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+        await giveAchievement(emailToSocket,'Revolución industrial', user.email);
         break;
       }
     }
     if (conquered) {
-      const achievementTitle = 'Conquistador';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'Conquistador', user.email);
     }
     if (win) {
       //User won send event to all
       victoryHandler(emailToSocket, winner);
       await playerController.updateWins(user.email);
-
-      //See if user unlocked Comandante principiante achievement
-      const achievementTitle = 'Comandante principiante';
-      const firstVictoryUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!firstVictoryUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      } 
       const numWins = await playerController.getWins(user.email);
-      if (numWins === 10) {
-        const achievementTitle = 'Comandante experimentado';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+      // Check the achievements
+      if (numWins === 1) {
+        await giveAchievement(emailToSocket,'Comandante principiante', user.email);
+      }
+      else if (numWins === 10) {
+        await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
       }
       else if (numWins === 100) {
-        const achievementTitle = 'Comandante veterano';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if (!achievementUnlocked) {
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+        await giveAchievement(emailToSocket,'Comandante veterano', user.email);
       }
     }
   } else {
@@ -311,12 +273,7 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     // If you buy your first factory, you unlock an achievement
     if(type === 'factory') {
       if(state.map[territory].factories === 1) {
-        const achievementTitle = 'Industrializador';
-        const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-        if(!achievementUnlocked){
-          await AchievementController.insert(achievementTitle, user.email);
-          sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-        }
+        await giveAchievement(emailToSocket,'Industrializador', user.email);
       }
       let factories = 0;
       for(let i=0;i<state.map.length;i++){
@@ -324,25 +281,15 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
           factories++;
         }
         if(factories === 15) {
-          const achievementTitle = 'Revolución industrial';
-          const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-          if (!achievementUnlocked) {
-            await AchievementController.insert(achievementTitle, user.email);
-            sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-          }
+          await giveAchievement(emailToSocket,'Revolución industrial', user.email);
           break;
         }
       }
     }
 
     //99 troops in a territory unlocks you an achievement
-    if (state.map[territory].troops === 99) {
-      const achievementTitle = 'La Armada Invencible';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+    if (state.map[territory].troops === 99 && state.map[territory].player == playerIndex) {
+      await giveAchievement(emailToSocket,'La Armada Invencible', user.email);
     }
   } else {
     console.log(`You are not in a room ` + user.email);
@@ -359,31 +306,17 @@ async function victoryHandler(emailToSocket, user) {
     // Emit game over to all the rest of users
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
 
-    // Añadir game a la base de datos
-    await AchievementController.updateWins(user.email);
-
-    const achievementTitle = 'Comandante principiante';
-    const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-    if (!achievementUnlocked) {
-      await AchievementController.insert(achievementTitle, user.email);
-      sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-    }
+    // Update wins and achievements
+    await ObtainsController.updateWins(user.email);
     const numWins = await playerController.getWins(user.email);
+    if (numWins === 1) {
+      await giveAchievement(emailToSocket,'Comandante principiante', user.email);
+    }
     if (numWins === 10) {
-      const achievementTitle = 'Comandante experimentado';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
     }
     else if (numWins === 100) {
-      const achievementTitle = 'Comandante veterano';
-      const achievementUnlocked = await AchievementController.hasAchievement(achievementTitle, user.email);
-      if (!achievementUnlocked) {
-        await AchievementController.insert(achievementTitle, user.email);
-        sendingThroughEmail(emailToSocket, user.email, 'achievementUnlocked', achievementTitle);
-      }
+      await giveAchievement(emailToSocket,'Comandante veterano', user.email);
     } 
   } else {
     console.log(`You are not in a room ` + user.email);
@@ -427,7 +360,7 @@ function invite(socket, emailToSocket, user, friendEmail) {
     const userInfo = {email: user.email, name: user.name, picture: user.picture}
     console.log(user);
     console.log(userInfo);
-    sendingThroughEmail(emailToSocket, friendEmail, 'invitationRecevied', {userCode, userInfo});
+    sendingThroughEmail(emailToSocket, friendEmail, 'invitationReceived', {userCode, userInfo});
   } else {
     console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
@@ -490,7 +423,20 @@ async function getUsersInfo(usersWithCode) {
   }
 }
 
-
+// Function for search if the user have the achievement
+async function giveAchievement(emailToSocket, achievementTitle, email) {
+  try {
+    const achievementUnlocked = await ObtainsController.hasAchievement(achievementTitle, email);
+    if (!achievementUnlocked) {
+      await ObtainsController.insert(achievementTitle,email);
+      if(emailToSocket){
+        sendingThroughEmail(emailToSocket, email, 'achievementUnlocked', achievementTitle);
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+}
 
 
 module.exports = {
@@ -509,4 +455,5 @@ module.exports = {
   getMap,
   chat,
   invite,
+  giveAchievement,
 };
