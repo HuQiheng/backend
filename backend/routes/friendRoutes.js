@@ -36,17 +36,19 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
       if (areAlreadyFriends) {
         res.status(400).send({ message: 'Users are already friends' });
       } else {
-        //We check if this user sent a friend request to the req.body.friend
+        // Verificamos si este usuario ha enviado una solicitud de amistad a req.body.friend
         const friendReq = await friendReqController.selectFriendReq(req.params.email);
         let isSent = false;
         for (let i = 0; i < friendReq.rows.length; i++) {
           if (friendReq.rows[i].email === friendEmail) {
             isSent = true;
+            break;
           }
         }
         if (!isSent) {
           res.status(400).send({ message: 'Friend request not sent' });
         } else {
+          // We add the logic to insert a friend
           await friendsController.insertFriend(req.params.email, friendEmail);
           // Check achievement 
           await giveAchievement(null,'Tu primer compañero', req.params.email);
@@ -64,6 +66,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
     res.status(500).send({ message: 'Internal Server Error: ' + error.message });
   }
 });
+
 
 
 // Delete a friend from the user's friend list

@@ -41,22 +41,24 @@ router.get('/:email/myFriendsRequests', checkAuthenticated, async (req, res) => 
 
 // Add a friend to the user's pending list
 router.put('/:email/friendRequests', checkAuthenticated, async (req, res) => {
-    console.log('Requested email ' + req.params.email);
-    console.log('Friend to add: ' + req.body.to);
-    try {
-    
-        const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.to);
-        console.log(areAlreadyFriends);
-        if (areAlreadyFriends) {
-            res.status(400).send({ message: 'Users are already friends' });
-        } else {
-            await friendsReqController.insertFriendReq(req.params.email, req.body.to);
-            res.json({ message: 'Friend request sent' });
-        }
-    } catch (error) {
+  console.log('Requested email ' + req.params.email);
+  console.log('Friend to add: ' + req.body.to);
+  try {
+      const areAlreadyFriends = await friendsController.areFriends(req.params.email, req.body.to);
+      const isRequestAlreadySent = await friendsReqController.friendRequestExist(req.body.to, req.params.email);
+
+      if (areAlreadyFriends) {
+          res.status(400).send({ message: 'Users are already friends' });
+      } else if (isRequestAlreadySent) {
+          res.status(400).send({ message: 'Friend request already sent' });
+      } else {
+          await friendsReqController.insertFriendReq(req.params.email, req.body.to);
+          res.json({ message: 'Friend request sent' });
+      }
+  } catch (error) {
       console.error('Error adding friend', error);
       res.status(500).send({ message: 'Internal Server Error: ' + error.message });
-    }
+  }
 });
 
 // Delete a friend request  made or received
