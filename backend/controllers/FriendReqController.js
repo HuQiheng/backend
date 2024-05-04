@@ -38,7 +38,7 @@ const removeFriendReq = async (player_from, player_to) => {
 //Selects friends requests pending to be confirmed by us
 const selectFriendReq = async (player_email) => {
     try {
-      const query = `SELECT P.email, P.username, P.picture
+      const query = `SELECT P.email, P.username as name, P.picture
                       FROM Friend_request F
                       JOIN Player P ON F.Player_from = P.email
                       WHERE F.Player_to = $1;`;
@@ -54,7 +54,7 @@ const selectFriendReq = async (player_email) => {
 //Select friends request to be confirmed by the other
 const selectFriendReqMade = async (player_email) => {
     try {
-      const query = `SELECT P.email, P.username, P.picture
+      const query = `SELECT P.email, P.username as name, P.picture
                       FROM Friend_request F
                       JOIN Player P ON F.Player_to = P.email
                       WHERE F.Player_from = $1;`;

@@ -22,6 +22,17 @@ const updatePlayer = async (email, username, password, picture) => {
   }
 };
 
+const updatePlayerPicture = async (email, picture) => {
+  try {
+    const query = `UPDATE Player SET picture = $2 WHERE email = $1 RETURNING *`;
+    const values = [email, picture];
+    const result = await db.query(query, values);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 const deletePlayer = async (email) => {
   try {
     const query = `DELETE FROM Player WHERE email = $1`;
@@ -104,4 +115,5 @@ module.exports = {
   selectPlayerByname,
   getWins,
   updateWins,
+  updatePlayerPicture
 };

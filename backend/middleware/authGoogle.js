@@ -32,7 +32,7 @@ passport.use(
           //create user
           await Player.insertPlayer(email, account.name, account.sub, account.picture);
         }
-        await Player.updatePlayer(email, account.name, account.sub, account.picture);
+        await Player.updatePlayerPicture(email, account.picture);
         console.log('Retunred user ' + JSON.stringify(user));
         //If the user exists no action is needed just return the user
         done(null, user);
