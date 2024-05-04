@@ -4,6 +4,7 @@ require('dotenv').config();
 const checkAuthenticated = require('../middleware/authGoogle');
 const playerController = require('../controllers/PlayerController');
 const friendController = require('../controllers/FriendController');
+const obtainsController = require('../controllers/ObtainsController');
 
 //Method that gets the users info
 router.get('/:email', checkAuthenticated, async (req, res) => {
@@ -45,6 +46,21 @@ router.delete('/:email', checkAuthenticated, async (req, res) => {
     }
   } catch (error) {
     console.error('Error deleting user', error);
+    res.status(500).send({ message: 'Internal Server Error' });
+  }
+});
+
+//Method that gets the users achievements
+router.get('/:email/achievements', checkAuthenticated, async (req, res) => {
+  try {
+    console.log('Email pedido ' + req.params.email);
+    console.log('Especificado ' + req.user.email);
+    if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
+      const userAchievements = await obtainsController.achievementsOfUser(req.params.email);
+      res.send(userAchievements.rows);
+    }
+  } catch (error) {
+    console.error('Error getting user achievements', error);
     res.status(500).send({ message: 'Internal Server Error' });
   }
 });
