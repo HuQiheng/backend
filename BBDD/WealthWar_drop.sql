@@ -1,23 +1,22 @@
--- Drop trigger
-DROP TRIGGER friend_request_trigger;
 
--- Drop function
-DROP FUNCTION check_friend_request;
+-- Drop friend request table
+DROP TABLE Friend_request CASCADE;
+
 -- Drop Friend table
-DROP TABLE Friend;
+DROP TABLE Friend CASCADE;
 
 -- Drop Compound table
-DROP TABLE Compound;
+DROP TABLE Compound CASCADE;
 
 -- Drop Obtains table
-DROP TABLE Obtains;
+DROP TABLE Obtains CASCADE;
 
 
 -- Drop Achievement table
-DROP TABLE Achievement;
+DROP TABLE Achievement CASCADE;
 
 -- Drop Game table
-DROP TABLE Game;
+DROP TABLE Game CASCADE;
 
 -- Drop Player table
-DROP TABLE Player;
+DROP TABLE Player CASCADE;

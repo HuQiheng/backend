@@ -36,7 +36,7 @@ const removeById = async (Achievements_title, Players_email) => {
 //All the achievements of a user
 const achievementsOfUser = async (player_email) => {
   try {
-    const query = `SELECT * FROM Obtains WHERE players_email = $1`;
+    const query = `SELECT achievements_title as achievement FROM Obtains WHERE players_email = $1`;
     const result = await db.query(query, [player_email]);
     return result;
   } catch (error) {
@@ -54,7 +54,6 @@ const hasAchievement = async (achievements_title, players_email) => {
   } catch (error){
     throw error;
   }
-  
 }
 
 module.exports = {

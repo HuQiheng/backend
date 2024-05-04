@@ -89,6 +89,7 @@ async function startGame(emailToSocket, code) {
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
+      console.log("Usario al que darle el logro " + user.email);
       await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
   } else {
@@ -192,6 +193,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     roomState.set(room.code, state);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
 
+    const ataqueString = "Jugador " + user.email + " atacó desde " + from + " a " + to + "con: " + troops;  
+    sendToAllWithCode(emailToSocket, room.code, 'attack', ataqueString)
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     let factories = 0;
     for(let i=0;i<state.map.length;i++){
@@ -209,8 +212,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     if (win) {
       //User won send event to all
       victoryHandler(emailToSocket, winner);
-      await playerController.updateWins(user.email);
-      const numWins = await playerController.getWins(user.email);
+      await PlayerController.updateWins(user.email);
+      const numWins = await PlayerController.getWins(user.email);
       // Check the achievements
       if (numWins === 1) {
         await giveAchievement(emailToSocket,'Comandante principiante', user.email);
@@ -307,8 +310,8 @@ async function victoryHandler(emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
 
     // Update wins and achievements
-    await ObtainsController.updateWins(user.email);
-    const numWins = await playerController.getWins(user.email);
+    await PlayerController.updateWins(user.email);
+    const numWins = await PlayerController.getWins(user.email);
     if (numWins === 1) {
       await giveAchievement(emailToSocket,'Comandante principiante', user.email);
     }

@@ -3,6 +3,7 @@ const express = require('express');
 const router = require('../../routes/userRoutes');
 const playerController = require('../../controllers/PlayerController');
 const friendController = require('../../controllers/FriendController');
+const obtainsController = require('../../controllers/ObtainsController'); 
 const { pool } = require('../../db/index');
 
 const app = express();
@@ -30,12 +31,14 @@ describe('Player Routes', () => {
     // Inserts a test player before each test
     testPlayer = await playerController.insertPlayer('test@example.com', 'test', 'password', 'testPicture');
     testFriend = await friendController.insertFriend('friend@example.com', 'test@example.com');
+    testAchievement = await obtainsController.insert('TestAchievement', 'test@example.com');
   });
 
   afterEach(async () => {
     // Deletes the test player after each test
     await playerController.deletePlayer('test@example.com');
     await friendController.removeFriend('test@example.com', 'friend@example.com');
+    await obtainsController.removeById('TestAchievement', 'test@example.com');
   });
 
   it('should get user info', async () => {
@@ -64,5 +67,14 @@ describe('Player Routes', () => {
     const res = await request(app).get('/test/get/friend@example.com').send();
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('email');
+  });
+
+  it('should get user achievements', async () => {
+    const res = await request(app).get('/test/get/test@example.com/achievements').send();
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toHaveProperty('Achievements_title');
+    expect(res.body[0]).toHaveProperty('Players_email');
+    expect(res.body[0].Players_email).toEqual('test@example.com');
   });
 });
