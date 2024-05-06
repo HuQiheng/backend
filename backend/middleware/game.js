@@ -1,6 +1,7 @@
 /**This module manage all the game logic */
 const ObtainsController = require('../controllers/ObtainsController');
 const PlayerController = require('../controllers/PlayerController');
+const AchievementController = require('../controllers/AchievementController')
 
 
 // Sets:
@@ -492,8 +493,9 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
     const achievementUnlocked = await ObtainsController.hasAchievement(achievementTitle, email);
     if (!achievementUnlocked) {
       await ObtainsController.insert(achievementTitle,email);
+      const achievement = await AchievementController.selectAchievement(achievementTitle);
       if(emailToSocket){
-        sendingThroughEmail(emailToSocket, email, 'achievementUnlocked', achievementTitle);
+        sendingThroughEmail(emailToSocket, email, 'achievementUnlocked', achievement);
       }
     }
   } catch (error) {
