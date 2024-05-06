@@ -5,12 +5,9 @@ require('dotenv').config();
 
 /**
  * @description This function handles Google authentication using Passport.js. 
- * It requests the user's profile and email as scope.
  * @param {string} title The title of the route.
  * @param {string} description The description of the route.
  * @returns {Object} The result of running the Google authentication query. 
- * If authentication is successful, a user object is returned. 
- * In case of an error, an error object is returned.
  */
 router.get(
   '/google',
@@ -22,13 +19,9 @@ router.get(
 
 /**
  * @description This function handles the Google authentication callback using Passport.js.
- * It checks the user-agent of the request to determine if the client is a mobile device or a web browser.
- * Depending on the client type and the environment (development or production), it redirects to the appropriate URL with the user data.
  * @param {string} title The title of the route.
  * @param {string} description The description of the route.
  * @returns {Object} The result of running the Google authentication callback. 
- * If authentication is successful, a redirection response is returned with the user data in the query string. 
- * In case of an error, a redirection to the Google authentication page is returned.
  */
 router.get(
   '/google/callback',
