@@ -325,6 +325,7 @@ async function victoryHandler(emailToSocket, user) {
 }
 
 //Given a user it sends the map to the user of the party that he is in
+//if there is no map it doesnt send anything
 function getMap(socket, user) {
   //Check if the user is in the room
   if(sids.has(user.email)) {
@@ -332,8 +333,10 @@ function getMap(socket, user) {
     console.log(userCode);
 
     const state = roomState.get(userCode);
-
-    socketEmit(socket, 'mapSent', state);
+    if(state){
+      socketEmit(socket, 'mapSent', state);
+    }
+    
   }
 }
 
@@ -368,6 +371,42 @@ function invite(socket, emailToSocket, user, friendEmail) {
   }
 }
 
+async function reconectionHandler(socket, user){
+//Take users in the game
+//Take the state of the map
+//Reconect the user
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    let players = getUsersWithCode(userCode);
+    let usersInfo = await getUsersInfo(players);
+    console.log("Se ha recuperado la informacion");
+    socketEmit(socket, 'usersInfo', usersInfo);
+
+    console.log("Se ha recuperado el mapa");
+    getMap(socket, user);
+  }
+}
+module.exports = {
+  createRoom,
+  joinRoom,
+  leaveRoom,
+  startGame,
+  rooms,
+  nextPhaseHandler,
+  nextTurnHandler,
+  moveTroopsHandler,
+  attackTerritoriesHandler,
+  surrenderHandler,
+  buyActivesHandler,
+  victoryHandler,
+  getMap,
+  chat,
+  invite,
+  giveAchievement,
+  reconectionHandler,
+};
+
+//---------------------------------Private functions---------------------------------
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
@@ -440,21 +479,3 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
 }
 
 
-module.exports = {
-  createRoom,
-  joinRoom,
-  leaveRoom,
-  startGame,
-  rooms,
-  nextPhaseHandler,
-  nextTurnHandler,
-  moveTroopsHandler,
-  attackTerritoriesHandler,
-  surrenderHandler,
-  buyActivesHandler,
-  victoryHandler,
-  getMap,
-  chat,
-  invite,
-  giveAchievement,
-};

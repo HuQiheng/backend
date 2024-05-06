@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+</head>
+<body>
+  <form id="createRoomForm">
+    <input type="text" id="roomName" placeholder="Enter room name">
+    <button type="submit">Create Room</button>
+  </form>
+
+  <script>
+    const socket = io('http://localhost:3010');
+
+    document.getElementById('createRoomForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const roomName = document.getElementById('roomName').value;
+      socket.emit('createRoom', roomName);
+    });
+
+    socket.on('accessCode', (code) => {
+      console.log(`Your access code: ${code}`);
+    });
+
+    socket.on('roomCreated', (room, code) => {
+      console.log(`Room "${room}" created with access code: ${code}`);
+    });
+  </script>
+</body>
+</html>
