@@ -1,5 +1,14 @@
+/**Controller for all the players**/
 const db = require('../db/index.js');
 
+/**
+ * @description Creates a new player 
+ * @param {string} email 
+ * @param {string} username 
+ * @param {string} password 
+ * @param {string} picture 
+ * @returns The result of running the query
+ */
 const insertPlayer = async (email, username, password, picture) => {
   try {
     const query = `INSERT INTO Player (email, username, password, picture, victories) VALUES ($1, $2, $3, $4, $5)`;
@@ -11,6 +20,14 @@ const insertPlayer = async (email, username, password, picture) => {
   }
 };
 
+/**
+ * @description Update the information of the user identified by email
+ * @param {string} email 
+ * @param {string} username 
+ * @param {string} password 
+ * @param {string} picture 
+ * @returns The result of running the query
+ */
 const updatePlayer = async (email, username, password, picture) => {
   try {
     const query = `UPDATE Player SET username = $2, password = $3, picture = $4 WHERE email = $1 RETURNING *`;
@@ -21,7 +38,12 @@ const updatePlayer = async (email, username, password, picture) => {
     throw error;
   }
 };
-
+/**
+ * @description updates the player picture
+ * @param {string} email 
+ * @param {string} picture 
+ * @returns The result of running the query
+ */
 const updatePlayerPicture = async (email, picture) => {
   try {
     const query = `UPDATE Player SET picture = $2 WHERE email = $1 RETURNING *`;
@@ -33,6 +55,11 @@ const updatePlayerPicture = async (email, picture) => {
   }
 }
 
+/**
+ * @description Deletes all the user information
+ * @param {string} email 
+ * @returns The result of running the query
+ */
 const deletePlayer = async (email) => {
   try {
     const query = `DELETE FROM Player WHERE email = $1`;
@@ -43,6 +70,11 @@ const deletePlayer = async (email) => {
   }
 };
 
+/**
+ * @description List all the user information
+ * @param {string} email 
+ * @returns The result of running the query
+ */
 const selectPlayer = async (email) => {
   try {
     const query = `SELECT * FROM Player WHERE email = $1`;
@@ -53,6 +85,12 @@ const selectPlayer = async (email) => {
   }
 };
 
+/**
+ * @description List all the user information by the given name
+ * it can return more than one user
+ * @param {string} name 
+ * @returns The result of running the query
+ */
 const selectPlayerByname = async (name) => {
   try {
     const query = `SELECT * FROM Player WHERE username = $1`;
@@ -78,13 +116,18 @@ const verificarCredenciales = async (email, password) => {
   const values = [email, password];
   try {
     const res = await db.query(query, values);
-    return res.rowCount == 1; // Returns true if there is one row that meets the conditions
+    return res.rowCount == 1; 
   } catch (err) {
     console.error('Error verifying user credentials:', err);
     throw err;
   }
 };
 
+/**
+ * @description Check the number of wins that a user has
+ * @param {string} email 
+ * @returns The result of running the query
+ */
 const getWins = async (email) => {
   try {
     const query = `SELECT victories FROM Player WHERE email = $1`;
@@ -95,6 +138,11 @@ const getWins = async (email) => {
   }
 };
 
+/**
+ * @description Add one to the number of victories that a user has
+ * @param {string} email 
+ * @returns The result of running the query
+ */
 const updateWins = async (email) => {
   try {
     const query = `UPDATE Player SET victories = victories + 1 WHERE email = $1`;
