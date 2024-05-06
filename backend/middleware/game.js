@@ -1,8 +1,11 @@
+/**This module manage all the game logic */
 const ObtainsController = require('../controllers/ObtainsController');
 const PlayerController = require('../controllers/PlayerController');
 
-// Game.js
-// Sets rooms set has all the rooms created, sids has in every room the users
+
+// Sets:
+// rooms set has all the rooms created
+// sids has the emails of the users that are in a room
 //that are in that room
 const sids = new Map();
 const rooms = new Map();
@@ -23,6 +26,13 @@ const {
 const data = require('../territories/territories.json');
 
 // Creates a room and returns a unique code to join it
+/**
+ * @description Creates a room, and join the user to the room
+ * emits the event {accessCode} with the code to the user
+ * @param {socket} socket 
+ * @param {user} user 
+ * @returns The result of creating the room
+ */
 function createRoom(socket, user) {
   //We create a new room
   let code;
@@ -33,13 +43,24 @@ function createRoom(socket, user) {
   rooms.get(code).add(user.email);
   //A user can only connect to a room simultaneously
   sids.set(user.email, { code });
-  console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
   socketEmit(socket, 'accessCode', code);
 
   return 'Sala creada con éxito';
 }
 
-//Joins a room, returns events in diferent situations
+
+/**
+ * @description The user try to join a room. It emits 
+ * differents events depending on the situations:
+ * - User could join the room: {roomAccess} and the code
+ * Also emits {connectedPlayers} with all the players in the room
+ * - Can't join the room: {roomJoinError}
+ * - Room doesn't exist: {nonExistingRoom}
+ * @param {Set} emailToSocket 
+ * @param {socket} socket 
+ * @param {user} user 
+ * @param {string} code 
+ */
 async function joinRoom(emailToSocket, socket, user, code) {
   // Check if the room exists
   const roomExists = rooms.has(Number(code));
@@ -47,49 +68,51 @@ async function joinRoom(emailToSocket, socket, user, code) {
     const playersInRoom = rooms.get(Number(code));
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
+    /**@todo Este check esta bien pero soobra comporbar si el codigo es el mismo */
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
       rooms.set(Number(code), playersInRoom);
       sids.set(user.email, { code: Number(code) });
-
-      console.log(`Player ${user.name} joined room with code ${code}`);
+      
+      //emit the event
       socketEmit(socket, 'roomAccess', code);
 
       let players = getUsersWithCode(code);
       let usersInfo = await getUsersInfo(players);
       sendToAllWithCode(emailToSocket, code, 'playerJoined', user.name);
       sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
-      console.log(usersInfo);
     } else {
-      console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
     }
-    console.log('Jugadores ' + playersInRoom.size);
   } else {
-    console.log(`Room with code ${code} does not exist`);
     socketEmit(socket, 'nonExistingRoom', code);
   }
-  console.log('EN JOIN:');
-  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
-// Function that starts a game
+
+/**
+ * @description Try to start a game it emits
+ * different events depending on the result:
+ * -Game started correctly: {gameStarting} and the code
+ * also sends {mapSent} with the initial map
+ * Also grants the users that is their first game 
+ * an achievement
+ * @param {Set} emailToSocket 
+ * @param {string} code 
+ */
 async function startGame(emailToSocket, code) {
   let usersWithCode = getUsersWithCode(code);
   let usersInfo = await getUsersInfo(usersWithCode);
   if (usersWithCode.length > 1) {
     sendToAllWithCode(emailToSocket, code, 'gameStarting', code);
-    console.log(`Game starting in room with code ${code}`);
-    //console.log(usersInfo)
+
     const state = assignTerritories(usersInfo, data);
     roomState.set(Number(code), state);
-    console.log(roomState.get(Number(code)));
     sendToAllWithCode(emailToSocket, code, 'mapSent', state);
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
-      console.log("Usario al que darle el logro " + user.email);
       await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
   } else {

@@ -1,9 +1,14 @@
-//Requires
+/**This module helps with the authentification strategy using passport */
+/**For more information about passport check https://www.passportjs.org/concepts/authentication/oauth/ */
 const passport = require('passport');
+
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
 require('dotenv').config();
 const Player = require('../controllers/PlayerController');
-
+/**
+ * Specify the passport strategy, we are using the google authentification 
+ * for our app
+ */
 passport.use(
   //specify the strategy to be used
   new GoogleStrategy(
@@ -17,9 +22,9 @@ passport.use(
       //Accces user google profile
       const account = profile._json;
       const email = profile.emails[0].value;
-      console.log('Email: ' + email);
-      console.log(account);
+
       try {
+        //Create a new object with the user info
         const user = {
           name: account.name,
           email: email,
@@ -28,13 +33,12 @@ passport.use(
         };
         //We look if the user exists
         const query = await Player.selectPlayer(email);
-        if (query.rows.length === 0) {
-          //create user
+        if (query.rows.length === 0) { 
+          //User doesnt exist --> create user
           await Player.insertPlayer(email, account.name, account.sub, account.picture);
         }
+        //User exists we update their profile picture
         await Player.updatePlayerPicture(email, account.picture);
-        console.log('Retunred user ' + JSON.stringify(user));
-        //If the user exists no action is needed just return the user
         done(null, user);
       } catch (error) {
         done(error);
@@ -43,8 +47,8 @@ passport.use(
   )
 );
 
-//note: user is stored in req.session.passport.user.{user} use it if its needed
-//With serialize and deserializa this information is attached to  req.user.{auth_user}
+//Note: user is stored in req.session.passport.user.{user} use it if its needed
+//With serialize and deserialize this information is attached to  req.user.{auth_user}
 
 //Just the most simple confguration
 passport.serializeUser((user, done) => {
@@ -59,6 +63,13 @@ passport.deserializeUser((user, done) => {
 
 //Middleware to check if the user is logged if it's not redirect them to the login
 //This is for the express session
+/**
+ * @function
+ * @description Check if the user is authentificated
+ * @returns If its authentifcated return the action that 
+ * the user requested, if its not redirect them to 
+ * authentificate
+ */
 checkAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
