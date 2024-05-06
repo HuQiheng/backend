@@ -47,7 +47,6 @@ app.get('/', (req, res) => {
 });
 
 
-
 //Used routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
