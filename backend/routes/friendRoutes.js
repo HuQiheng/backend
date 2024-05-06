@@ -55,7 +55,7 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
           await friendsController.insertFriend(req.params.email, friendEmail);
           // Check achievement 
           await giveAchievement(null,'Tu primer compañero', req.params.email);
-          await giveAchievement(null,'Tu primer compañero', req.body.email);
+          await giveAchievement(null,'Tu primer compañero', friendEmail);
 
           await friendReqController.removeFriendReq(req.params.email, friendEmail);
           res.json({ message: 'Friend added' });
