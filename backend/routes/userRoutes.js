@@ -40,9 +40,6 @@ router.get('/:email', checkAuthenticated, async (req, res) => {
  */
 router.put('/:email', checkAuthenticated, async (req, res) => {
   try {
-    console.log('Info: \n');
-    console.log('Email: ' + req.params.email + '\n');
-    console.log('Password: ' + req.body.password);
     if (req.user.email === req.params.email) {
       const userInfo = await playerController.updatePlayer(req.params.email, req.body.username, req.body.password, req.body.picture);
       res.send('User updated ' + userInfo.rows[0].email.trim());
@@ -87,8 +84,6 @@ router.delete('/:email', checkAuthenticated, async (req, res) => {
  */
 router.get('/:email/achievements', checkAuthenticated, async (req, res) => {
   try {
-    console.log('Email pedido ' + req.params.email);
-    console.log('Especificado ' + req.user.email);
     if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
       const userAchievements = await obtainsController.achievementsOfUser(req.params.email);
       res.send(userAchievements.rows);
@@ -98,5 +93,8 @@ router.get('/:email/achievements', checkAuthenticated, async (req, res) => {
     res.status(500).send({ message: 'Internal Server Error' });
   }
 });
+
+//RUta para que el usuario seleccione que insignias enseñar(maximo 3)
+
 
 module.exports = router; // Export the router
