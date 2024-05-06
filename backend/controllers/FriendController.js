@@ -1,7 +1,7 @@
 /**Controller to for all the friends*/
 const db = require('../db/index');
 
-//Given two emails, it insert the players as friends
+
 /**
  * @description create a new friendship relation between the 
  * two users
