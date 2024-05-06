@@ -94,7 +94,26 @@ router.get('/:email/achievements', checkAuthenticated, async (req, res) => {
   }
 });
 
-//RUta para que el usuario seleccione que insignias enseñar(maximo 3)
-
+/**
+ * @description This function handles the PUT request to select a specific user's achievements.
+ * It checks if the authenticated user is the same as the user specified in the route parameter.
+ * If the users match, it selects the user's achievements.
+ * If the users do not match, it sends a 500 Internal Server Error response.
+ * @param {string} email The email of the user whose achievements are to be selected.
+ * @returns {Object} The result of running the achievements selection query.
+ * If the selection is successful, the user's achievements are returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
+router.put('/:email/achievements', checkAuthenticated, async (req, res) => {
+  try {
+    if (req.user.email === req.params.email) {
+      const userAchievements = await obtainsController.selectAchievements(req.params.email, req.body.achievements);
+      res.send(userAchievements.rows);
+    }
+  } catch (error) {
+    console.error('Error selecting user achievements', error);
+    res.status(500).send({ message: 'Internal Server Error' });
+  }
+});
 
 module.exports = router; // Export the router
