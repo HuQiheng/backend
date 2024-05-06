@@ -1,5 +1,11 @@
 
-// Assign territories
+/**
+ * @description This function assigns territories to players at the start of the game.
+ * It distributes the territories evenly among the players and initializes their state.
+ * @param {Array} players The array of players in the game.
+ * @param {Object} data The data of the territories.
+ * @returns {Object} The initial state of the game.
+ */
 function assignTerritories(players, data) {
   const initialFactories = 0;
   const initialTroops = 3;
@@ -43,7 +49,17 @@ function assignTerritories(players, data) {
 }
 
 
-// A Player Move troops
+/**
+ * @description This function handles a player's action to move troops from one territory to another.
+ * It checks if the player's turn and if the territories are owned by the player.
+ * If the conditions are met, it moves the troops.
+ * @param {Object} state The current state of the game.
+ * @param {string} from The territory from which the troops are moved.
+ * @param {string} to The territory to which the troops are moved.
+ * @param {number} t The number of troops to move.
+ * @param {string} player The player who is moving the troops.
+ * @returns {Object} The updated state of the game.
+ */
 function moveTroops(state, from, to, t, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let map = state.map;
@@ -53,24 +69,26 @@ function moveTroops(state, from, to, t, player) {
       if (map[from].player === playerIndex && map[to].player === playerIndex) {
         map[to].troops += troops;
         map[from].troops -= troops;
-      } else {
-        console.log('Territories are owned by different players');
       }
-    } else {
-      console.log('No troops available');
     }
-  } else {
-    console.log('Not your turn');
   }
   return state;
 }
 
-// Player Attack territories
+/**
+ * @description This function handles a player's action to attack a territory.
+ * It checks if the player's turn and if the territories are owned by the player.
+ * If the conditions are met, it performs the attack.
+ * @param {Object} state The current state of the game.
+ * @param {string} from The territory from which the attack is launched.
+ * @param {string} to The territory which is being attacked.
+ * @param {number} troops The number of troops used in the attack.
+ * @param {string} player The player who is launching the attack.
+ * @param {Object} emailToSocket The mapping of emails to sockets.
+ * @returns {Object} The updated state of the game and the result of the attack.
+ */
 function attackTerritories(state, from, to, troops, player, emailToSocket) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
-  console.log("Estado del ataque");
-  console.log("Numero de tropas usadas");
-  console.log(troops);
   const map = state.map;
   conquered = false;
   let winner = false;
@@ -89,19 +107,18 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
           map[to].troops -= troops;
         }
         map[from].troops -= troops;
-      } else {
-        console.log('Territories are owned by the same player');
-      }
-    } else {
-      console.log('No troops available');
-    }
-  } else {
-    console.log('Not your turn');
+      } 
+    } 
   }
   return {state, conquered, winner, player};
 }
 
-// Check if the player named player conquered all territories
+/**
+ * @description This function checks if a player has conquered all territories.
+ * @param {Object} state The current state of the game.
+ * @param {string} player The player to check.
+ * @returns {boolean} True if the player has conquered all territories, false otherwise.
+ */
 function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
@@ -118,7 +135,11 @@ function checkVictory(state, player) {
   }
 }
 
-//Check if any of the players has conquered al the territories
+/**
+ * @description This function checks if any player has conquered all territories.
+ * @param {Object} gameState The current state of the game.
+ * @returns {number} The index of the player who has conquered all territories, or -1 if no player has conquered all territories.
+ */
 function checkWinner(gameState) {
   let players = new Set();
   for (let territory in gameState.map) {
@@ -131,12 +152,17 @@ function checkWinner(gameState) {
   }
 }
 
-// Surrender
+/**
+ * @description This function handles a player's action to surrender.
+ * It checks if the player's turn.
+ * If the condition is met, it performs the surrender.
+ * @param {Object} state The current state of the game.
+ * @param {string} player The player who is surrendering.
+ * @returns {Object} The updated state of the game and the result of the surrender.
+ */
 function surrender(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let winner = false;
-  console.log('index of the player that surrendered');
-  console.log(playerIndex);
   const map = state.map;
   for (const i in map) {
     if (map[i].player === playerIndex) {
@@ -156,11 +182,16 @@ function surrender(state, player) {
     winner = true;
     playerWinner = state.players[indexWinner];
   }
-  console.log('Player surrendered');
   return {state, winner, playerWinner};
 }
 
-// Shift management
+/**
+ * @description This function handles the shift of turns in the game.
+ * It checks if the current phase is the last one.
+ * If the condition is met, it shifts the turn to the next player and resets the phase.
+ * @param {Object} state The current state of the game.
+ * @returns {Object} The updated state of the game.
+ */
 function nextTurn(state) {
   //Check if the phase is the last one
   if (state.phase === 2) {
@@ -175,7 +206,13 @@ function nextTurn(state) {
   return state;
 }
 
-// Given the data of a game it changes the phase we're a player is
+/**
+ * @description This function handles the shift of phases in the game.
+ * It checks if the current phase is not the last one.
+ * If the condition is met, it shifts the phase to the next one.
+ * @param {Object} state The current state of the game.
+ * @returns {Object} The updated state of the game.
+ */
 function nextPhase(state) {
   if (state.phase === 0 || state.phase === 1) {
     state.phase += 1;
@@ -183,14 +220,21 @@ function nextPhase(state) {
   return state;
 }
 
-// Buy actives
+/**
+ * @description This function handles a player's action to buy actives.
+ * It checks if the player has enough coins and if the territory is owned by the player.
+ * If the conditions are met, it buys the actives.
+ * @param {Object} state The current state of the game.
+ * @param {string} player The player who is buying the actives.
+ * @param {string} type The type of active to buy.
+ * @param {string} territory The territory where the actives are bought.
+ * @param {number} numActives The number of actives to buy.
+ * @returns {Object} The updated state of the game.
+ */
 function buyActives(state, player, type, territory, numActives) {
   //Obtain the index in the state object
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
-  console.log('Indice del jugador');
-  console.log(playerIndex);
   const map = state.map;
-  console.log(state.players[playerIndex].coins);
   if (type === 'factory') {
     var cost = 15;
   } else if (type === 'troop' && numActives == 5) {
@@ -205,21 +249,21 @@ function buyActives(state, player, type, territory, numActives) {
       state.players[playerIndex].coins -= cost;
       map[territory].factories += numActives;
     } else if (type === 'factory' && map[territory].factories > 0) {
-      console.log('Territory already has a factory');
     } else if (type === 'troop') {
       state.players[playerIndex].coins -= cost;
       map[territory].troops += numActives;
-    } else {
-      console.log("El tipo de tropa no es admisible");
     }
-  } else {
-    console.log('Not enough coins or territory is not owned by the player');
   }
   state.map = map;
   return state;
 }
 
-//Given a number of player it calculates the number of coins that this player have
+/**
+ * @description This function calculates the number of coins that a player has.
+ * @param {Object} state The current state of the game.
+ * @param {number} playerNumber The index of the player.
+ * @returns {number} The number of coins that the player has.
+ */
 function countPlayerCoins(state, playerNumber) {
   let count = 0;
   for (let territory in state.map) {
@@ -233,7 +277,11 @@ function countPlayerCoins(state, playerNumber) {
   return count;
 }
 
-// Function that makes the ranking
+/**
+ * @description This function updates the ranking of the players based on their points.
+ * @param {Object} gameState The current state of the game.
+ * @returns {Array} The updated ranking of the players.
+ */
 function updateRanking(gameState) {
   // Copy the players array from the gameState
   const ranking = [...gameState.players];

@@ -6,11 +6,18 @@ const playerController = require('../controllers/PlayerController');
 const friendController = require('../controllers/FriendController');
 const obtainsController = require('../controllers/ObtainsController');
 
-//Method that gets the users info
+/**
+ * @description This function handles the GET request to retrieve a specific user's information.
+ * It checks if the authenticated user is the same as the user specified in the route parameter or if they are friends.
+ * If either condition is met, it retrieves the user's information.
+ * If neither condition is met, it sends a 500 Internal Server Error response.
+ * @param {string} email The email of the user whose information is to be retrieved.
+ * @returns {Object} The result of running the user information retrieval query.
+ * If the retrieval is successful, the user's information is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.get('/:email', checkAuthenticated, async (req, res) => {
   try {
-    console.log('Email pedido ' + req.params.email);
-    console.log('Especificado ' + req.user.email);
     if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
       const userInfo = await playerController.selectPlayer(req.params.email);
       res.send(userInfo.rows[0]);
@@ -21,7 +28,16 @@ router.get('/:email', checkAuthenticated, async (req, res) => {
   }
 });
 
-//Method that updates the user info, the username and password are required in the body of the json
+/**
+ * @description This function handles the PUT request to update a specific user's information.
+ * It checks if the authenticated user is the same as the user specified in the route parameter.
+ * If the users match, it updates the user's information.
+ * If the users do not match, it sends a 500 Internal Server Error response.
+ * @param {string} email The email of the user whose information is to be updated.
+ * @returns {Object} The result of running the user information update query.
+ * If the update is successful, a success message is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.put('/:email', checkAuthenticated, async (req, res) => {
   try {
     console.log('Info: \n');
@@ -37,7 +53,16 @@ router.put('/:email', checkAuthenticated, async (req, res) => {
   }
 });
 
-//Method that deletes a user, this is NOT reversible
+/**
+ * @description This function handles the DELETE request to delete a specific user.
+ * It checks if the authenticated user is the same as the user specified in the route parameter.
+ * If the users match, it deletes the user.
+ * If the users do not match, it sends a 500 Internal Server Error response.
+ * @param {string} email The email of the user to be deleted.
+ * @returns {Object} The result of running the user deletion query.
+ * If the deletion is successful, a success message is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.delete('/:email', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email) {
@@ -50,7 +75,16 @@ router.delete('/:email', checkAuthenticated, async (req, res) => {
   }
 });
 
-//Method that gets the users achievements
+/**
+ * @description This function handles the GET request to retrieve a specific user's achievements.
+ * It checks if the authenticated user is the same as the user specified in the route parameter or if they are friends.
+ * If either condition is met, it retrieves the user's achievements.
+ * If neither condition is met, it sends a 500 Internal Server Error response.
+ * @param {string} email The email of the user whose achievements are to be retrieved.
+ * @returns {Object} The result of running the achievements retrieval query.
+ * If the retrieval is successful, the user's achievements are returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.get('/:email/achievements', checkAuthenticated, async (req, res) => {
   try {
     console.log('Email pedido ' + req.params.email);

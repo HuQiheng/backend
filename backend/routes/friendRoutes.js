@@ -7,11 +7,18 @@ const friendReqController = require('../controllers/FriendReqController');
 const ObtainsController = require('../controllers/ObtainsController');
 const { giveAchievement } = require('../middleware/game')
 
-// Get the information of all the friends of a user
+/**
+ * @description This function handles the GET request to retrieve all friends of a specific user.
+ * It checks if the authenticated user is the same as the user specified in the route parameter.
+ * If the users match, it retrieves all friends of that user.
+ * If the users do not match, it sends a 403 Forbidden response.
+ * @param {string} email The email of the user whose friends are to be retrieved.
+ * @returns {Object} The result of running the friends retrieval query.
+ * If the retrieval is successful, an array of friends is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
   try {
-    console.log("Solicitado " + req.params.email);
-    console.log("Pedido con " + req.user.email);
     if (req.user.email === req.params.email) {
       const userInfo = await friendsController.selectFriends(req.params.email);
       res.send(userInfo.rows);
@@ -24,11 +31,17 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
-// Add a friend to the user's friend list
+/**
+ * @description This function handles the PUT request to add a friend for a specific user.
+ * It checks if the users are already friends or if a friend request has been sent by the user.
+ * If neither condition is met, it adds a friend.
+ * @param {string} email The email of the user who is adding a friend.
+ * @returns {Object} The result of running the friend addition query.
+ * If the addition is successful, a success message is returned.
+ * If the users are already friends or a friend request has not been sent by the user, an error message is returned with a status code of 400.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
-  console.log('Requested email ' + req.params.email);
-  console.log('Friend to add: ' + req.body.email);
-  console.log('Requested from: ' + req.user.email);
   const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
@@ -67,12 +80,17 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
-
-
-// Delete a friend from the user's friend list
+/**
+ * @description This function handles the DELETE request to remove a friend for a specific user.
+ * It checks if the authenticated user is the same as the user specified in the route parameter.
+ * If the users match, it removes the friend.
+ * If the users do not match, it sends a 403 Forbidden response.
+ * @param {string} email The email of the user who is removing a friend.
+ * @returns {Object} The result of running the friend removal query.
+ * If the removal is successful, a success message is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
-  console.log('Requested email ' + req.params.email);
-  console.log('Friend to delete: ' + req.body.email);
   try {
     if (req.user.email === req.params.email) {
       await friendsController.removeFriend(req.params.email, req.body.email);
@@ -86,6 +104,17 @@ router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
+/**
+ * @description This function handles the GET request to check if two users are friends.
+ * It checks if the authenticated user is one of the two users specified in the route parameters.
+ * If the authenticated user is one of the two users, it checks if the two users are friends.
+ * If the authenticated user is not one of the two users, it sends a 403 Forbidden response.
+ * @param {string} email1 The email of the first user.
+ * @param {string} email2 The email of the second user.
+ * @returns {Object} The result of running the friendship check query.
+ * If the check is successful, a boolean indicating if the two users are friends is returned.
+ * In case of an error, an error message is returned with a status code of 500.
+ */
 router.get('/:email1/:email2/friendship', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email1 || req.user.email === req.params.email2){
