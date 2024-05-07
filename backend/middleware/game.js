@@ -498,7 +498,7 @@ async function reconectionHandler(socket, user){
     let players = getUsersWithCode(userCode);
     let usersInfo = await getUsersInfo(players);
     console.log("Se ha recuperado la informacion");
-    socketEmit(socket, 'usersInfo', usersInfo);
+    socketEmit(socket, 'connectedPlayers', usersInfo);
 
     console.log("Se ha recuperado el mapa");
     getMap(socket, user);
