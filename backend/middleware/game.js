@@ -405,7 +405,12 @@ async function victoryHandler(emailToSocket, user) {
     sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
     // Emit game over to all the rest of users
     sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
-
+    
+    //All the users are out
+    let players = getUsersWithCode(userCode);
+    for (const player of players){
+      leaveRoom(emailToSocket, player);
+    }
     // Update wins and achievements
     await PlayerController.updateWins(user.email);
     const numWins = await PlayerController.getWins(user.email);
