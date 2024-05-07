@@ -1,7 +1,6 @@
 
 /**
  * @description This function assigns territories to players at the start of the game.
- * It distributes the territories evenly among the players and initializes their state.
  * @param {Array} players The array of players in the game.
  * @param {Object} data The data of the territories.
  * @returns {Object} The initial state of the game.
@@ -51,8 +50,6 @@ function assignTerritories(players, data) {
 
 /**
  * @description This function handles a player's action to move troops from one territory to another.
- * It checks if the player's turn and if the territories are owned by the player.
- * If the conditions are met, it moves the troops.
  * @param {Object} state The current state of the game.
  * @param {string} from The territory from which the troops are moved.
  * @param {string} to The territory to which the troops are moved.
@@ -77,8 +74,6 @@ function moveTroops(state, from, to, t, player) {
 
 /**
  * @description This function handles a player's action to attack a territory.
- * It checks if the player's turn and if the territories are owned by the player.
- * If the conditions are met, it performs the attack.
  * @param {Object} state The current state of the game.
  * @param {string} from The territory from which the attack is launched.
  * @param {string} to The territory which is being attacked.
@@ -154,8 +149,6 @@ function checkWinner(gameState) {
 
 /**
  * @description This function handles a player's action to surrender.
- * It checks if the player's turn.
- * If the condition is met, it performs the surrender.
  * @param {Object} state The current state of the game.
  * @param {string} player The player who is surrendering.
  * @returns {Object} The updated state of the game and the result of the surrender.
@@ -187,8 +180,6 @@ function surrender(state, player) {
 
 /**
  * @description This function handles the shift of turns in the game.
- * It checks if the current phase is the last one.
- * If the condition is met, it shifts the turn to the next player and resets the phase.
  * @param {Object} state The current state of the game.
  * @returns {Object} The updated state of the game.
  */
@@ -208,8 +199,6 @@ function nextTurn(state) {
 
 /**
  * @description This function handles the shift of phases in the game.
- * It checks if the current phase is not the last one.
- * If the condition is met, it shifts the phase to the next one.
  * @param {Object} state The current state of the game.
  * @returns {Object} The updated state of the game.
  */
@@ -222,8 +211,6 @@ function nextPhase(state) {
 
 /**
  * @description This function handles a player's action to buy actives.
- * It checks if the player has enough coins and if the territory is owned by the player.
- * If the conditions are met, it buys the actives.
  * @param {Object} state The current state of the game.
  * @param {string} player The player who is buying the actives.
  * @param {string} type The type of active to buy.

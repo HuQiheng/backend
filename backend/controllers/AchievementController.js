@@ -16,7 +16,20 @@ const insertAchievement = async (title, description) => {
     throw error;
   }
 };
-
+/**
+ * @description Select an achievement based on the given title
+ * @param {string} title 
+ * @returns 
+ */
+const selectAchievement = async(title) => {
+  try {
+    const query = `SELECT * FROM Achievement WHERE title = $1`;
+    const result = await db.query(query, [title]);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 /**
  * 
@@ -75,4 +88,5 @@ module.exports = {
   selectAllAchievements,
   removeAchievement,
   updateAchievement,
+  selectAchievement,
 };
