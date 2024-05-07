@@ -47,7 +47,6 @@ app.get('/', (req, res) => {
 });
 
 
-
 //Used routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
@@ -157,6 +156,7 @@ const {
   getMap,
   chat,
   invite,
+  reconectionHandler
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
@@ -174,7 +174,7 @@ io.on('connection', (socket) => {
     emailToSocket.set(user.email, socket);
     console.log('Socket ID: ' + socket.id);
     console.log('User authenticated: ' + JSON.stringify(user));
-
+    reconectionHandler(socket, user);
     // Create lobby
     socket.on('createRoom', () => {
       try {

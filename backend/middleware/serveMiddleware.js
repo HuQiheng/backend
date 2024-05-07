@@ -1,7 +1,7 @@
 require('dotenv').config();
 const session = require('express-session');
 require('dotenv').config();
-//Every petition will have a session information, we use this as a middleware for express and socket
+//Every petition will have a session information, we use this as a middleware for express and socket.io
 const sessionMiddleware = session({
   //You need to have the secret to generate the cookies
   secret: process.env.COOKIE_SECRET,
@@ -15,6 +15,7 @@ const sessionMiddleware = session({
   saveUninitialized: false,
 });
 
+//Function for make a handsake, between express, passport and socket.io
 const onlyForHandshake = (middleware) => {
   return (req, res, next) => {
     const isHandshake = req._query.sid === undefined;

@@ -1,6 +1,12 @@
+/**Controller for all the achievement unlocks*/
 const db = require('../db/index');
 
-//A user unlocks an achievement
+/**
+ * @description The user unlocks the achievement
+ * @param {string} title 
+ * @param {string} player_email 
+ * @returns The result of running the query
+ */
 const insert = async (title, player_email) => {
   try {
     const query = `INSERT INTO Obtains (Achievements_title, Players_email) VALUES($1, $2)`;
@@ -12,6 +18,10 @@ const insert = async (title, player_email) => {
   }
 }
 
+/**
+ * 
+ * @returns All the users and the achievement that they unlocked
+ */
 const selectAll = async () =>  {
   try {
     const query = `SELECT * FROM Obtains`;
@@ -23,6 +33,12 @@ const selectAll = async () =>  {
 }
 
 //Remove that a user has an achievement
+/**
+ * @description Remove the fact that a user has an achievement
+ * @param {string} Achievements_title 
+ * @param {string} Players_email 
+ * @returns The result of running the query
+ */
 const removeById = async (Achievements_title, Players_email) => {
   try {
     const query = `DELETE FROM Obtains WHERE Achievements_title = $1 AND Players_email = $2`;
@@ -33,7 +49,12 @@ const removeById = async (Achievements_title, Players_email) => {
   }
 }
 
-//All the achievements of a user
+
+/**
+ * @description Check all the achievements that a user has
+ * @param {string} player_email 
+ * @returns The result of running the query
+ */
 const achievementsOfUser = async (player_email) => {
   try {
     const query = `SELECT *  FROM achievement where title IN 
@@ -45,7 +66,13 @@ const achievementsOfUser = async (player_email) => {
   }
 }
 
-//True if user has the achievement false in any ohter case
+
+/**
+ * @description Check if the user has the achievement
+ * @param {string} achievements_title 
+ * @param {string} players_email 
+ * @returns True only if the user has the achievement
+ */
 const hasAchievement = async (achievements_title, players_email) => {
   try{
     const query = `SELECT * FROM Obtains WHERE achievements_title = $1 AND players_email = $2`;

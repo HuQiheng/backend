@@ -7,11 +7,13 @@ const friendReqController = require('../controllers/FriendReqController');
 const ObtainsController = require('../controllers/ObtainsController');
 const { giveAchievement } = require('../middleware/game')
 
-// Get the information of all the friends of a user
+/**
+ * @description This function handles the GET request to retrieve all friends of a specific user.
+ * @param {string} email The email of the user whose friends are to be retrieved.
+ * @returns {Object} The result of running the friends retrieval query.
+ */
 router.get('/:email/friends', checkAuthenticated, async (req, res) => {
   try {
-    console.log("Solicitado " + req.params.email);
-    console.log("Pedido con " + req.user.email);
     if (req.user.email === req.params.email) {
       const userInfo = await friendsController.selectFriends(req.params.email);
       res.send(userInfo.rows);
@@ -24,11 +26,12 @@ router.get('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
-// Add a friend to the user's friend list
+/**
+ * @description This function handles the PUT request to add a friend for a specific user.
+ * @param {string} email The email of the user who is adding a friend.
+ * @returns {Object} The result of running the friend addition query.
+ */
 router.put('/:email/friends', checkAuthenticated, async (req, res) => {
-  console.log('Requested email ' + req.params.email);
-  console.log('Friend to add: ' + req.body.email);
-  console.log('Requested from: ' + req.user.email);
   const friendEmail = req.body.email;
   try {
     if (req.user.email === req.params.email) {
@@ -67,12 +70,12 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
-
-
-// Delete a friend from the user's friend list
+/**
+ * @description This function handles the DELETE request to remove a friend for a specific user.
+ * @param {string} email The email of the user who is removing a friend.
+ * @returns {Object} The result of running the friend removal query.
+ */
 router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
-  console.log('Requested email ' + req.params.email);
-  console.log('Friend to delete: ' + req.body.email);
   try {
     if (req.user.email === req.params.email) {
       await friendsController.removeFriend(req.params.email, req.body.email);
@@ -86,6 +89,12 @@ router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
   }
 });
 
+/**
+ * @description This function handles the GET request to check if two users are friends.
+ * @param {string} email1 The email of the first user.
+ * @param {string} email2 The email of the second user.
+ * @returns {Object} The result of running the friendship check query.
+ */
 router.get('/:email1/:email2/friendship', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email1 || req.user.email === req.params.email2){

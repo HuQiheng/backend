@@ -1,8 +1,12 @@
+/**This module manage all the game logic */
 const ObtainsController = require('../controllers/ObtainsController');
 const PlayerController = require('../controllers/PlayerController');
+const AchievementController = require('../controllers/AchievementController')
 
-// Game.js
-// Sets rooms set has all the rooms created, sids has in every room the users
+
+// Sets:
+// rooms set has all the rooms created
+// sids has the emails of the users that are in a room
 //that are in that room
 const sids = new Map();
 const rooms = new Map();
@@ -23,6 +27,13 @@ const {
 const data = require('../territories/territories.json');
 
 // Creates a room and returns a unique code to join it
+/**
+ * @description Creates a room, and join the user to the room
+ * emits the event {accessCode} with the code to the user
+ * @param {socket} socket 
+ * @param {user} user 
+ * @returns The result of creating the room
+ */
 function createRoom(socket, user) {
   //We create a new room
   let code;
@@ -33,13 +44,24 @@ function createRoom(socket, user) {
   rooms.get(code).add(user.email);
   //A user can only connect to a room simultaneously
   sids.set(user.email, { code });
-  console.log(`Jugador ${user.name} creó una sala con código de acceso ${code}`);
   socketEmit(socket, 'accessCode', code);
 
   return 'Sala creada con éxito';
 }
 
-//Joins a room, returns events in diferent situations
+
+/**
+ * @description The user try to join a room. It emits 
+ * differents events depending on the situations:
+ * - User could join the room: {roomAccess} and the code
+ * Also emits {connectedPlayers} with all the players in the room
+ * - Can't join the room: {roomJoinError}
+ * - Room doesn't exist: {nonExistingRoom}
+ * @param {Set} emailToSocket 
+ * @param {socket} socket 
+ * @param {user} user 
+ * @param {string} code 
+ */
 async function joinRoom(emailToSocket, socket, user, code) {
   // Check if the room exists
   const roomExists = rooms.has(Number(code));
@@ -47,49 +69,51 @@ async function joinRoom(emailToSocket, socket, user, code) {
     const playersInRoom = rooms.get(Number(code));
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
+    /**@todo Este check esta bien pero soobra comporbar si el codigo es el mismo */
     if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
       rooms.set(Number(code), playersInRoom);
       sids.set(user.email, { code: Number(code) });
-
-      console.log(`Player ${user.name} joined room with code ${code}`);
+      
+      //emit the event
       socketEmit(socket, 'roomAccess', code);
 
       let players = getUsersWithCode(code);
       let usersInfo = await getUsersInfo(players);
       sendToAllWithCode(emailToSocket, code, 'playerJoined', user.name);
       sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
-      console.log(usersInfo);
     } else {
-      console.log(`Player ${user.name} could not join room with code ${code}`);
       socketEmit(socket, 'roomJoinError', code);
     }
-    console.log('Jugadores ' + playersInRoom.size);
   } else {
-    console.log(`Room with code ${code} does not exist`);
     socketEmit(socket, 'nonExistingRoom', code);
   }
-  console.log('EN JOIN:');
-  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
-// Function that starts a game
+
+/**
+ * @description Try to start a game, it emits
+ * different events depending on the result:
+ * -Game started correctly: {gameStarting} and the code
+ * also sends {mapSent} with the initial map
+ * Also grants the users that is their first game 
+ * an achievement
+ * @param {Set} emailToSocket 
+ * @param {string} code 
+ */
 async function startGame(emailToSocket, code) {
   let usersWithCode = getUsersWithCode(code);
   let usersInfo = await getUsersInfo(usersWithCode);
   if (usersWithCode.length > 1) {
     sendToAllWithCode(emailToSocket, code, 'gameStarting', code);
-    console.log(`Game starting in room with code ${code}`);
-    //console.log(usersInfo)
+
     const state = assignTerritories(usersInfo, data);
     roomState.set(Number(code), state);
-    console.log(roomState.get(Number(code)));
     sendToAllWithCode(emailToSocket, code, 'mapSent', state);
 
     // First game? -> unlocks an achievement
     for (let user of usersInfo) {
-      console.log("Usario al que darle el logro " + user.email);
       await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
   } else {
@@ -100,15 +124,23 @@ async function startGame(emailToSocket, code) {
 }
 
 // Function to leave a room
+/**
+ * @description It checks if the user is in a room
+ * if the user is in one, the user leaves it and
+ * send to all the other users that a player left the room
+ * and the connected players in that room
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ */
 async function leaveRoom(emailToSocket, user) {
   const userEntry = sids.get(user.email);
   //We check if user has a room asigned
   if (userEntry) {
     let code = Number(userEntry.code);
-    
+    //Delete the user from all the sets
     rooms.get(code).delete(user.email);
     sids.delete(user.email);
-    console.log(`Jugador ${user.email} abandonó la sala ${code}`);
+    //Notify all the users that the player left the room
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
     let players = getUsersWithCode(code);
     let usersInfo = await getUsersInfo(players);
@@ -116,19 +148,23 @@ async function leaveRoom(emailToSocket, user) {
   }
 }
 
+/**
+ * @description If the user is in a room and is his turn
+ * it changes the game phase (not the turn), it sends all the
+ * users the new map. If the user is not in a room it notify the user
+ * with the event {notInARoom}
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ */
 function nextPhaseHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
-    console.log(roomState);
 
     //Next phase for the user
     const state = nextPhase(roomState.get(userCode));
-    console.log(state);
     roomState.set(userCode, state);
-    //socketEmit(socket, 'nextPhase', user.email);
-    //sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'nextPhase', ' ');
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -136,17 +172,25 @@ function nextPhaseHandler(socket, emailToSocket, user) {
   }
 }
 
+/**
+ * @description Give the turn to the next player if the user is
+ * in a room and it's his turn, send to all the users the new map.
+ * If the user is not in a room send him the event {notInARoom}.
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ */
 async function nextTurnHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
     console.log(userCode);
 
-    //Next stat for the user
+    //Next turn for the game
     const state = nextTurn(roomState.get(userCode));
     roomState.set(userCode, state);
 
-    console.log(state);
+
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
@@ -160,15 +204,27 @@ async function nextTurnHandler(socket, emailToSocket, user) {
   }
 }
 
+/**
+ * @description Move the number of troops {troops} from
+ * the territory {from} to the territory {to}. User must be
+ * in the middle of a game and both territories needs to be 
+ * possessed by the user.
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ * @param {string} from 
+ * @param {string} to 
+ * @param {Number} troops 
+ */
 async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) {
   const room = sids.get(user.email);
 
   //Check if the user is in the room
   if (room && room.code) {
-    //Next phase for the user
+    //Move the troops
     const state = moveTroops(roomState.get(room.code), from, to, troops, user.email);
-    console.log(state);
     roomState.set(room.code, state);
+    //Send to all the new state
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
     
     //99 troops in a territory unlocks you an achievement
@@ -181,6 +237,22 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
   }
 }
 
+/**
+ * @description Attack the territory {to} using a 
+ * number of troops {troops} that are in the territory
+ * {from}. User must be in the middle of a game, territory
+ * {from} must be owned by them and territory {from} can't be.
+ * Number of troops must be a range of troops between [1,n-1] n
+ * is the number of troops in the territory {from}.
+ * As a result if the user attack with more troops than the number of
+ * troops in the territory {to}, the territory will be owned by them.
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ * @param {string} from 
+ * @param {string} to 
+ * @param {Number} troops 
+ */
 async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops) {
   const room = sids.get(user.email);
 
@@ -189,7 +261,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     
     //Next phase for the user
     const {state ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
-    console.log(state);
+
     roomState.set(room.code, state);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
 
@@ -197,11 +269,12 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     sendToAllWithCode(emailToSocket, room.code, 'attack', ataqueString)
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     let factories = 0;
-    for(let i=0;i<state.map.length;i++){
-      if(state.map[i].factories === 1 && state.map[i].player === playerIndex){
+    const map = state.map;
+    for(const i in map){
+      if(map[i].factories === 1 && map[i].player === playerIndex){
         factories++;
       }
-      if(factories === 15) {
+      if(Number(factories) === 15) {
         await giveAchievement(emailToSocket,'Revolución industrial', user.email);
         break;
       }
@@ -215,13 +288,13 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       await PlayerController.updateWins(user.email);
       const numWins = await PlayerController.getWins(user.email);
       // Check the achievements
-      if (numWins === 1) {
+      if (Number(numWins) === 1) {
         await giveAchievement(emailToSocket,'Comandante principiante', user.email);
       }
-      else if (numWins === 10) {
+      else if (Number(numWins) === 10) {
         await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
       }
-      else if (numWins === 100) {
+      else if (Number(numWins) === 100) {
         await giveAchievement(emailToSocket,'Comandante veterano', user.email);
       }
     }
@@ -231,14 +304,22 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   }
 }
 
+/**
+ * @description If the user is in a game, it surrender
+ * making them unable to play in the game and distributing their
+ * territory among all the left users. If there are only two players
+ * the player that didn't surrender wins the game
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ */
 function surrenderHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
 
+    //Surrender
     const {state, winner, playerWinner} = surrender(roomState.get(userCode), user.email);
-    console.log(state);
 
     //A user that surrenders leaves the room
     leaveRoom(emailToSocket, user);
@@ -247,8 +328,7 @@ function surrenderHandler(socket, emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
     socketEmit(socket, 'youSurrendered', userCode);
 
-    console.log("HAY GANADOR ");
-    console.log(winner);
+    //Check if there is a winner
     if(winner) {
       victoryHandler(emailToSocket, playerWinner);
     }
@@ -258,17 +338,27 @@ function surrenderHandler(socket, emailToSocket, user) {
   }
 }
 
+/**
+ * @description Buys a number of {numActives} to
+ * {territory}. The {type} can 'troop' or 'factory'.
+ * User has to have the number of coins to buy the actives and be
+ * the owner of the territory
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ * @param {string} type 
+ * @param {string} territory 
+ * @param {Number} numActives 
+ */
 async function buyActivesHandler(socket, emailToSocket, user, type, territory, numActives) {
 
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
 
-    console.log("Codigo en buy actives");
-    console.log(userCode);
     //Next phase for the user
     const state = buyActives(roomState.get(userCode), user.email, type, territory, Number(numActives));
-    console.log(state);
+
     roomState.set(userCode, state);
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
@@ -279,8 +369,9 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
         await giveAchievement(emailToSocket,'Industrializador', user.email);
       }
       let factories = 0;
-      for(let i=0;i<state.map.length;i++){
-        if(state.map[i].factories === 1 && state.map[i].player === playerIndex){
+      const map = state.map;
+      for(const i in map){
+        if(map[i].factories === 1 && map[i].player === playerIndex){
           factories++;
         }
         if(factories === 15) {
@@ -300,6 +391,12 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
   }
 }
 
+/**
+ * @description Handles the victory of a user, sending to all
+ * the users a game over event and the user that has won the game
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ */
 async function victoryHandler(emailToSocket, user) {
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
@@ -312,13 +409,14 @@ async function victoryHandler(emailToSocket, user) {
     // Update wins and achievements
     await PlayerController.updateWins(user.email);
     const numWins = await PlayerController.getWins(user.email);
-    if (numWins === 1) {
+
+    if (Number(numWins) === 1) {
       await giveAchievement(emailToSocket,'Comandante principiante', user.email);
     }
-    if (numWins === 10) {
+    if (Number(numWins) === 10) {
       await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
     }
-    else if (numWins === 100) {
+    else if (Number(numWins) === 100) {
       await giveAchievement(emailToSocket,'Comandante veterano', user.email);
     } 
   } else {
@@ -326,7 +424,12 @@ async function victoryHandler(emailToSocket, user) {
   }
 }
 
-//Given a user it sends the map to the user of the party that he is in
+/**
+ * @description If the user is in the middle of a game
+ * it sends the map for them.
+ * @param {socket} socket 
+ * @param {user} user 
+ */
 function getMap(socket, user) {
   //Check if the user is in the room
   if(sids.has(user.email)) {
@@ -334,18 +437,26 @@ function getMap(socket, user) {
     console.log(userCode);
 
     const state = roomState.get(userCode);
-
-    socketEmit(socket, 'mapSent', state);
+    if(state){
+      socketEmit(socket, 'mapSent', state);
+    }
+    
   }
 }
 
-//Function distributed chat
+/**
+ * @description Sends a message to all the users in the game.
+ * If the user is not in a game it sends an error event
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ * @param {string} message 
+ */
 function chat(socket, emailToSocket, user, message) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log("message to be sent");
-    console.log(message);
+    //Send the message to all the users including himself
     sendToAllWithCode(emailToSocket, userCode, 'messageReceived', { message, user: user.email });
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -353,16 +464,21 @@ function chat(socket, emailToSocket, user, message) {
   }
 }
 
-// Invite someone to a game 
+
+/**
+ * @description Send an invitation to a friend 
+ * to join a lobby
+ * @param {socket} socket 
+ * @param {Set} emailToSocket 
+ * @param {user} user 
+ * @param {string} friendEmail 
+ */
 function invite(socket, emailToSocket, user, friendEmail) {
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
-    console.log(friendEmail);
-
+    //Get the info of the user that is inviting
     const userInfo = {email: user.email, name: user.name, picture: user.picture}
-    console.log(user);
-    console.log(userInfo);
+    //Send the invitation
     sendingThroughEmail(emailToSocket, friendEmail, 'invitationReceived', {userCode, userInfo});
   } else {
     console.log(`You are not in a Room  ` + user.email);
@@ -370,6 +486,45 @@ function invite(socket, emailToSocket, user, friendEmail) {
   }
 }
 
+/**
+ * @description Check if the user was in a game
+ * if it was on it reconnect it to that game
+ * @param {socket} socket 
+ * @param {user} user 
+ */
+async function reconectionHandler(socket, user){
+  if (sids.has(user.email)) {
+    let userCode = sids.get(user.email).code;
+    let players = getUsersWithCode(userCode);
+    let usersInfo = await getUsersInfo(players);
+    console.log("Se ha recuperado la informacion");
+    socketEmit(socket, 'usersInfo', usersInfo);
+
+    console.log("Se ha recuperado el mapa");
+    getMap(socket, user);
+  }
+}
+module.exports = {
+  createRoom,
+  joinRoom,
+  leaveRoom,
+  startGame,
+  rooms,
+  nextPhaseHandler,
+  nextTurnHandler,
+  moveTroopsHandler,
+  attackTerritoriesHandler,
+  surrenderHandler,
+  buyActivesHandler,
+  victoryHandler,
+  getMap,
+  chat,
+  invite,
+  giveAchievement,
+  reconectionHandler,
+};
+
+//---------------------------------Private functions---------------------------------
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
   console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
@@ -432,8 +587,9 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
     const achievementUnlocked = await ObtainsController.hasAchievement(achievementTitle, email);
     if (!achievementUnlocked) {
       await ObtainsController.insert(achievementTitle,email);
+      const achievement = await AchievementController.selectAchievement(achievementTitle);
       if(emailToSocket){
-        sendingThroughEmail(emailToSocket, email, 'achievementUnlocked', achievementTitle);
+        sendingThroughEmail(emailToSocket, email, 'achievementUnlocked', achievement);
       }
     }
   } catch (error) {
@@ -442,21 +598,3 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
 }
 
 
-module.exports = {
-  createRoom,
-  joinRoom,
-  leaveRoom,
-  startGame,
-  rooms,
-  nextPhaseHandler,
-  nextTurnHandler,
-  moveTroopsHandler,
-  attackTerritoriesHandler,
-  surrenderHandler,
-  buyActivesHandler,
-  victoryHandler,
-  getMap,
-  chat,
-  invite,
-  giveAchievement,
-};

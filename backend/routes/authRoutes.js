@@ -3,8 +3,12 @@ const router = express.Router(); // Create a new router
 const passport = require('passport');
 require('dotenv').config();
 
-//Use google strategy as middleware
-//We want the user info profile and the email
+/**
+ * @description This function handles Google authentication using Passport.js. 
+ * @param {string} title The title of the route.
+ * @param {string} description The description of the route.
+ * @returns {Object} The result of running the Google authentication query. 
+ */
 router.get(
   '/google',
   passport.authenticate('google', {
@@ -12,7 +16,13 @@ router.get(
   })
 );
 
-//This callback redirects to the correct url depending if we are on web or mobile
+
+/**
+ * @description This function handles the Google authentication callback using Passport.js.
+ * @param {string} title The title of the route.
+ * @param {string} description The description of the route.
+ * @returns {Object} The result of running the Google authentication callback. 
+ */
 router.get(
   '/google/callback',
   passport.authenticate('google', { session: true, failureRedirect: '/auth/google' }),
@@ -41,7 +51,6 @@ router.get(
         res.redirect('https://wealthwars.games/signin?user=' + userData);
       }
     }
-    console.log('Devuelto ' + JSON.stringify(req.user));
   }
 );
 
