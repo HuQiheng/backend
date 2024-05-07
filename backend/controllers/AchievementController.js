@@ -25,7 +25,7 @@ const selectAchievement = async(title) => {
   try {
     const query = `SELECT * FROM Achievement WHERE title = $1`;
     const result = await db.query(query, [title]);
-    return result;
+    return result.rows[0];
   } catch (error) {
     throw error;
   }
