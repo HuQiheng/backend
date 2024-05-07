@@ -300,8 +300,9 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
         await giveAchievement(emailToSocket,'Industrializador', user.email);
       }
       let factories = 0;
-      for(let i=0;i<state.map.length;i++){
-        if(state.map[i].factories === 1 && state.map[i].player === playerIndex){
+      const map = state.map;
+      for(const i in map){
+        if(map[i].factories === 1 && map[i].player === playerIndex){
           factories++;
         }
         if(factories === 15) {
@@ -333,13 +334,15 @@ async function victoryHandler(emailToSocket, user) {
     // Update wins and achievements
     await PlayerController.updateWins(user.email);
     const numWins = await PlayerController.getWins(user.email);
-    if (numWins === 1) {
+    console.log("Numero de victorias de: ");
+    console.log(numWins);
+    if (Number(numWins) === 1) {
       await giveAchievement(emailToSocket,'Comandante principiante', user.email);
     }
-    if (numWins === 10) {
+    if (Number(numWins) === 10) {
       await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
     }
-    else if (numWins === 100) {
+    else if (Number(numWins) === 100) {
       await giveAchievement(emailToSocket,'Comandante veterano', user.email);
     } 
   } else {
