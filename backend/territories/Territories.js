@@ -117,7 +117,8 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
 function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
-  for (let i = 0; i < state.map.length; i++) {
+  const map = state.map;
+  for (const i in map) {
     if (state.map[i].player !== playerIndex) {
       samePlayer = false;
       break;
