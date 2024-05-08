@@ -91,4 +91,21 @@ router.put('/:email/achievements', checkAuthenticated, async (req, res) => {
   }
 });
 
+/**
+ * @description This function handles the GET request to get the number of wins of a player
+ * @param {string} email The email of the user
+ * @returns {Integer} The number of wins of the player
+ */
+router.get('/:email/wins', checkAuthenticated, async (req, res) => {
+  try {
+    if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
+      const userWins = await playerController.getWins(req.params.email);
+      res.send(userWins);
+    }
+  } catch (error) {
+    console.error('Error getting user wins', error);
+    res.status(500).send({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router; // Export the router

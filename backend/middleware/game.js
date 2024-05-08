@@ -284,6 +284,8 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     }
     if (win) {
       //User won send event to all
+      console.log("User won!!!!!!!")
+      console.log(user.email);
       victoryHandler(emailToSocket, winner);
       await PlayerController.updateWins(user.email);
       const numWins = await PlayerController.getWins(user.email);
@@ -374,7 +376,9 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
         if(map[i].factories === 1 && map[i].player === playerIndex){
           factories++;
         }
-        if(factories === 15) {
+        console.log("Numero de fabricas");
+        console.log(factories);
+        if(Number(factories) === 15) {
           await giveAchievement(emailToSocket,'Revolución industrial', user.email);
           break;
         }
