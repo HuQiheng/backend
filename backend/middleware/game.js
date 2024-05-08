@@ -195,8 +195,8 @@ async function nextTurnHandler(socket, emailToSocket, user) {
     sendToAllWithCode(emailToSocket, userCode, 'nextTurn', ' ');
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     // If reach 1000 coins, unlock an achievement
-    if(state.players[playerIndex].coins >= 1000) {
-      await giveAchievement(emailToSocket,'Mileurista', user.email)
+    if(Number(state.players[playerIndex].coins) >= 1000) {
+      await giveAchievement(emailToSocket,'Mileurista', user.email);
     }
   } else {
     console.log(`You are not in a Room  ` + user.email);
