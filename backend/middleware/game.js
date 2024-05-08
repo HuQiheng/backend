@@ -132,7 +132,7 @@ async function startGame(emailToSocket, code) {
  * @param {Set} emailToSocket 
  * @param {user} user 
  */
-async function leaveRoom(emailToSocket, user) {
+async function leaveRoom(socket, emailToSocket, user) {
   const userEntry = sids.get(user.email);
   //We check if user has a room asigned
   if (userEntry) {
@@ -145,6 +145,15 @@ async function leaveRoom(emailToSocket, user) {
     let players = getUsersWithCode(code);
     let usersInfo = await getUsersInfo(players);
     sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
+
+    // Skip the turn of this player
+    const state = roomState.get(code);
+    if(state) {
+      const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
+      if (playerIndex === state.turn) {
+        nextTurnHandler(socket, emailToSocket, user);
+      }
+    }
   }
 }
 
