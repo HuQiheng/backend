@@ -98,10 +98,8 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
           if(checkVictory(state, player)) {
             winner = true;
           }
-          map[from].troops -= troops;
-        } else {
-          console.log('Territories are owned by the same player');
         }
+        map[from].troops -= troops;
       } 
     } 
   }
