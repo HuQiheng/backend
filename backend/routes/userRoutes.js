@@ -98,7 +98,7 @@ router.put('/:email/achievements', checkAuthenticated, async (req, res) => {
  */
 router.get('/:email/wins', checkAuthenticated, async (req, res) => {
   try {
-    if (req.user.email === req.params.email) {
+    if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
       const userWins = await playerController.getWins(req.params.email);
       res.send(userWins.rows[0]);
     }
