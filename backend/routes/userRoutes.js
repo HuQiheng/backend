@@ -100,7 +100,7 @@ router.get('/:email/wins', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email || friendController.areFriends(req.user.email, req.params.email)) {
       const userWins = await playerController.getWins(req.params.email);
-      res.send(userWins.rows[0]);
+      res.send(userWins);
     }
   } catch (error) {
     console.error('Error getting user wins', error);
