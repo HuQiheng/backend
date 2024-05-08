@@ -10,6 +10,7 @@ function assignTerritories(players, data) {
   const initialTroops = 3;
   const initialCoins = 0;
   const initialPoints = 0;
+  const gameStarted = false;
   const state = {
     turn: 0,
     phase: 0,
