@@ -7,4 +7,5 @@ INSERT INTO Achievement (title, description, image_url) VALUES
 ('Conquistador', 'Conquista un territorio en una partida', 'https://i.ibb.co/qCzKMfX/conquista-1-territorio.jpg'),
 ('Industrializador', 'Compra una fabrica en una partida', 'https://i.ibb.co/3rK0JzM/comprar-1-fabrica.jpg'),
 ('Revolucion industrial', 'Obten 15 partidas en una sola partida', 'https://i.ibb.co/2v7Zsbp/comprar-15-fabricas.jpg'),
-('La Armada Invencible', 'Alcanza a tener 99 tropas en un solo territorio', 'https://i.ibb.co/N7CtJPC/conseguir-99-tropas.jpg');
+('La Armada Invencible', 'Alcanza a tener 99 tropas en un solo territorio', 'https://i.ibb.co/N7CtJPC/conseguir-99-tropas.jpg')
+('Mileurista', 'https://wealthwars.games/badges/conseguir_1000_monedas.png');
