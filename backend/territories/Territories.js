@@ -1,4 +1,4 @@
-
+const surrendered = {};
 /**
  * @description This function assigns territories to players at the start of the game.
  * @param {Array} players The array of players in the game.
@@ -158,11 +158,12 @@ function surrender(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let winner = false;
   const map = state.map;
+  surrendered.add(playerIndex);
   for (const i in map) {
     if (map[i].player === playerIndex) {
       // asign territory to another player
       let j = Math.floor(Math.random() * state.players.length);
-      while (j === playerIndex) {
+      while (surrendered.has(playerIndex)) {
         j = Math.floor(Math.random() * state.players.length);
       }
       map[i].player = j;
