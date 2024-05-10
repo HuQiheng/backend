@@ -242,12 +242,11 @@ function buyActives(state, player, type, territory, numActives) {
   }
   if (state.players[playerIndex].coins >= cost  && map[territory].player === playerIndex) {
     if (type === 'factory' && map[territory].factories === 0) {
-      state.players[playerIndex].coins -= cost;
       map[territory].factories += numActives;
     } else if (type === 'troop' && map[territory].troops < 99 && (map[territory].troops + numActives) <= 99) {
-      state.players[playerIndex].coins -= cost;
       map[territory].troops += numActives;
     }
+    state.players[playerIndex].coins -= cost;
   }
   state.map = map;
   return state;
