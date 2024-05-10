@@ -287,17 +287,6 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       console.log("User won!!!!!!!")
       console.log(user.email);
       victoryHandler(emailToSocket, user);
-      const numWins = await PlayerController.getWins(user.email);
-      // Check the achievements
-      if (Number(numWins) === 1) {
-        await giveAchievement(emailToSocket,'Comandante principiante', user.email);
-      }
-      else if (Number(numWins) === 10) {
-        await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
-      }
-      else if (Number(numWins) === 100) {
-        await giveAchievement(emailToSocket,'Comandante veterano', user.email);
-      }
     }
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
@@ -415,18 +404,7 @@ async function victoryHandler(emailToSocket, user) {
       leaveRoom(emailToSocket, player);
     }
     // Update wins and achievements
-    await PlayerController.updateWins(user.email);
-    const numWins = await PlayerController.getWins(user.email);
-
-    if (Number(numWins) === 1) {
-      await giveAchievement(emailToSocket,'Comandante principiante', user.email);
-    }
-    if (Number(numWins) === 10) {
-      await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
-    }
-    else if (Number(numWins) === 100) {
-      await giveAchievement(emailToSocket,'Comandante veterano', user.email);
-    } 
+    await giveWins(emailToSocket, user.email);
   } else {
     console.log(`You are not in a room ` + user.email);
   }
@@ -512,6 +490,7 @@ async function reconectionHandler(socket, user){
     getMap(socket, user);
   }
 }
+
 module.exports = {
   createRoom,
   joinRoom,
@@ -603,6 +582,22 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
   } catch (error) {
     throw error;
   }
+}
+
+// Functions for make the code more simple
+async function giveWins(emailToSocket, userMail) {
+    await PlayerController.updateWins(userMail);
+    const numWins = await PlayerController.getWins(userMail);
+
+    if (Number(numWins) === 1) {
+      await giveAchievement(emailToSocket,'Comandante principiante', userMail);
+    }
+    if (Number(numWins) === 10) {
+      await giveAchievement(emailToSocket,'Comandante experimentado', userMail);
+    }
+    else if (Number(numWins) === 100) {
+      await giveAchievement(emailToSocket,'Comandante veterano', userMail);
+    }
 }
 
 
