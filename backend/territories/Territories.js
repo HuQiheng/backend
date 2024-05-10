@@ -237,10 +237,6 @@ function buyActives(state, player, type, territory, numActives) {
   const map = state.map;
   if (type === 'factory') {
     var cost = 15;
-  } else if (type === 'troop' && numActives == 5) {
-    var cost = 5;
-  } else if (type === 'troop' && numActives == 10) {
-    var cost = 10;
   } else if (type === 'troop') {
     var cost = 2 * numActives;
   }
