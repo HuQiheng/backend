@@ -260,7 +260,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   if (room && room.code) {
     
     //Next phase for the user
-    const {state ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    const {state ,conquered, winner, player} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
 
     roomState.set(room.code, state);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
@@ -282,12 +282,11 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     if (conquered) {
       await giveAchievement(emailToSocket,'Conquistador', user.email);
     }
-    if (win) {
+    if (winner) {
       //User won send event to all
       console.log("User won!!!!!!!")
       console.log(user.email);
-      victoryHandler(emailToSocket, winner);
-      await PlayerController.updateWins(user.email);
+      victoryHandler(emailToSocket, user);
       const numWins = await PlayerController.getWins(user.email);
       // Check the achievements
       if (Number(numWins) === 1) {

@@ -83,7 +83,7 @@ function moveTroops(state, from, to, t, player) {
  * @param {Object} emailToSocket The mapping of emails to sockets.
  * @returns {Object} The updated state of the game and the result of the attack.
  */
-function attackTerritories(state, from, to, troops, player, emailToSocket) {
+function attackTerritories(state, from, to, troops, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   const map = state.map;
   conquered = false;
@@ -95,10 +95,13 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
           map[to].troops = troops - map[to].troops;
           map[to].player = playerIndex;
           conquered = true;
+          state.map = map;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
             winner = true;
+            console.log("En la funcion attack has ganado")
           }
+          console.log("EN ATTACK" + winner);
         } else {
           map[to].troops -= troops;
         }
@@ -119,12 +122,16 @@ function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
   const map = state.map;
+  console.log(map);
+  console.log(playerIndex);
   for (const i in map) {
+    console.log(samePlayer);
     if (state.map[i].player !== playerIndex) {
       samePlayer = false;
       break;
     }
   }
+  console.log("El resultado final: " + samePlayer);
   if (samePlayer) {
     return true;
   } else {
@@ -164,7 +171,7 @@ function surrender(state, player) {
     if (map[i].player === playerIndex) {
       // asign territory to another player
       let j = Math.floor(Math.random() * state.players.length);
-      while (j === playerIndex) {
+      while (j === playerIndex || state.surrendered.includes(j)) {
         j = Math.floor(Math.random() * state.players.length);
       }
       map[i].player = j;
