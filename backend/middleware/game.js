@@ -132,28 +132,19 @@ async function startGame(emailToSocket, code) {
  * @param {Set} emailToSocket 
  * @param {user} user 
  */
-async function leaveRoom(socket, emailToSocket, user) {
+async function leaveRoom(emailToSocket, user) {
   const userEntry = sids.get(user.email);
   //We check if user has a room asigned
   if (userEntry) {
     let code = Number(userEntry.code);
-    //Delete the user from all the sets
+    
     rooms.get(code).delete(user.email);
     sids.delete(user.email);
-    //Notify all the users that the player left the room
+    console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
     let players = getUsersWithCode(code);
     let usersInfo = await getUsersInfo(players);
     sendToAllWithCode(emailToSocket, code, 'connectedPlayers', usersInfo);
-
-    // Skip the turn of this player
-    const state = roomState.get(code);
-    if(state) {
-      const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
-      if (playerIndex === state.turn) {
-        nextTurnHandler(socket, emailToSocket, user);
-      }
-    }
   }
 }
 

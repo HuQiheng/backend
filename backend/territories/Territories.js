@@ -1,4 +1,3 @@
-const surrendered = {};
 /**
  * @description This function assigns territories to players at the start of the game.
  * @param {Array} players The array of players in the game.
@@ -20,6 +19,8 @@ function assignTerritories(players, data) {
       coins: initialCoins,
       points: initialPoints,
     })),
+    //Players that had surrendered
+    surrendered: [],
     map: {},
   };
 
@@ -158,12 +159,12 @@ function surrender(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let winner = false;
   const map = state.map;
-  surrendered.add(playerIndex);
+  state.surrendered.push(playerIndex);
   for (const i in map) {
     if (map[i].player === playerIndex) {
       // asign territory to another player
       let j = Math.floor(Math.random() * state.players.length);
-      while (surrendered.has(playerIndex)) {
+      while (j === playerIndex) {
         j = Math.floor(Math.random() * state.players.length);
       }
       map[i].player = j;
@@ -189,8 +190,11 @@ function nextTurn(state) {
   //Check if the phase is the last one
   if (state.phase === 2) {
     //Cacluate the number of coins for every player
-    // Next turn
-    state.turn = (state.turn + 1) % state.players.length;
+    // Next turn, we have to look for the next turn of the player
+    //that didn't surrendered
+    do{
+      state.turn = (state.turn + 1) % state.players.length;
+    }while(state.surrendered.includes(state.turn))
     let coins = countPlayerCoins(state, state.turn);
     state.players[state.turn].coins += coins;
     state.players[state.turn].points += coins;

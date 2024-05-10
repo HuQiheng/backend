@@ -208,7 +208,7 @@ io.on('connection', (socket) => {
     // Leave a lobby
     socket.on('leaveRoom', () => {
       try {
-        leaveRoom(socket, emailToSocket, user);
+        leaveRoom(emailToSocket, user);
       } catch (error) {
         console.log('Error leaving room: ' + error.message);
         socket.emit('error', 'Error leaving room: ' + error.message);
