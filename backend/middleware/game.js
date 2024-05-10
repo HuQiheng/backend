@@ -63,20 +63,25 @@ function createRoom(socket, user) {
  * @param {string} code 
  */
 async function joinRoom(emailToSocket, socket, user, code) {
+  const roomCode = Number(code);
+
   // Check if the room exists
-  const roomExists = rooms.has(Number(code));
+  const roomExists = rooms.has(roomCode);
   if (roomExists) {
-    const playersInRoom = rooms.get(Number(code));
+    const playersInRoom = rooms.get(roomCode);
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
-    // Check if the game start
-    const gameStarted = roomState.get(Number(code));
-    /**@todo Este check esta bien pero soobra comporbar si el codigo es el mismo */
-    if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4 && gameStarted == null) {
+
+    // Check if the game has started
+    const gameStarted = roomState.get(roomCode);
+
+    // Check if thera are less than 4 players in the room
+    if (firstPlayerDetails && playersInRoom.size < 4 && gameStarted == null) {
+      
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
-      rooms.set(Number(code), playersInRoom);
-      sids.set(user.email, { code: Number(code) });
+      rooms.set(roomCode, playersInRoom);
+      sids.set(user.email, { code: roomCode });
       
       //emit the event
       socketEmit(socket, 'roomAccess', code);
