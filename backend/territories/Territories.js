@@ -1,4 +1,3 @@
-
 /**
  * @description This function assigns territories to players at the start of the game.
  * @param {Array} players The array of players in the game.
@@ -20,6 +19,8 @@ function assignTerritories(players, data) {
       coins: initialCoins,
       points: initialPoints,
     })),
+    //Players that had surrendered
+    surrendered: [],
     map: {},
   };
 
@@ -82,7 +83,7 @@ function moveTroops(state, from, to, t, player) {
  * @param {Object} emailToSocket The mapping of emails to sockets.
  * @returns {Object} The updated state of the game and the result of the attack.
  */
-function attackTerritories(state, from, to, troops, player, emailToSocket) {
+function attackTerritories(state, from, to, troops, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   const map = state.map;
   conquered = false;
@@ -94,10 +95,13 @@ function attackTerritories(state, from, to, troops, player, emailToSocket) {
           map[to].troops = troops - map[to].troops;
           map[to].player = playerIndex;
           conquered = true;
+          state.map = map;
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
             winner = true;
+            console.log("En la funcion attack has ganado")
           }
+          console.log("EN ATTACK" + winner);
         } else {
           map[to].troops -= troops;
         }
@@ -118,12 +122,16 @@ function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
   const map = state.map;
+  console.log(map);
+  console.log(playerIndex);
   for (const i in map) {
+    console.log(samePlayer);
     if (state.map[i].player !== playerIndex) {
       samePlayer = false;
       break;
     }
   }
+  console.log("El resultado final: " + samePlayer);
   if (samePlayer) {
     return true;
   } else {
@@ -158,11 +166,12 @@ function surrender(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let winner = false;
   const map = state.map;
+  state.surrendered.push(playerIndex);
   for (const i in map) {
     if (map[i].player === playerIndex) {
       // asign territory to another player
       let j = Math.floor(Math.random() * state.players.length);
-      while (j === playerIndex) {
+      while (j === playerIndex || state.surrendered.includes(j)) {
         j = Math.floor(Math.random() * state.players.length);
       }
       map[i].player = j;
@@ -188,8 +197,11 @@ function nextTurn(state) {
   //Check if the phase is the last one
   if (state.phase === 2) {
     //Cacluate the number of coins for every player
-    // Next turn
-    state.turn = (state.turn + 1) % state.players.length;
+    // Next turn, we have to look for the next turn of the player
+    //that didn't surrendered
+    do{
+      state.turn = (state.turn + 1) % state.players.length;
+    }while(state.surrendered.includes(state.turn))
     let coins = countPlayerCoins(state, state.turn);
     state.players[state.turn].coins += coins;
     state.players[state.turn].points += coins;
@@ -236,8 +248,7 @@ function buyActives(state, player, type, territory, numActives) {
     if (type === 'factory' && map[territory].factories === 0) {
       state.players[playerIndex].coins -= cost;
       map[territory].factories += numActives;
-    } else if (type === 'factory' && map[territory].factories > 0) {
-    } else if (type === 'troop') {
+    } else if (type === 'troop' && map[territory].troops < 99 && (map[territory].troops + numActives) <= 99) {
       state.players[playerIndex].coins -= cost;
       map[territory].troops += numActives;
     }

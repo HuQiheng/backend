@@ -69,8 +69,10 @@ async function joinRoom(emailToSocket, socket, user, code) {
     const playersInRoom = rooms.get(Number(code));
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
+    // Check if the game start
+    const gameStarted = roomState.get(Number(code));
     /**@todo Este check esta bien pero soobra comporbar si el codigo es el mismo */
-    if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4) {
+    if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4 && gameStarted == null) {
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
       rooms.set(Number(code), playersInRoom);
@@ -137,10 +139,10 @@ async function leaveRoom(emailToSocket, user) {
   //We check if user has a room asigned
   if (userEntry) {
     let code = Number(userEntry.code);
-    //Delete the user from all the sets
+    
     rooms.get(code).delete(user.email);
     sids.delete(user.email);
-    //Notify all the users that the player left the room
+    console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
     let players = getUsersWithCode(code);
     let usersInfo = await getUsersInfo(players);
@@ -260,7 +262,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
   if (room && room.code) {
     
     //Next phase for the user
-    const {state ,conquered, win, winner} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
+    const {state ,conquered, winner, player} = attackTerritories(roomState.get(room.code), from, to, troops, user.email);
 
     roomState.set(room.code, state);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
@@ -282,12 +284,11 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     if (conquered) {
       await giveAchievement(emailToSocket,'Conquistador', user.email);
     }
-    if (win) {
+    if (winner) {
       //User won send event to all
       console.log("User won!!!!!!!")
       console.log(user.email);
-      victoryHandler(emailToSocket, winner);
-      await PlayerController.updateWins(user.email);
+      victoryHandler(emailToSocket, user);
       const numWins = await PlayerController.getWins(user.email);
       // Check the achievements
       if (Number(numWins) === 1) {
