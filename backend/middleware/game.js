@@ -23,6 +23,7 @@ const {
   nextTurn,
   buyActives,
   updateRanking,
+  isPlayerTurn,
 } = require('../territories/Territories');
 const data = require('../territories/territories.json');
 
@@ -192,7 +193,7 @@ async function nextTurnHandler(socket, emailToSocket, user) {
     console.log(userCode);
 
     //Next turn for the game
-    const state = nextTurn(roomState.get(userCode));
+    const state = nextTurn(roomState.get(userCode), false);
     roomState.set(userCode, state);
 
 
@@ -316,8 +317,12 @@ function surrenderHandler(socket, emailToSocket, user) {
     //Surrender
     const {state, winner, playerWinner} = surrender(roomState.get(userCode), user.email);
 
-    //A user that surrenders leaves the room
-    leaveRoom(emailToSocket, user);
+    //Is the turn of the user that surrendered
+    if(isPlayerTurn(state, user.email)){
+      console.log("Era su turno");
+      console.log(state);
+      nextTurn(state, true);
+    }
 
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
