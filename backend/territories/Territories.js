@@ -190,12 +190,14 @@ function surrender(state, player) {
 
 /**
  * @description This function handles the shift of turns in the game.
+ * It only shift turns if the user surrendered or is his last phase.
  * @param {Object} state The current state of the game.
+ * @param {boolean} surrnedered If the player has surrendered or not
  * @returns {Object} The updated state of the game.
  */
-function nextTurn(state) {
+function nextTurn(state, surrnedered) {
   //Check if the phase is the last one
-  if (state.phase === 2) {
+  if (state.phase === 2 || surrnedered) {
     //Cacluate the number of coins for every player
     // Next turn, we have to look for the next turn of the player
     //that didn't surrendered
@@ -210,6 +212,20 @@ function nextTurn(state) {
   return state;
 }
 
+/**
+ * 
+ * @param {Object} state 
+ * @param {Object} player 
+ * @returns {true} if is the player turn, false in any other case
+ */
+function isPlayerTurn(state, player){
+  let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
+  if(state.turn === playerIndex){
+    return true;
+  } else {
+    return false;
+  }
+}
 /**
  * @description This function handles the shift of phases in the game.
  * @param {Object} state The current state of the game.
@@ -299,4 +315,5 @@ module.exports = {
   attackTerritories,
   nextPhase,
   updateRanking,
+  isPlayerTurn,
 };

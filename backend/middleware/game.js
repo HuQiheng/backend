@@ -23,6 +23,7 @@ const {
   nextTurn,
   buyActives,
   updateRanking,
+  isPlayerTurn,
 } = require('../territories/Territories');
 const data = require('../territories/territories.json');
 
@@ -63,20 +64,25 @@ function createRoom(socket, user) {
  * @param {string} code 
  */
 async function joinRoom(emailToSocket, socket, user, code) {
+  const roomCode = Number(code);
+
   // Check if the room exists
-  const roomExists = rooms.has(Number(code));
+  const roomExists = rooms.has(roomCode);
   if (roomExists) {
-    const playersInRoom = rooms.get(Number(code));
+    const playersInRoom = rooms.get(roomCode);
     const firstPlayerInRoom = Array.from(playersInRoom)[0];
     const firstPlayerDetails = sids.get(firstPlayerInRoom);
-    // Check if the game start
-    const gameStarted = roomState.get(Number(code));
-    /**@todo Este check esta bien pero soobra comporbar si el codigo es el mismo */
-    if (firstPlayerDetails && Number(firstPlayerDetails.code) === Number(code) && playersInRoom.size < 4 && gameStarted == null) {
+
+    // Check if the game has started
+    const gameStarted = roomState.get(roomCode);
+
+    // Check if thera are less than 4 players in the room
+    if (firstPlayerDetails && playersInRoom.size < 4 && gameStarted == null) {
+      
       // Add the user email to connected players for the game
       playersInRoom.add(user.email);
-      rooms.set(Number(code), playersInRoom);
-      sids.set(user.email, { code: Number(code) });
+      rooms.set(roomCode, playersInRoom);
+      sids.set(user.email, { code: roomCode });
       
       //emit the event
       socketEmit(socket, 'roomAccess', code);
@@ -189,7 +195,7 @@ async function nextTurnHandler(socket, emailToSocket, user) {
     console.log(userCode);
 
     //Next turn for the game
-    const state = nextTurn(roomState.get(userCode));
+    const state = nextTurn(roomState.get(userCode), false);
     roomState.set(userCode, state);
 
 
@@ -289,17 +295,6 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       console.log("User won!!!!!!!")
       console.log(user.email);
       victoryHandler(emailToSocket, user);
-      const numWins = await PlayerController.getWins(user.email);
-      // Check the achievements
-      if (Number(numWins) === 1) {
-        await giveAchievement(emailToSocket,'Comandante principiante', user.email);
-      }
-      else if (Number(numWins) === 10) {
-        await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
-      }
-      else if (Number(numWins) === 100) {
-        await giveAchievement(emailToSocket,'Comandante veterano', user.email);
-      }
     }
   } else {
     console.log(`You are not in the room ${room.code} ` + user.email);
@@ -324,8 +319,12 @@ function surrenderHandler(socket, emailToSocket, user) {
     //Surrender
     const {state, winner, playerWinner} = surrender(roomState.get(userCode), user.email);
 
-    //A user that surrenders leaves the room
-    leaveRoom(emailToSocket, user);
+    //Is the turn of the user that surrendered
+    if(isPlayerTurn(state, user.email)){
+      console.log("Era su turno");
+      console.log(state);
+      nextTurn(state, true);
+    }
 
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     sendToAllWithCode(emailToSocket, userCode, 'userSurrendered', user.email);
@@ -417,18 +416,7 @@ async function victoryHandler(emailToSocket, user) {
       leaveRoom(emailToSocket, player);
     }
     // Update wins and achievements
-    await PlayerController.updateWins(user.email);
-    const numWins = await PlayerController.getWins(user.email);
-
-    if (Number(numWins) === 1) {
-      await giveAchievement(emailToSocket,'Comandante principiante', user.email);
-    }
-    if (Number(numWins) === 10) {
-      await giveAchievement(emailToSocket,'Comandante experimentado', user.email);
-    }
-    else if (Number(numWins) === 100) {
-      await giveAchievement(emailToSocket,'Comandante veterano', user.email);
-    } 
+    await giveWins(emailToSocket, user.email);
   } else {
     console.log(`You are not in a room ` + user.email);
   }
@@ -514,6 +502,7 @@ async function reconectionHandler(socket, user){
     getMap(socket, user);
   }
 }
+
 module.exports = {
   createRoom,
   joinRoom,
@@ -605,6 +594,22 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
   } catch (error) {
     throw error;
   }
+}
+
+// Functions for make the code more simple
+async function giveWins(emailToSocket, userMail) {
+    await PlayerController.updateWins(userMail);
+    const numWins = await PlayerController.getWins(userMail);
+
+    if (Number(numWins) === 1) {
+      await giveAchievement(emailToSocket,'Comandante principiante', userMail);
+    }
+    if (Number(numWins) === 10) {
+      await giveAchievement(emailToSocket,'Comandante experimentado', userMail);
+    }
+    else if (Number(numWins) === 100) {
+      await giveAchievement(emailToSocket,'Comandante veterano', userMail);
+    }
 }
 
 
