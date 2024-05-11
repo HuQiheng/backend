@@ -18,15 +18,12 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      console.log('Origen  ' + origin);
       // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        console.log('CORS not allowed');
         var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
       }
-      console.log('Allowed');
       return callback(null, true);
     },
     credentials: true,
@@ -94,18 +91,12 @@ if (process.env.MODE_ENV === 'development') {
 io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
-      if(origin){
-        console.log('Origen  ' + origin);
-      }
-
       // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        console.log('CORS not allowed');
         var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
       }
-      console.log('Allowed');
       return callback(null, true);
     },
     credentials: true,
@@ -130,12 +121,10 @@ io.engine.use(
 if (process.env.MODE_ENV === 'development') {
   const host = 'localhost';
   server.listen(3010, host, () => {
-    console.log(`Server is listening on ${host}:${3010}`);
   });
 } else {
   const host = process.env.CLIENT_URL;
   server.listen(3010, host, () => {
-    console.log(`Server is listening on https://${host}:3010`);
   });
 }
 
@@ -174,23 +163,18 @@ io.on('connection', (socket) => {
 
     //Check if the user had a timeout cancel it
     const existingTimeout = userTimeouts.get(user.email);
-    console.log("El timeout " + existingTimeout);
-    console.log("Del usuario " + user.email)
     if (existingTimeout) {
       clearTimeout(existingTimeout);
       userTimeouts.delete(user.email);
     }
     //Create a new pair, the user is associated with that socket
     emailToSocket.set(user.email, socket);
-    console.log('Socket ID: ' + socket.id);
-    console.log('User authenticated: ' + JSON.stringify(user));
     //reconectionHandler(socket, user);
     // Create lobby
     socket.on('createRoom', () => {
       try {
         createRoom(socket, user);
       } catch (error) {
-        console.log('Error creating room: ' + error.message);
         socket.emit('error', 'Error creating room: ' + error.message);
       }
     });
@@ -200,7 +184,6 @@ io.on('connection', (socket) => {
       try {
         joinRoom(emailToSocket, socket, user, code);
       } catch (error) {
-        console.log('Error joining room: ' + error.message);
         socket.emit('error', 'Error joining room: ' + error.message);
       }
     });
@@ -210,7 +193,6 @@ io.on('connection', (socket) => {
       try {
         startGame(emailToSocket, code, user, socket);
       } catch (error) {
-        console.log('Error starting game: ' + error.message);
         socket.emit('error', 'Error starting game: ' + error.message);
       }
     });
@@ -220,29 +202,23 @@ io.on('connection', (socket) => {
       try {
         leaveRoom(emailToSocket, user);
       } catch (error) {
-        console.log('Error leaving room: ' + error.message);
         socket.emit('error', 'Error leaving room: ' + error.message);
       }
     });
 
     // Socket disconnection
     socket.on('disconnect', () => {
-      console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
       const timeoutId = setTimeout(() => {
         surrenderHandler(socket, emailToSocket, user);
         leaveRoom(emailToSocket, user);
         userTimeouts.delete(user.email);
       }, 90000); // Time is in milliseconds (90 seconds = 90000 milliseconds)
-      console.log("Se va a poner un timeout");
-      console.log(" Para el usuario "+ user.email);
-      console.log("El timeout sera " + timeoutId);
 
       //There was a previous timeout for a previous disconnection
       //First we clear that one
       const existingTimeout = userTimeouts.get(user.email);
       if (existingTimeout) {
-        console.log("Borramos un timeout previo " + existingTimeout);
         clearTimeout(existingTimeout);
         userTimeouts.delete(user.email);
       }
@@ -255,7 +231,6 @@ io.on('connection', (socket) => {
       try {
         nextPhaseHandler(socket, emailToSocket, user);
       } catch (error) {
-        console.log('Error in next phase: ' + error.message);
         socket.emit('error', 'Error in next phase: ' + error.message);
       }
     });
@@ -265,7 +240,6 @@ io.on('connection', (socket) => {
       try {
         moveTroopsHandler(socket, emailToSocket, user, from, to, troops);
       } catch (error) {
-        console.log('Error moving troops: ' + error.message);
         socket.emit('error', 'Error moving troops: ' + error.message);
       }
     });
@@ -275,7 +249,6 @@ io.on('connection', (socket) => {
       try {
         attackTerritoriesHandler(socket, emailToSocket, user, from, to, troops);
       } catch (error) {
-        console.log('Error attacking territories: ' + error.message);
         socket.emit('error', 'Error attacking territories: ' + error.message);
       }
     });
@@ -285,7 +258,6 @@ io.on('connection', (socket) => {
       try {
         surrenderHandler(socket, emailToSocket, user);
       } catch (error) {
-        console.log('Error in surrender: ' + error.message);
         socket.emit('error', 'Error in surrender: ' + error.message);
       }
     });
@@ -295,7 +267,6 @@ io.on('connection', (socket) => {
       try {
         nextTurnHandler(socket, emailToSocket, user);
       } catch (error) {
-        console.log('Error in next turn: ' + error.message);
         socket.emit('error', 'Error in next turn: ' + error.message);
       }
     });
@@ -305,7 +276,6 @@ io.on('connection', (socket) => {
       try {
         buyActivesHandler(socket, emailToSocket, user, type, territory, numActives);
       } catch (error) {
-        console.log('Error buying actives: ' + error.message);
         socket.emit('error', 'Error buying actives: ' + error.message);
       }
     });
@@ -315,7 +285,6 @@ io.on('connection', (socket) => {
       try {
         victoryHandler(emailToSocket, user);
       } catch (error) {
-        console.log('Error in victory: ' + error.message);
         socket.emit('error', 'Error in victory: ' + error.message);
       }
     });
@@ -325,7 +294,6 @@ io.on('connection', (socket) => {
       try {
         getMap(socket, user);
       } catch (error) {
-        console.log('Error sending map: ' + error.message);
         socket.emit('error', 'Error sending map: ' + error.message);
       }
     });
@@ -335,7 +303,6 @@ io.on('connection', (socket) => {
       try {
         chat(socket, emailToSocket, user, msg);
       } catch (error) {
-        console.log('Error in chat: ' + error.message);
         socket.emit('error', 'Error in chat: ' + error.message);
       }
     });
@@ -345,12 +312,10 @@ io.on('connection', (socket) => {
       try{
         invite(socket, emailToSocket, user, email);
       } catch (error) {
-        console.log('Error sending map: ' + error.message);
         socket.emit('error', 'Error sending map: ' + error.message);
       }
     });
   } catch (error) {
-    console.log('Error in connection event: ' + error.message);
   }
 });
 

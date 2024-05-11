@@ -28,7 +28,6 @@ router.get(
   passport.authenticate('google', { session: true, failureRedirect: '/auth/google' }),
   (req, res) => {
     const userAgent = req.headers['user-agent'];
-    console.log('Agent: ' + userAgent);
 
     let isMobile = false;
     //Searching if its a mobile
