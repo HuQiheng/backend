@@ -162,19 +162,29 @@ const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
+
+// We create a map of active timeout identifiers, for managing reconections
+const userTimeouts = new Map();
 // Conexion de un socket
 io.on('connection', (socket) => {
   try {
-    //The session
-    const session = socket.request.session;
+
     //The user
     const user = socket.request.user;
 
+    //Check if the user had a timeout cancel it
+    const existingTimeout = userTimeouts.get(user.email);
+    console.log("El timeout " + existingTimeout);
+    console.log("Del usuario " + user.email)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      userTimeouts.delete(user.email);
+    }
     //Create a new pair, the user is associated with that socket
     emailToSocket.set(user.email, socket);
     console.log('Socket ID: ' + socket.id);
     console.log('User authenticated: ' + JSON.stringify(user));
-    reconectionHandler(socket, user);
+    //reconectionHandler(socket, user);
     // Create lobby
     socket.on('createRoom', () => {
       try {
@@ -219,7 +229,25 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
-      // leaveRoom(socket,user);
+      const timeoutId = setTimeout(() => {
+        surrenderHandler(socket, emailToSocket, user);
+        leaveRoom(emailToSocket, user);
+        userTimeouts.delete(user.email);
+      }, 90000); // Time is in milliseconds (90 seconds = 90000 milliseconds)
+      console.log("Se va a poner un timeout");
+      console.log(" Para el usuario "+ user.email);
+      console.log("El timeout sera " + timeoutId);
+
+      //There was a previous timeout for a previous disconnection
+      //First we clear that one
+      const existingTimeout = userTimeouts.get(user.email);
+      if (existingTimeout) {
+        console.log("Borramos un timeout previo " + existingTimeout);
+        clearTimeout(existingTimeout);
+        userTimeouts.delete(user.email);
+      }
+      // Store the timeout identifier for the user
+      userTimeouts.set(user.email, timeoutId);
     });
 
     // Next phase

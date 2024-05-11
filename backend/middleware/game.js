@@ -273,8 +273,7 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
     roomState.set(room.code, state);
     sendToAllWithCode(emailToSocket, room.code, 'mapSent', state);
 
-    const ataqueString = "Jugador " + user.email + " atacó desde " + from + " a " + to + "con: " + troops;  
-    sendToAllWithCode(emailToSocket, room.code, 'attack', ataqueString)
+    sendToAllWithCode(emailToSocket, room.code, 'attack', {email: user.email, from: from, to: to, numberTroops: troops})
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
     let factories = 0;
     const map = state.map;
