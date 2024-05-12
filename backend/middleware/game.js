@@ -414,6 +414,9 @@ async function victoryHandler(emailToSocket, user) {
     for (const player of players){
       leaveRoom(emailToSocket, player);
     }
+    rooms.delete(userCode);
+    roomState.delete(userCode);
+    console.log("Vamos a actualizar las victorias de  " + user.email);
     // Update wins and achievements
     await giveWins(emailToSocket, user.email);
   } else {
@@ -525,8 +528,13 @@ module.exports = {
 //---------------------------------Private functions---------------------------------
 // Send a message to a specific user
 function socketEmit(socket, event, data) {
-  console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
-  socket.emit(event, data);
+  //Check the socket conecction
+  if (socket.connected) {
+    console.log(`Emitiendo evento ${event} con valores ${JSON.stringify(data)} a ${socket.id}`);
+    socket.emit(event, data);
+} else {
+    console.log(`La conexión del socket ${socket.id} está cerrada.`);
+}
 }
 
 //Given a code it sends a message containing event to all the players that used that code
@@ -543,7 +551,12 @@ function sendingThroughEmail(emailToSocket, email, event, data) {
   //console.log(emailToSocket);
   const socket = emailToSocket.get(email);
   if (socket) {
-    socket.emit(event, data);
+    if(socket.connected){
+      socket.emit(event, data);
+    } else {
+      console.log("The socket is not connected");
+    }
+
   } else {
     console.log(`No socket found for email ${email}`);
   }
@@ -599,7 +612,7 @@ async function giveAchievement(emailToSocket, achievementTitle, email) {
 async function giveWins(emailToSocket, userMail) {
     await PlayerController.updateWins(userMail);
     const numWins = await PlayerController.getWins(userMail);
-
+    console.log("Vamos a darle una victoria a " + userMail);
     if (Number(numWins) === 1) {
       await giveAchievement(emailToSocket,'Comandante principiante', userMail);
     }
