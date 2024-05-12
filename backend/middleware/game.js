@@ -124,11 +124,7 @@ async function startGame(emailToSocket, code) {
     for (let user of usersInfo) {
       await giveAchievement(emailToSocket,'Bienvenido a WealthWars', user.email);
     }
-  } else {
-    console.log(`No players in room with code ${code}`);
   }
-  console.log('EN JOIN:');
-  console.log([...rooms.entries()].map(([room, sockets]) => `${room}: ${[...sockets].join(', ')}`));
 }
 
 // Function to leave a room
@@ -148,7 +144,6 @@ async function leaveRoom(emailToSocket, user) {
     
     rooms.get(code).delete(user.email);
     sids.delete(user.email);
-    console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
     let players = getUsersWithCode(code);
     let usersInfo = await getUsersInfo(players);
@@ -175,7 +170,6 @@ function nextPhaseHandler(socket, emailToSocket, user) {
     roomState.set(userCode, state);
     sendToAllWithCode(emailToSocket, userCode, 'nextPhase', ' ');
   } else {
-    console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', ' ');
   }
 }
@@ -192,7 +186,6 @@ async function nextTurnHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
 
     //Next turn for the game
     const state = nextTurn(roomState.get(userCode), false);
@@ -207,7 +200,6 @@ async function nextTurnHandler(socket, emailToSocket, user) {
       await giveAchievement(emailToSocket,'Mileurista', user.email);
     }
   } else {
-    console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', ' ');
   }
 }
@@ -240,7 +232,6 @@ async function moveTroopsHandler(socket, emailToSocket, user, from, to, troops) 
       await giveAchievement(emailToSocket,'La Armada Invencible', user.email);
     }
   } else {
-    console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInTheRoom', room.code);
   }
 }
@@ -290,13 +281,10 @@ async function attackTerritoriesHandler(socket, emailToSocket, user, from, to, t
       await giveAchievement(emailToSocket,'Conquistador', user.email);
     }
     if (winner) {
-      //User won send event to all
-      console.log("User won!!!!!!!")
-      console.log(user.email);
+      //User won send event to all);
       victoryHandler(emailToSocket, user);
     }
   } else {
-    console.log(`You are not in the room ${room.code} ` + user.email);
     socketEmit(socket, 'notInARoom', room.code);
   }
 }
@@ -320,8 +308,6 @@ function surrenderHandler(socket, emailToSocket, user) {
 
     //Is the turn of the user that surrendered
     if(isPlayerTurn(state, user.email)){
-      console.log("Era su turno");
-      console.log(state);
       nextTurn(state, true);
     }
 
@@ -334,7 +320,6 @@ function surrenderHandler(socket, emailToSocket, user) {
       victoryHandler(emailToSocket, playerWinner);
     }
   } else {
-    console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', ' ');
   }
 }
@@ -375,8 +360,6 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
         if(map[i].factories === 1 && map[i].player === playerIndex){
           factories++;
         }
-        console.log("Numero de fabricas");
-        console.log(factories);
         if(Number(factories) === 15) {
           await giveAchievement(emailToSocket,'Revolución industrial', user.email);
           break;
@@ -389,7 +372,6 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
       await giveAchievement(emailToSocket,'La Armada Invencible', user.email);
     }
   } else {
-    console.log(`You are not in a room ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
   }
 }
@@ -405,9 +387,9 @@ async function victoryHandler(emailToSocket, user) {
     let userCode = sids.get(user.email).code;
     let rank = updateRanking(roomState.get(userCode));
     // Emit victory event to the winning player
-    sendingThroughEmail(emailToSocket, user.email, 'victory', `Congratulations, ${user.name}! You have won the game! `);
+    sendingThroughEmail(emailToSocket, user.email, 'victory', {email: user.email});
     // Emit game over to all the rest of users
-    sendToAllWithCode(emailToSocket, userCode, 'gameOver', {message: `Game over, ${user.name} has won the game!`, ranking: rank});
+    sendToAllWithCode(emailToSocket, userCode, 'gameOver', {email: user.email, ranking: rank});
     
     //All the users are out
     let players = getUsersWithCode(userCode);
@@ -419,8 +401,6 @@ async function victoryHandler(emailToSocket, user) {
     console.log("Vamos a actualizar las victorias de  " + user.email);
     // Update wins and achievements
     await giveWins(emailToSocket, user.email);
-  } else {
-    console.log(`You are not in a room ` + user.email);
   }
 }
 
@@ -434,8 +414,6 @@ function getMap(socket, user) {
   //Check if the user is in the room
   if(sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-    console.log(userCode);
-
     const state = roomState.get(userCode);
     if(state){
       socketEmit(socket, 'mapSent', state);
@@ -459,7 +437,6 @@ function chat(socket, emailToSocket, user, message) {
     //Send the message to all the users including himself
     sendToAllWithCode(emailToSocket, userCode, 'messageReceived', { message, user: user.email });
   } else {
-    console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
   }
 }
@@ -481,7 +458,6 @@ function invite(socket, emailToSocket, user, friendEmail) {
     //Send the invitation
     sendingThroughEmail(emailToSocket, friendEmail, 'invitationReceived', {userCode, userInfo});
   } else {
-    console.log(`You are not in a Room  ` + user.email);
     socketEmit(socket, 'notInARoom', user.email);
   }
 }
@@ -497,10 +473,7 @@ async function reconectionHandler(socket, user){
     let userCode = sids.get(user.email).code;
     let players = getUsersWithCode(userCode);
     let usersInfo = await getUsersInfo(players);
-    console.log("Se ha recuperado la informacion");
     socketEmit(socket, 'connectedPlayers', usersInfo);
-
-    console.log("Se ha recuperado el mapa");
     getMap(socket, user);
   }
 }
@@ -541,14 +514,11 @@ function socketEmit(socket, event, data) {
 function sendToAllWithCode(emailToSocket, code, event, data) {
   let usersWithCode = getUsersWithCode(Number(code));
   usersWithCode.forEach((email) => {
-    console.log('Emails: ' + email);
     sendingThroughEmail(emailToSocket, email, event, data);
   });
 }
 // Given an email it emits an event to the corresponding socket
 function sendingThroughEmail(emailToSocket, email, event, data) {
-  //console.log("El email to socket: ");
-  //console.log(emailToSocket);
   const socket = emailToSocket.get(email);
   if (socket) {
     if(socket.connected){

@@ -52,12 +52,10 @@ passport.use(
 
 //Just the most simple confguration
 passport.serializeUser((user, done) => {
-  //console.log('Serialized user ' + JSON.stringify(user));
   done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
-  //console.log('Deserializad user ' + JSON.stringify(user));
   done(null, user);
 });
 

@@ -31,7 +31,6 @@ app.post('/auth', async (req, res) => {
     }
     req.session.userId = userInfo.id;
     req.session.save(() => {
-      console.log(`User ${userInfo.name} authenticated`);
       res.send(userInfo);
     });
   } catch (error) {
@@ -40,5 +39,4 @@ app.post('/auth', async (req, res) => {
   }
 });
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
 });

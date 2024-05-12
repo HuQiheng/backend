@@ -99,9 +99,7 @@ function attackTerritories(state, from, to, troops, player) {
           // Check if the player conquered all territories and win the game
           if(checkVictory(state, player)) {
             winner = true;
-            console.log("En la funcion attack has ganado")
           }
-          console.log("EN ATTACK" + winner);
         } else {
           map[to].troops -= troops;
         }
@@ -122,16 +120,12 @@ function checkVictory(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
   let samePlayer = true;
   const map = state.map;
-  console.log(map);
-  console.log(playerIndex);
   for (const i in map) {
-    console.log(samePlayer);
     if (state.map[i].player !== playerIndex) {
       samePlayer = false;
       break;
     }
   }
-  console.log("El resultado final: " + samePlayer);
   if (samePlayer) {
     return true;
   } else {
@@ -285,8 +279,6 @@ function countPlayerCoins(state, playerNumber) {
         }
       }
     }
-  } else {
-    console.log('Not your turn');
   }
   return count;
 }
