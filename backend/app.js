@@ -231,6 +231,7 @@ io.on('connection', (socket) => {
         if (!activeUsers[user.email]) {
           surrenderHandler(socket, emailToSocket, user);
           leaveRoom(emailToSocket, user);
+          console.log("Este usuario se ha ido " + user.email);
         }
       }, 90000); // 90 seconds
 });
