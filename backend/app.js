@@ -21,6 +21,7 @@ app.use(
       // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
+        console.log('CORS not allowed');
         var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
       }
@@ -121,10 +122,12 @@ io.engine.use(
 if (process.env.MODE_ENV === 'development') {
   const host = 'localhost';
   server.listen(3010, host, () => {
+    console.log(`Server is listening on ${host}:${3010}`);
   });
 } else {
   const host = process.env.CLIENT_URL;
   server.listen(3010, host, () => {
+    console.log(`Server is listening on https://${host}:3010`);
   });
 }
 
