@@ -144,7 +144,12 @@ async function leaveRoom(emailToSocket, user) {
   if (userEntry) {
     let code = Number(userEntry.code);
     
-    rooms.get(code).delete(user.email);
+    if ( rooms.has(code)) {
+      const room = rooms.get(code);
+      if (room ) {
+        room.delete(user?.email);
+      }
+    }
     sids.delete(user.email);
     console.log(`Jugador ${user.email} abandonó la sala ${code}`);
     sendToAllWithCode(emailToSocket, code, 'playerLeftRoom', user.name);
