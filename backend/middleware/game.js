@@ -354,6 +354,11 @@ async function buyActivesHandler(socket, emailToSocket, user, type, territory, n
     sendToAllWithCode(emailToSocket, userCode, 'mapSent', state);
     const playerIndex = state.players.findIndex((p) => p.email.trim() === user.email.trim());
 
+    // If reach 1000 coins, unlock an achievement
+    if(Number(state.players[playerIndex].coins) >= 1000) {
+      await giveAchievement(emailToSocket,'Mileurista', user.email);
+    }
+
     // If you buy your first factory, you unlock an achievement
     if(type === 'factory') {
       if(state.map[territory].factories === 1) {
