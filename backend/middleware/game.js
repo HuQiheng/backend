@@ -307,8 +307,8 @@ function surrenderHandler(socket, emailToSocket, user) {
   //Check if the user is in the room
   if (sids.has(user.email)) {
     let userCode = sids.get(user.email).code;
-
-    //Surrender
+    if(roomState.get(userCode)){
+          //Surrender
     const {state, winner, playerWinner} = surrender(roomState.get(userCode), user.email);
 
     //Is the turn of the user that surrendered
@@ -324,6 +324,8 @@ function surrenderHandler(socket, emailToSocket, user) {
     if(winner) {
       victoryHandler(emailToSocket, playerWinner);
     }
+    }
+
   } else {
     socketEmit(socket, 'notInARoom', ' ');
   }
