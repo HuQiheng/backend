@@ -4,10 +4,10 @@ const passport = require('passport');
 require('dotenv').config();
 
 /**
- * @description This function handles Google authentication using Passport.js. 
+ * @description This function handles Google authentication using Passport.js.
  * @param {string} title The title of the route.
  * @param {string} description The description of the route.
- * @returns {Object} The result of running the Google authentication query. 
+ * @returns {Object} The result of running the Google authentication query.
  */
 router.get(
   '/google',
@@ -16,12 +16,11 @@ router.get(
   })
 );
 
-
 /**
  * @description This function handles the Google authentication callback using Passport.js.
  * @param {string} title The title of the route.
  * @param {string} description The description of the route.
- * @returns {Object} The result of running the Google authentication callback. 
+ * @returns {Object} The result of running the Google authentication callback.
  */
 router.get(
   '/google/callback',
@@ -54,10 +53,10 @@ router.get(
   }
 );
 
-router.post('/logout', function(req, res, next){
-  req.logout(function(err) {
-    if (err) { 
-      return next(err); 
+router.post('/logout', function (req, res, next) {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
     }
     res.redirect('/');
   });

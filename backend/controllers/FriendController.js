@@ -1,12 +1,11 @@
 /**Controller to for all the friends*/
 const db = require('../db/index');
 
-
 /**
- * @description create a new friendship relation between the 
+ * @description create a new friendship relation between the
  * two users
- * @param {string} player_email1 
- * @param {string} player_email2 
+ * @param {string} player_email1
+ * @param {string} player_email2
  * @returns The result of running the query
  */
 const insertFriend = async (player_email1, player_email2) => {
@@ -20,9 +19,8 @@ const insertFriend = async (player_email1, player_email2) => {
   }
 };
 
-
 /**
- * 
+ *
  * @returns all the friendship relations
  */
 const selectAllFriends = async () => {
@@ -37,8 +35,8 @@ const selectAllFriends = async () => {
 
 /**
  * @description Function to delete the friendship relation between the users
- * @param {String} player_email1 
- * @param {String} player_email2 
+ * @param {String} player_email1
+ * @param {String} player_email2
  * @returns The result of deleting the friendship relation between the users
  */
 const removeFriend = async (player_email1, player_email2) => {
@@ -52,10 +50,9 @@ const removeFriend = async (player_email1, player_email2) => {
   }
 };
 
-
 /**
- * 
- * @param {string} player_email 
+ *
+ * @param {string} player_email
  * @returns All the friends of player_email
  */
 const selectFriends = async (player_email) => {
@@ -77,8 +74,8 @@ const selectFriends = async (player_email) => {
 
 /**
  * @description given two emails return if they are friends or not
- * @param {string} player_email1 
- * @param {string} player_email2 
+ * @param {string} player_email1
+ * @param {string} player_email2
  * @returns True only if the two users are friends
  */
 const areFriends = async (player_email1, player_email2) => {

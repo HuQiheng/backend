@@ -46,7 +46,6 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la página de inicio');
 });
 
-
 //Used routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
@@ -65,7 +64,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send({ message: '¡Algo salió mal!' });
 });
-
 
 //Where using socket io, for game states
 const { Server } = require('socket.io');
@@ -94,7 +92,7 @@ if (process.env.MODE_ENV === 'development') {
 io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
-      if(origin){
+      if (origin) {
         console.log('Origen  ' + origin);
       }
 
@@ -156,20 +154,18 @@ const {
   getMap,
   chat,
   invite,
-  reconectionHandler
+  reconectionHandler,
 } = require('./middleware/game');
 const data = require('./territories/territories.json');
 
 // As socket ids are volatile through pages, we keep track of pairs email-socket
 const emailToSocket = new Map();
 
-
 //All the actve users
 let activeUsers = {};
 // Conexion de un socket
 io.on('connection', (socket) => {
   try {
-
     //The user
     const user = socket.request.user;
     //User is now active
@@ -224,17 +220,17 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       console.log(`Jugador ${user.email} desconectado`);
       emailToSocket.delete(user.email);
-      
+
       //This user is not active, we let him a time to reconnect
       activeUsers[user.email] = false;
       setTimeout(() => {
         if (!activeUsers[user.email]) {
           surrenderHandler(socket, emailToSocket, user);
           leaveRoom(emailToSocket, user);
-          console.log("Este usuario se ha ido " + user.email);
+          console.log('Este usuario se ha ido ' + user.email);
         }
       }, 90000); // 90 seconds
-});
+    });
 
     // Next phase
     socket.on('nextPhase', () => {
@@ -305,7 +301,7 @@ io.on('connection', (socket) => {
         socket.emit('error', 'Error in victory: ' + error.message);
       }
     });
-    
+
     //Send the map
     socket.on('sendMap', () => {
       try {
@@ -327,8 +323,8 @@ io.on('connection', (socket) => {
     });
 
     //Invite someone to lobby
-    socket.on('invite', (email) =>{
-      try{
+    socket.on('invite', (email) => {
+      try {
         invite(socket, emailToSocket, user, email);
       } catch (error) {
         console.log('Error sending map: ' + error.message);
@@ -339,4 +335,3 @@ io.on('connection', (socket) => {
     console.log('Error in connection event: ' + error.message);
   }
 });
-

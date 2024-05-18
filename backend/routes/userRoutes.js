@@ -31,7 +31,12 @@ router.get('/:email', checkAuthenticated, async (req, res) => {
 router.put('/:email', checkAuthenticated, async (req, res) => {
   try {
     if (req.user.email === req.params.email) {
-      const userInfo = await playerController.updatePlayer(req.params.email, req.body.username, req.body.password, req.body.picture);
+      const userInfo = await playerController.updatePlayer(
+        req.params.email,
+        req.body.username,
+        req.body.password,
+        req.body.picture
+      );
       res.send('User updated ' + userInfo.rows[0].email.trim());
     }
   } catch (error) {

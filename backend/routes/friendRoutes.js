@@ -5,7 +5,7 @@ const checkAuthenticated = require('../middleware/authGoogle');
 const friendsController = require('../controllers/FriendController');
 const friendReqController = require('../controllers/FriendReqController');
 const ObtainsController = require('../controllers/ObtainsController');
-const { giveAchievement } = require('../middleware/game')
+const { giveAchievement } = require('../middleware/game');
 
 /**
  * @description This function handles the GET request to retrieve all friends of a specific user.
@@ -53,16 +53,16 @@ router.put('/:email/friends', checkAuthenticated, async (req, res) => {
         } else {
           // We add the logic to insert a friend
           await friendsController.insertFriend(req.params.email, friendEmail);
-          // Check achievement 
-          await giveAchievement(null,'Tu primer compañero', req.params.email);
-          await giveAchievement(null,'Tu primer compañero', friendEmail);
+          // Check achievement
+          await giveAchievement(null, 'Tu primer compañero', req.params.email);
+          await giveAchievement(null, 'Tu primer compañero', friendEmail);
 
           await friendReqController.removeFriendReq(req.params.email, friendEmail);
           res.json({ message: 'Friend added' });
         }
       }
     } else {
-      res.status(403).send({ message:'Access denied' });
+      res.status(403).send({ message: 'Access denied' });
     }
   } catch (error) {
     console.error('Error adding friend', error);
@@ -97,7 +97,7 @@ router.delete('/:email/friends', checkAuthenticated, async (req, res) => {
  */
 router.get('/:email1/:email2/friendship', checkAuthenticated, async (req, res) => {
   try {
-    if (req.user.email === req.params.email1 || req.user.email === req.params.email2){
+    if (req.user.email === req.params.email1 || req.user.email === req.params.email2) {
       const user1 = req.params.email1;
       const user2 = req.params.email2;
       const areFriends = await friendsController.areFriends(user1, user2);
