@@ -38,5 +38,4 @@ app.post('/auth', async (req, res) => {
     res.status(401).send('Invalid token');
   }
 });
-app.listen(port, () => {
-});
+app.listen(port, () => {});

@@ -48,7 +48,6 @@ function assignTerritories(players, data) {
   return state;
 }
 
-
 /**
  * @description This function handles a player's action to move troops from one territory to another.
  * @param {Object} state The current state of the game.
@@ -97,17 +96,17 @@ function attackTerritories(state, from, to, troops, player) {
           conquered = true;
           state.map = map;
           // Check if the player conquered all territories and win the game
-          if(checkVictory(state, player)) {
+          if (checkVictory(state, player)) {
             winner = true;
           }
         } else {
           map[to].troops -= troops;
         }
         map[from].troops -= troops;
-      } 
-    } 
+      }
+    }
   }
-  return {state, conquered, winner, player};
+  return { state, conquered, winner, player };
 }
 
 /**
@@ -175,11 +174,11 @@ function surrender(state, player) {
   const indexWinner = checkWinner(state);
   //There is a winner
   let playerWinner;
-  if(indexWinner !== -1){
+  if (indexWinner !== -1) {
     winner = true;
     playerWinner = state.players[indexWinner];
   }
-  return {state, winner, playerWinner};
+  return { state, winner, playerWinner };
 }
 
 /**
@@ -195,9 +194,9 @@ function nextTurn(state, surrnedered) {
     //Cacluate the number of coins for every player
     // Next turn, we have to look for the next turn of the player
     //that didn't surrendered
-    do{
+    do {
       state.turn = (state.turn + 1) % state.players.length;
-    }while(state.surrendered.includes(state.turn))
+    } while (state.surrendered.includes(state.turn));
     let coins = countPlayerCoins(state, state.turn);
     state.players[state.turn].coins += coins;
     state.players[state.turn].points += coins;
@@ -207,14 +206,14 @@ function nextTurn(state, surrnedered) {
 }
 
 /**
- * 
- * @param {Object} state 
- * @param {Object} player 
+ *
+ * @param {Object} state
+ * @param {Object} player
  * @returns {true} if is the player turn, false in any other case
  */
-function isPlayerTurn(state, player){
+function isPlayerTurn(state, player) {
   let playerIndex = state.players.findIndex((p) => p.email.trim() === player.trim());
-  if(state.turn === playerIndex){
+  if (state.turn === playerIndex) {
     return true;
   } else {
     return false;
@@ -250,10 +249,10 @@ function buyActives(state, player, type, territory, numActives) {
   } else if (type === 'troop') {
     var cost = 2 * numActives;
   }
-  if (state.players[playerIndex].coins >= cost  && map[territory].player === playerIndex) {
+  if (state.players[playerIndex].coins >= cost && map[territory].player === playerIndex) {
     if (type === 'factory' && map[territory].factories === 0) {
       map[territory].factories += numActives;
-    } else if (type === 'troop' && map[territory].troops < 99 && (map[territory].troops + numActives) <= 99) {
+    } else if (type === 'troop' && map[territory].troops < 99 && map[territory].troops + numActives <= 99) {
       map[territory].troops += numActives;
     }
     state.players[playerIndex].coins -= cost;
@@ -291,10 +290,10 @@ function countPlayerCoins(state, playerNumber) {
 function updateRanking(gameState) {
   // Copy the players array from the gameState
   const ranking = [...gameState.players];
-  
+
   // Sort players array based on points in descending order
   ranking.sort((a, b) => b.points - a.points);
-    
+
   return ranking;
 }
 

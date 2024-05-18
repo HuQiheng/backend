@@ -3,7 +3,7 @@ const express = require('express');
 const router = require('../../routes/userRoutes');
 const playerController = require('../../controllers/PlayerController');
 const friendController = require('../../controllers/FriendController');
-const obtainsController = require('../../controllers/ObtainsController'); 
+const obtainsController = require('../../controllers/ObtainsController');
 const { pool } = require('../../db/index');
 
 const app = express();

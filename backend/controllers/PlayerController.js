@@ -2,11 +2,11 @@
 const db = require('../db/index.js');
 
 /**
- * @description Creates a new player 
- * @param {string} email 
- * @param {string} username 
- * @param {string} password 
- * @param {string} picture 
+ * @description Creates a new player
+ * @param {string} email
+ * @param {string} username
+ * @param {string} password
+ * @param {string} picture
  * @returns The result of running the query
  */
 const insertPlayer = async (email, username, password, picture) => {
@@ -22,10 +22,10 @@ const insertPlayer = async (email, username, password, picture) => {
 
 /**
  * @description Update the information of the user identified by email
- * @param {string} email 
- * @param {string} username 
- * @param {string} password 
- * @param {string} picture 
+ * @param {string} email
+ * @param {string} username
+ * @param {string} password
+ * @param {string} picture
  * @returns The result of running the query
  */
 const updatePlayer = async (email, username, password, picture) => {
@@ -40,8 +40,8 @@ const updatePlayer = async (email, username, password, picture) => {
 };
 /**
  * @description updates the player picture
- * @param {string} email 
- * @param {string} picture 
+ * @param {string} email
+ * @param {string} picture
  * @returns The result of running the query
  */
 const updatePlayerPicture = async (email, picture) => {
@@ -53,11 +53,11 @@ const updatePlayerPicture = async (email, picture) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 /**
  * @description Deletes all the user information
- * @param {string} email 
+ * @param {string} email
  * @returns The result of running the query
  */
 const deletePlayer = async (email) => {
@@ -72,7 +72,7 @@ const deletePlayer = async (email) => {
 
 /**
  * @description List all the user information
- * @param {string} email 
+ * @param {string} email
  * @returns The result of running the query
  */
 const selectPlayer = async (email) => {
@@ -88,7 +88,7 @@ const selectPlayer = async (email) => {
 /**
  * @description List all the user information by the given name
  * it can return more than one user
- * @param {string} name 
+ * @param {string} name
  * @returns The result of running the query
  */
 const selectPlayerByname = async (name) => {
@@ -116,7 +116,7 @@ const verificarCredenciales = async (email, password) => {
   const values = [email, password];
   try {
     const res = await db.query(query, values);
-    return res.rowCount == 1; 
+    return res.rowCount == 1;
   } catch (err) {
     console.error('Error verifying user credentials:', err);
     throw err;
@@ -125,7 +125,7 @@ const verificarCredenciales = async (email, password) => {
 
 /**
  * @description Check the number of wins that a user has
- * @param {string} email 
+ * @param {string} email
  * @returns The result of running the query
  */
 const getWins = async (email) => {
@@ -140,7 +140,7 @@ const getWins = async (email) => {
 
 /**
  * @description Add one to the number of victories that a user has
- * @param {string} email 
+ * @param {string} email
  * @returns The result of running the query
  */
 const updateWins = async (email) => {
@@ -163,5 +163,5 @@ module.exports = {
   selectPlayerByname,
   getWins,
   updateWins,
-  updatePlayerPicture
+  updatePlayerPicture,
 };

@@ -3,8 +3,8 @@ const db = require('../db/index');
 
 /**
  * @description Create a new achievement with the given title and description
- * @param {string} title 
- * @param {string} description 
+ * @param {string} title
+ * @param {string} description
  * @returns The result of running the query
  */
 const insertAchievement = async (title, description) => {
@@ -18,10 +18,10 @@ const insertAchievement = async (title, description) => {
 };
 /**
  * @description Select an achievement based on the given title
- * @param {string} title 
- * @returns 
+ * @param {string} title
+ * @returns
  */
-const selectAchievement = async(title) => {
+const selectAchievement = async (title) => {
   try {
     const query = `SELECT * FROM Achievement WHERE title = $1`;
     const result = await db.query(query, [title]);
@@ -32,7 +32,7 @@ const selectAchievement = async(title) => {
 };
 
 /**
- * 
+ *
  * @returns All the achievements in the table
  */
 const selectAllAchievements = async () => {
@@ -45,10 +45,9 @@ const selectAllAchievements = async () => {
   }
 };
 
-
 /**
  * @description Remove the achievement identified by title
- * @param {string} title 
+ * @param {string} title
  * @returns The result of running the query
  */
 const removeAchievement = async (title) => {
@@ -61,19 +60,18 @@ const removeAchievement = async (title) => {
   }
 };
 
-
 /**
  * @description Update the achievement identified by title, changing
  * the description
- * @param {string} title 
- * @param {string} description 
+ * @param {string} title
+ * @param {string} description
  * @returns The result of running the query
  */
 const updateAchievement = async (title, description) => {
   try {
     const query = `UPDATE Achievement SET description = $1 WHERE title = $2`;
     const result = await db.query(query, [description, title]);
-    if (!result || result.rowCount === 0) { 
+    if (!result || result.rowCount === 0) {
       throw new Error('The achievement could not be updated');
     } else {
       return result.rows[0];
